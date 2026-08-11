@@ -102,3 +102,18 @@ logado e botão de logout.
 - Auto-update / OTA via GitHub Releases.
 - Identidade visual "Universe Deep Space" aplicada ao código (há mockups de referência em
   `docs/design-reference/`, mas as páginas atuais são só estrutura funcional, sem estilo).
+
+## Relevante para o Dev B (trilha "Campo & Eleitores")
+
+- O login do líder já funciona (criado pelo Gestor) e o perfil dele — incluindo `regiao` e
+  `raioKm` — já está disponível em `campaigns/{campaignId}/members/{uid}`. Não é preciso mexer
+  nesse fluxo, só consumir os dados de lá.
+- A subcoleção `campaigns/{campaignId}/voters/{voterId}` já está prevista nas Security Rules
+  (leitura/escrita restrita ao próprio líder, via `leaderId == uid`), mas **nenhum código de
+  cadastro de eleitor existe ainda** — é o ponto de partida do Dev B.
+- Ao criar a UI do líder, usar `useAuth()` (`src/contexts/AuthContext.jsx`) para obter `user.uid`
+  e `campaignId` — mesmo padrão já usado em `ManagerDashboard.jsx`.
+- Onboarding completo (acesso ao repo, `.env`, Firebase Console) está no
+  [`README.md`](./README.md), seção "Onboarding de um novo colaborador".
+- Antes de mexer no schema do Firestore, ver a seção "Contrato com o Dev B" em
+  [`PROGRESS.md`](./PROGRESS.md).
