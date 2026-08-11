@@ -50,30 +50,26 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
 - [x] **Eleitores** (`panel/VotersTab.jsx`) — 4 KPIs, produção validada por todos os
   líderes, explicação do processo de validação, filtros por líder/status, busca local,
   tabela com motivo da evidência e paginação de 50 em 50
-- [x] **Aba Relatório Expresso** (`panel/ReportTab.jsx`) — 4 KPIs, seleção de
-  frequência, horário e escopo, toggles dos 6 blocos, lista de destinatários com o
-  total **derivado da soma de pessoas** (14, não fixo), prévia da mensagem no estilo
-  WhatsApp atualizada em tempo real, botão de teste com feedback de 2,4s e a nota de
-  confiança
+- [x] **Aba Relatório Expresso** (`panel/ReportTab.jsx`) — fechamento diário
+  obrigatório de todos os líderes, um único WhatsApp do gestor persistido na campanha,
+  horário configurável, blocos complementares, prévia em tempo real e teste que abre a
+  mensagem pronta no WhatsApp do gestor
 
 ### Regras de negócio extraídas para módulos testáveis
 - [x] `panel/leaderMetrics.js` — rating relativo pelos eleitores validados (maior =
   5,0; menor = 1,0), ordenações, cor do "+N na semana", formatação pt-BR
 - [x] `panel/buildReportMessage.js` — montagem da mensagem do WhatsApp, com cada
   bloco entrando só se o toggle estiver ligado
-- [x] `panel/reportScope.js` — filtros de líderes usados pela prévia conforme o
-  escopo selecionado
 - [x] `panel/panelLeaders.js` — valida e adapta os documentos vindos do Firestore;
   líderes incompletos continuam no cadastro, mas não quebram mapa/ranking
 
 ### Testes escritos e executados
 - [x] `tests/component/leaderMetrics.test.jsx` — 11 casos (rating nos limites,
   as três ordenações, imutabilidade do array, faixas de cor, formatação)
-- [x] `tests/component/buildReportMessage.test.jsx` — 7 casos (cabeçalho e rodapé
-  sempre presentes, blocos desligados omitidos, somas corretas, ranking por
-  crescimento, só bases em alerta listadas, frequência/horário refletidos)
-- [x] `tests/component/reportScope.test.jsx` — 5 casos (todos, Região Central,
-  bases em alerta, top 20 imutável e atualização da prévia pela interface)
+- [x] `tests/component/buildReportMessage.test.jsx` — 7 casos (cabeçalho e rodapé,
+  todos os líderes sempre presentes, soma e ordenação do dia, alertas e horário)
+- [x] `tests/component/ReportTab.test.jsx` — destinatário único do gestor,
+  persistência de telefone/horário e abertura da prévia no WhatsApp
 - [x] Testes de layout/sidebar, integração do dashboard com as assinaturas do
   Firestore e filtragem dos líderes aptos ao painel
 - [x] Testes do cadastro geolocalizado, gerador de eleitores e página de consulta
@@ -91,12 +87,11 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
 - [x] **Chip "Dados sincronizados · há 4 minutos"** no cabeçalho da aba Regiões
 - [ ] **Botão "Abrir ficha do líder"** no card de líder selecionado (o handoff prevê
   o botão, mas não existe tela de ficha para onde levar)
-- [ ] **Botão "Adicionar" destinatário** — está no handoff, mas sem um fluxo real de
-  cadastro de destinatário decidido, deixei de fora em vez de colocar um botão morto
+- [x] **Destinatário do relatório** — o gestor cadastra um único WhatsApp; líderes
+  nunca recebem o relatório automático
 - [x] `invalidateSize()` do mapa ao voltar para a aba Regiões; a aba permanece
   montada para preservar zoom, posição, filtro e líder selecionado
-- [x] Escopo do relatório (`Todos os líderes` / `Somente Região Central` / etc.)
-  filtra o conteúdo da prévia
+- [x] O relatório não possui escopo variável: todos os líderes entram no fechamento diário
 
 ### Para sair da demo (quando os dados reais existirem)
 - [x] **lat/lng no cadastro de líder** — o gestor escolhe um ponto de atuação e o
@@ -109,10 +104,10 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
 - [ ] **Números estáticos da demo** — demandas abertas, sentimento do Rádio Peão IA e
   presença nos conselhos estão fixos em `DEMO_STATIC_STATS`; nenhum tem origem no
   sistema hoje
-- [ ] **Persistir a configuração do Relatório Expresso** — frequência, horário,
-  escopo, blocos e destinatários vivem só no estado do componente; nada é salvo
-- [ ] **Envio real no WhatsApp** — o botão de teste só muda o próprio rótulo; não há
-  integração com a WhatsApp Business API
+- [x] **Persistir destino e horário do Relatório Expresso** — salvos no documento da
+  campanha com regra que limita o gestor a esses campos
+- [ ] **Disparo automático pela WhatsApp Business API** — o teste já abre a mensagem
+  pronta no número do gestor; o agendamento sem intervenção ainda exige provedor/API
 
 ### Fluxo dos dados
 As seções analíticas assinam `campaigns/{campaignId}/members` pelo serviço

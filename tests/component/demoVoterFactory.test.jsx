@@ -25,6 +25,11 @@ describe("demoVoterFactory", () => {
     expect(Object.values(summaries).reduce((sum, summary) => sum + summary.eleitores, 0)).toBe(300);
     expect(Object.values(summaries).reduce((sum, summary) => sum + summary.eleitoresValidados, 0))
       .toBe(records.filter((record) => record.validationStatus === "validado").length);
+    expect(Object.values(summaries).reduce((sum, summary) => sum + summary.hoje, 0))
+      .toBe(records.filter((record) => (
+        record.validationStatus === "validado"
+        && record.createdAt.toDateString() === new Date("2026-08-11T15:00:00Z").toDateString()
+      )).length);
     expect(records[0]).toEqual(expect.objectContaining({
       leaderId: "a",
       validationStatus: "validado",

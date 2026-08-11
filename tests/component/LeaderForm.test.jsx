@@ -18,6 +18,7 @@ describe("LeaderForm", () => {
     await user.type(screen.getByLabelText("Nome completo"), "Novo Líder");
     await user.type(screen.getByLabelText("E-mail (login)"), "novo@demo.local");
     await user.type(screen.getByLabelText("Senha inicial"), "123456");
+    await user.type(screen.getByLabelText("WhatsApp"), "(62) 9 9999-1111");
     await user.selectOptions(screen.getByLabelText("Ponto de atuação no mapa"), "setor-bueno");
     await user.click(screen.getByRole("button", { name: "Criar líder" }));
 
@@ -25,7 +26,7 @@ describe("LeaderForm", () => {
       name: "Novo Líder",
       email: "novo@demo.local",
       password: "123456",
-      whatsapp: "",
+      whatsapp: "(62) 9 9999-1111",
       campaignId: "campaign-demo",
       regiao: "Região Sul",
       bairro: "Setor Bueno",
@@ -43,6 +44,7 @@ describe("LeaderForm", () => {
     await user.type(screen.getByLabelText("Nome completo"), "Novo Líder");
     await user.type(screen.getByLabelText("E-mail (login)"), "novo@demo.local");
     await user.type(screen.getByLabelText("Senha inicial"), "123456");
+    await user.type(screen.getByLabelText("WhatsApp"), "(62) 9 9999-1111");
     await user.click(screen.getByRole("button", { name: "Criar líder" }));
 
     expect(createLeader).not.toHaveBeenCalled();

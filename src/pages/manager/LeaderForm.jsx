@@ -94,6 +94,7 @@ export default function LeaderForm({ campaignId, onCreated, onCancel }) {
           placeholder="(62) 9 0000-0000"
           value={form.whatsapp}
           onChange={(e) => setForm((current) => ({ ...current, whatsapp: e.target.value }))}
+          required
         />
       </div>
       <div className="leader-location-grid">

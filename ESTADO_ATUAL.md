@@ -80,6 +80,11 @@ não de filtro de campo — é o padrão seguro confirmado pelos testes.
 - **`/manager`** — painel responsivo do gestor com mapa de regiões, ranking da rede,
   consulta paginada de eleitores, Relatório Expresso e CRUD de líderes.
 
+No mapa, o card do líder selecionado mostra o WhatsApp cadastrado e abre uma conversa
+direta. O Relatório Expresso é diário, sempre contém todos os líderes e possui um único
+destinatário: o WhatsApp definido pelo gestor. Número e horário são persistidos na campanha;
+o teste abre a mensagem pronta, enquanto o disparo automático ainda depende da Business API.
+
 Todo painel autenticado usa uma sidebar esquerda recolhível no desktop e drawer no celular,
 com e-mail, papel do usuário e botão de logout.
 

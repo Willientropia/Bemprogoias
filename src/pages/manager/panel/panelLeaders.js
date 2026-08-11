@@ -21,6 +21,7 @@ export function toPanelLeaders(leaders) {
       ...leader,
       nome: leader.name ?? leader.nome,
       eleitoresValidados: Number.isFinite(leader.eleitoresValidados) ? leader.eleitoresValidados : 0,
+      hoje: Number.isFinite(leader.hoje) ? leader.hoje : 0,
     }));
 }
 

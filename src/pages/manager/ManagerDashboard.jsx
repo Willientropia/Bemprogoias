@@ -102,7 +102,7 @@ export default function ManagerDashboard() {
       </section>
       <section hidden={tab !== "expresso"}>
         <PanelDataState loading={loadingLeaders} error={loadError} leadersCount={panelLeaders.length} />
-        {hasPanelData && <ReportTab leaders={panelLeaders} />}
+        {hasPanelData && <ReportTab leaders={panelLeaders} campaignId={campaignId} campaign={campaign} />}
       </section>
       <section hidden={tab !== "eleitores"}>
         {tab === "eleitores" && (

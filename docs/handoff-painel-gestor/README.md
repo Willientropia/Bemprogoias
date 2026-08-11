@@ -6,7 +6,7 @@ Painel administrativo restrito a **gestores** da plataforma "Bem pro Brasil" (pl
 
 1. **Regiões** — mapa interativo de Goiânia com a localização dos líderes regionais.
 2. **Rede de Indicações** — ranking dos líderes com rating pela quantidade de eleitores validados.
-3. **Relatório Expresso** — configuração de um bot que envia no WhatsApp os relatórios dos líderes ao fim de cada dia (ou na frequência configurada).
+3. **Relatório Expresso** — fechamento diário de todos os líderes enviado exclusivamente ao WhatsApp definido pelo gestor.
 
 Conceito de domínio importante: cada cidade/região/segmentação pode ter um **presidente de conselho de participação pública local**. Se a campanha tem 250 líderes, ela pode ter até 250 conselhos. O objetivo do produto é ampliar a base de eleitores e engajar o público nos projetos do mandato.
 
@@ -245,26 +245,23 @@ Trocar a ordenação re-renderiza **pódio e tabela juntos** (o pódio sempre mo
 
 ## Aba 3: Relatório Expresso (bot de WhatsApp)
 
-**Propósito:** configurar o bot que envia no WhatsApp o consolidado dos líderes ao fim de cada dia — com frequência, horário, escopo, conteúdo e destinatários configuráveis — e ver **em tempo real** como a mensagem vai chegar.
+**Propósito:** configurar o WhatsApp do gestor que recebe diariamente o consolidado obrigatório de todos os líderes e ver **em tempo real** como a mensagem vai chegar.
 
 ### Layout
 
-1. **Cabeçalho:** H1 "Relatório Expresso" ao lado de um chip **BOT ATIVO** (fundo `#e3f1e8`, texto `#1f6b34`, com bolinha pulsante de 7px). Subtítulo: "Um bot envia no WhatsApp o consolidado dos líderes ao fim de cada dia — e na frequência que você definir". À direita, um chip de conexão em **`#25d366`** com o ícone do WhatsApp: "Conectado / WhatsApp Business".
-2. **Grid de 4 KPIs:** RELATÓRIOS ENVIADOS (`1.284`, em `#1f6b34`) · TAXA DE ENTREGA (`98,6%`) · PRÓXIMO ENVIO (espelha o horário configurado) · DESTINATÁRIOS (**calculado a partir da lista de destinatários** — ver abaixo).
+1. **Cabeçalho:** H1 "Relatório Expresso" ao lado de um chip **ROTINA DIÁRIA**. Subtítulo: "Consolidado diário de todos os líderes enviado somente ao WhatsApp definido pelo gestor". À direita, o destino "WhatsApp do gestor".
+2. **Grid de 4 KPIs:** RELATÓRIOS ENVIADOS (`1.284`, em `#1f6b34`) · TAXA DE ENTREGA (`98,6%`) · PRÓXIMO ENVIO DIÁRIO (espelha o horário configurado) · GESTOR DESTINATÁRIO (`1` quando configurado).
 3. **Grid de duas colunas** — `1fr 372px`, gap 18px, `align-items: start`.
 
-### Coluna esquerda — configuração (três cards, gap 16px)
+### Coluna esquerda — configuração (dois cards, gap 16px)
 
-**Card "Frequência de envio"** (título Spectral 700 18px + apoio "Com que intervalo o bot dispara o consolidado dos líderes"):
-- Quatro botões de opção (estilo de filtro, seleção única): **Diário (fim do dia)** (padrão) · A cada 12 horas · A cada 6 horas · Semanal.
-- Abaixo, grid 2×1: **Horário do disparo** (`input type="time"`, valor inicial `21:00`) e **Escopo do relatório** (select com: "Todos os líderes de Goiânia", "Somente Região Central", "Somente bases em alerta", "Top 20 líderes").
+**Card "Destino do relatório"**: um único campo **WhatsApp do gestor**, horário do disparo e botão **Salvar destinatário**. Número e horário são persistidos no documento da campanha. Não existe seletor de escopo nem destinatário líder.
 
 **Card "O que entra no relatório"** (apoio: "Os blocos ativados aparecem na mensagem do WhatsApp") — lista de blocos com **toggle** cada:
 
 | Bloco | Padrão |
 |---|---|
 | Resumo de eleitores indicados | ligado |
-| Ranking dos 5 melhores líderes | ligado |
 | Bases em alerta (queda de desempenho) | ligado |
 | Demandas abertas no dia | ligado |
 | Sentimento das redes (Rádio Peão IA) | desligado |
@@ -273,46 +270,34 @@ Trocar a ordenação re-renderiza **pódio e tabela juntos** (o pódio sempre mo
 Cada linha: rótulo à esquerda (13,5px — `#243528` quando ligado, `#9aa397` quando desligado) + toggle à direita, com divisor `#f0efe9`.
 **Toggle:** 44×26px, raio 999px, sem borda; knob branco de 20px em `top:3px; left:3px` com sombra; ligado → fundo `#1f6b34` e knob deslocado 18px; desligado → fundo `#d5d8d1`.
 
-**Card "Destinatários"** — título + botão "Adicionar" (estilo de filtro, com ícone de `+`). Cada destinatário é uma linha com fundo `#f7f7f3`, raio 11px, padding `12px 14px`: avatar circular de 36px em `#25d366` com a inicial, nome (13,5px peso 600), "telefone · papel" (11,5px `#9aa397`) e um chip "ativo" (`#e3f1e8` / `#1f6b34`).
-
-Destinatários seed — **cada um tem uma contagem de pessoas** (grupos contam mais de um):
-
-| Nome | Telefone | Papel | Pessoas |
-|---|---|---|---|
-| Ana Ribeiro | (62) 9 9123-4567 | Coordenação geral | 1 |
-| Carlos Mendes | (62) 9 9871-2210 | Coordenação Sul | 1 |
-| Equipe Marketing | (62) 9 9440-1188 | Grupo — 6 membros | 6 |
-| Coordenadores Regionais | (62) 9 9317-4402 | Grupo — 5 membros | 5 |
-| Gabinete | (62) 9 9002-7755 | Chefia de gabinete | 1 |
-
-**Regra:** o KPI "DESTINATÁRIOS" e o texto de confirmação do envio de teste devem ser **derivados da soma dessas contagens** (total 14) — nunca um número fixo, para não haver contradição visível entre o número exibido e a lista.
+**Regra fixa:** a lista completa de líderes e a produção validada do dia sempre entram no relatório. Os toggles controlam somente blocos complementares.
 
 ### Coluna direita — prévia e ações (gap 14px)
 
-**Card de prévia:** cabeçalho com o label "PRÉVIA DA MENSAGEM" e, à direita, quando o envio ocorre ("hoje 21:00"; se a frequência for Semanal, "toda segunda 21:00"). O corpo simula o chat: fundo `#e6ddd4`, padding `18px 16px 22px`, altura mínima 430px.
+**Card de prévia:** cabeçalho com o label "PRÉVIA PARA O GESTOR" e, à direita, o horário do envio diário. O corpo simula o chat: fundo `#e6ddd4`, padding `18px 16px 22px`, altura mínima 430px.
 - Cabeçalho do contato: círculo de 34px `#143a1c` com o emblema da logo, "Relatório Expresso" (13px peso 700) e "bot oficial · online" (11px `#6b7669`).
 - **Bolha da mensagem:** fundo `#dcf8c6`, raio `12px 12px 12px 3px`, padding `13px 15px`, sombra leve, 13px, `line-height: 1.62`, preservando quebras de linha (`white-space: pre-line`).
 - Abaixo, à direita, o horário com dois ticks: `21:00 ✓✓` (10,5px, `#7a8a7d`).
 
-**Botão "Enviar teste agora":** largura total, fundo `#25d366`, texto branco, raio 12px, padding 15px, peso 700, com ícone de envio. Ao clicar, o rótulo muda para "Teste enviado aos 14 destinatários ✓" e **volta ao original após 2,4s**.
+**Botão "Abrir teste no WhatsApp":** largura total, fundo `#25d366`, texto branco, raio 12px, padding 15px, peso 700. Abre `wa.me` para o único número do gestor com a mensagem completa preenchida.
 
 **Nota de confiança:** faixa `#eef4f0` com borda `#d8e6dd`, raio 12px, ícone de escudo em `#1f6b34`, texto `#3a5a45` 12,5px: "Envio por WhatsApp Business API com registro de entrega. Nenhum dado do eleitor sai da plataforma — o relatório traz apenas números consolidados."
 
 ### Conteúdo gerado da mensagem (formato WhatsApp)
 
-A mensagem é remontada a cada mudança de frequência, horário ou toggle. Estrutura (usa `*negrito*` e `_itálico_` do WhatsApp):
+A mensagem é remontada a cada mudança de horário ou toggle. Estrutura (usa `*negrito*` e `_itálico_` do WhatsApp):
 
 ```
 *BEM PRO BRASIL — Relatório Expresso*
-_<frequência> · <horário> · Goiânia_
+_Diário · <horário> · Goiânia_
 ────────────────
 
-📈 *Eleitores indicados hoje:* <soma de "semana">
-Base total: <soma de "eleitores"> eleitores
+📈 *Eleitores validados hoje:* <soma de "hoje">
+Base validada: <soma de "eleitoresValidados"> eleitores
 
-🏆 *Top líderes do dia*
-1. <nome> — +<semana>
-... (5 primeiros por crescimento)
+📋 *Todos os líderes — produção do dia (<contagem>)*
+1. <nome> — +<hoje> hoje · <eleitoresValidados> validados
+... (todos os líderes)
 
 ⚠️ *Bases em alerta:* <contagem>
 • <nome> (<bairro>) — +<semana>
@@ -338,7 +323,7 @@ Cada bloco só aparece se o seu toggle estiver ligado; os cabeçalho, os separad
 - **Login:** validação do código, mensagem de erro inline, `Enter` submete, nome alimenta a sidebar; o mapa só é inicializado **após** o login (com ~60ms de atraso, pois o contêiner precisa existir e ter dimensões).
 - **Mapa:** hover nos pinos com `title`; clique no pino abre popup e preenche o detalhe; clique na lista dá `flyTo`/`setView` zoom 14 + popup + detalhe; filtro adiciona/remove camadas.
 - **Rede:** troca de ordenação re-renderiza pódio e tabela.
-- **Relatório Expresso:** frequência, horário e toggles atualizam a prévia **em tempo real**; botão de teste com feedback temporário de 2,4s.
+- **Relatório Expresso:** horário e toggles complementares atualizam a prévia **em tempo real**; todos os líderes são fixos e o teste abre o WhatsApp do gestor.
 - **Estados vazios:** lista do mapa sem resultados exibe mensagem própria.
 - **Formatação de números:** sempre `pt-BR` (separador de milhar por ponto); percentuais com vírgula decimal.
 - **Responsividade:** o protótipo é desktop-first (painel de gestão). Os painéis do login rolam de forma independente para não cortar conteúdo em telas curtas. Ao portar, defina os breakpoints conforme o padrão do codebase — sugestão: abaixo de ~1100px, empilhar os grids de duas colunas (mapa acima do painel lateral; configuração acima da prévia) e reduzir os grids de 4 KPIs para 2 colunas.
@@ -350,16 +335,16 @@ Cada bloco só aparece se o seu toggle estiver ligado; os cabeçalho, os separad
 - `filtroDesempenho`: `'todos' | 'alto' | 'medio' | 'alerta'` — afeta camadas do mapa e a lista lateral.
 - `liderSelecionado`: índice/id do líder — alimenta o card de detalhe.
 - `ordenacaoRede`: `'eleitores' | 'rating' | 'crescimento'`.
-- `frequencia`, `horario`, `escopo`: configuração do bot.
+- `horario`, `reportRecipientWhatsapp`: configuração persistida do fechamento diário.
 - `blocos`: array de `{ rótulo, ativo }` — dirige a montagem da mensagem.
 - `feedbackTeste`: booleano temporário (2,4s) do botão de envio.
 - Instância do mapa + coleções de marcadores e círculos mantidas fora do ciclo de render (ref/singleton), nunca recriadas a cada render.
 
 ### Dados esperados da API (produção)
 
-- `GET /gestor/lideres` → `[{ id, nome, regiao, bairro, lat, lng, eleitores, novosNaSemana, desempenho }]`
+- `GET /gestor/lideres` → `[{ id, nome, whatsapp, regiao, bairro, lat, lng, eleitores, eleitoresValidados, hoje, novosNaSemana, desempenho }]`
 - `GET /gestor/rede/resumo` → totais e média da rede (ou calcular no cliente a partir da lista).
-- `GET /gestor/relatorio-expresso/config` e `PUT` da mesma → `{ frequencia, horario, escopo, blocos[], destinatarios[] }`
+- `GET /gestor/relatorio-expresso/config` e `PUT` da mesma → `{ horario, reportRecipientWhatsapp, blocos[] }`
 - `POST /gestor/relatorio-expresso/teste` → dispara o envio de teste.
 - `GET /gestor/relatorio-expresso/previa` → opcionalmente renderizar a prévia no servidor, garantindo que a mensagem exibida seja idêntica à enviada.
 

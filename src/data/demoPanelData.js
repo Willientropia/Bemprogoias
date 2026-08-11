@@ -9,8 +9,8 @@
 // três telas consultam campaigns/{campaignId}/members no Firestore. Assim a
 // demonstração percorre o mesmo caminho de dados de uma campanha normal.
 //
-// RECIPIENTS / REPORT_BLOCKS continuam locais até existir persistência para a
-// configuração do Relatório Expresso.
+// REPORT_BLOCKS continua local; o WhatsApp do gestor e o horário do relatório
+// são persistidos na campanha.
 
 export const DEMO_LEADERS = [
   { id: "l1", nome: "Ana Ribeiro", regiao: "Região Central", bairro: "Setor Central", lat: -16.6799, lng: -49.255, eleitores: 2140, semana: 86, perf: "alto" },
@@ -30,17 +30,8 @@ export const DEMO_LEADERS = [
   { id: "l15", nome: "Bruno Teixeira", regiao: "Trindade", bairro: "Centro", lat: -16.651, lng: -49.489, eleitores: 1350, semana: 41, perf: "medio" },
 ];
 
-export const DEMO_RECIPIENTS = [
-  { id: "r1", nome: "Ana Ribeiro", telefone: "(62) 9 9123-4567", papel: "Coordenação geral", pessoas: 1 },
-  { id: "r2", nome: "Carlos Mendes", telefone: "(62) 9 9871-2210", papel: "Coordenação Sul", pessoas: 1 },
-  { id: "r3", nome: "Equipe Marketing", telefone: "(62) 9 9440-1188", papel: "Grupo — 6 membros", pessoas: 6 },
-  { id: "r4", nome: "Coordenadores Regionais", telefone: "(62) 9 9317-4402", papel: "Grupo — 5 membros", pessoas: 5 },
-  { id: "r5", nome: "Gabinete", telefone: "(62) 9 9002-7755", papel: "Chefia de gabinete", pessoas: 1 },
-];
-
 export const DEFAULT_REPORT_BLOCKS = [
-  { id: "resumo", label: "Resumo de eleitores indicados", ativo: true },
-  { id: "ranking", label: "Ranking dos 5 melhores líderes", ativo: true },
+  { id: "resumo", label: "Resumo de eleitores validados no dia", ativo: true },
   { id: "alerta", label: "Bases em alerta (queda de desempenho)", ativo: true },
   { id: "demandas", label: "Demandas abertas no dia", ativo: true },
   { id: "sentimento", label: "Sentimento das redes (Rádio Peão IA)", ativo: false },

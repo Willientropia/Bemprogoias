@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Circle, Popup, useMap } from "react-le
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { GOIANIA_CENTER, PERF_COLORS, PERF_LABELS } from "../../../data/demoPanelData";
+import { whatsappUrl } from "../../../utils/whatsapp";
 import { formatNumber, leaderRating, validatedVoters } from "./leaderMetrics";
 import { spreadLeaderPositions } from "./panelLeaders";
 import { Avatar, Chip, FilterButton, KpiCard, SectionLabel, Stars } from "./PanelBits";
@@ -198,6 +199,22 @@ export default function RegionsTab({ leaders, active = true }) {
                 <Chip background={`${PERF_COLORS[selected.perf]}1f`} color={PERF_COLORS[selected.perf]}>
                   {PERF_LABELS[selected.perf]}
                 </Chip>
+                <div className="leader-whatsapp-contact">
+                  <div>
+                    <span>WHATSAPP DO LÍDER</span>
+                    <strong>{selected.whatsapp || "Não cadastrado"}</strong>
+                  </div>
+                  {selected.whatsapp && (
+                    <a
+                      href={whatsappUrl(selected.whatsapp, `Olá, ${selected.nome}!`)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="whatsapp-link"
+                    >
+                      Conversar
+                    </a>
+                  )}
+                </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8, marginTop: 14 }}>
                   <div style={{ background: "#f7f7f3", borderRadius: 10, padding: 12 }}>
                     <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 20, color: "var(--ink-strong)" }}>

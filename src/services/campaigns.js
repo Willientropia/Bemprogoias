@@ -43,6 +43,14 @@ export function updateCampaign(campaignId, { name, minAppVersion }) {
   });
 }
 
+export function updateReportSettings(campaignId, { whatsapp, deliveryTime }) {
+  return updateDoc(doc(db, "campaigns", campaignId), {
+    reportRecipientWhatsapp: whatsapp.trim(),
+    reportDeliveryTime: deliveryTime,
+    reportSettingsUpdatedAt: serverTimestamp(),
+  });
+}
+
 export function deleteCampaign(campaignId) {
   return deleteDoc(doc(db, "campaigns", campaignId));
 }

@@ -964,6 +964,51 @@ button.leader-row:hover {
   background: #fafaf7;
 }
 
+.leader-whatsapp-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 11px 12px;
+  border: 1px solid #d8e8dc;
+  border-radius: 10px;
+  background: #f4faf5;
+}
+
+.leader-whatsapp-contact span,
+.leader-whatsapp-contact strong {
+  display: block;
+}
+
+.leader-whatsapp-contact span {
+  color: var(--ink-soft);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+.leader-whatsapp-contact strong {
+  margin-top: 2px;
+  color: #243528;
+  font-size: 12px;
+}
+
+a.whatsapp-link {
+  flex-shrink: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #25d366;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.whatsapp-link:hover {
+  background: #1fb658;
+}
+
 /* Toggle do Relatório Expresso */
 button.switch {
   width: 44px;

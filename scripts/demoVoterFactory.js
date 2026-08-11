@@ -172,6 +172,7 @@ export function buildDemoVoterRecords(leaders, total, now = new Date()) {
     summaries[leader.id] = {
       eleitores: leaderRecords.length,
       eleitoresValidados: validated.length,
+      hoje: validated.filter((record) => record.createdAt.toDateString() === now.toDateString()).length,
       semana: validated.filter((record) => now.getTime() - record.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000).length,
       perf: "alerta",
     };

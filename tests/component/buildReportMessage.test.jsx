@@ -2,14 +2,13 @@ import { describe, it, expect } from "vitest";
 import { buildReportMessage } from "../../src/pages/manager/panel/buildReportMessage";
 
 const leaders = [
-  { id: "a", nome: "Ana", bairro: "Centro", eleitores: 2000, semana: 80, perf: "alto" },
-  { id: "b", nome: "Bruno", bairro: "Sul", eleitores: 900, semana: 10, perf: "alerta" },
-  { id: "c", nome: "Carla", bairro: "Norte", eleitores: 600, semana: 5, perf: "alerta" },
+  { id: "a", nome: "Ana", bairro: "Centro", eleitores: 20, eleitoresValidados: 18, hoje: 4, semana: 8, perf: "alto" },
+  { id: "b", nome: "Bruno", bairro: "Sul", eleitores: 9, eleitoresValidados: 8, hoje: 1, semana: 3, perf: "alerta" },
+  { id: "c", nome: "Carla", bairro: "Norte", eleitores: 6, eleitoresValidados: 5, hoje: 2, semana: 2, perf: "alerta" },
 ];
 
 const allBlocks = [
   { id: "resumo", ativo: true },
-  { id: "ranking", ativo: true },
   { id: "alerta", ativo: true },
   { id: "demandas", ativo: true },
   { id: "sentimento", ativo: true },
@@ -18,40 +17,42 @@ const allBlocks = [
 
 const noBlocks = allBlocks.map((b) => ({ ...b, ativo: false }));
 
-const base = { leaders, frequencia: "Diário (fim do dia)", horario: "21:00" };
+const base = { leaders, horario: "21:00" };
 
 describe("buildReportMessage", () => {
-  it("sempre inclui cabeçalho, frequência/horário e rodapé", () => {
+  it("sempre inclui cabeçalho, rotina diária, todos os líderes e rodapé", () => {
     const msg = buildReportMessage({ ...base, blocks: noBlocks });
     expect(msg).toContain("*BEM PARA GOIÁS — Relatório Expresso*");
-    expect(msg).toContain("_Diário (fim do dia) · 21:00 · Goiânia_");
+    expect(msg).toContain("_Diário · 21:00 · Goiânia_");
+    expect(msg).toContain("*Todos os líderes — produção do dia (3)*");
+    expect(msg).toContain("Ana — +4 hoje");
+    expect(msg).toContain("Bruno — +1 hoje");
+    expect(msg).toContain("Carla — +2 hoje");
     expect(msg).toContain("Painel completo:");
   });
 
   it("omite blocos desligados", () => {
     const msg = buildReportMessage({ ...base, blocks: noBlocks });
-    expect(msg).not.toContain("Eleitores indicados hoje");
-    expect(msg).not.toContain("Top líderes do dia");
+    expect(msg).not.toContain("Eleitores validados hoje");
     expect(msg).not.toContain("Bases em alerta");
   });
 
-  it("soma os eleitores da semana no bloco de resumo", () => {
+  it("soma somente a produção validada do dia no bloco de resumo", () => {
     const msg = buildReportMessage({
       ...base,
       blocks: [{ id: "resumo", ativo: true }],
     });
-    expect(msg).toContain("*Eleitores indicados hoje:* 95");
-    expect(msg).toContain("Base total: 3.500 eleitores");
+    expect(msg).toContain("*Eleitores validados hoje:* 7");
+    expect(msg).toContain("Base validada: 31 eleitores");
   });
 
-  it("lista os líderes por crescimento no ranking", () => {
+  it("ordena todos os líderes pela produção do dia", () => {
     const msg = buildReportMessage({
       ...base,
-      blocks: [{ id: "ranking", ativo: true }],
+      blocks: noBlocks,
     });
-    expect(msg).toContain("1. Ana — +80");
-    expect(msg).toContain("2. Bruno — +10");
-    expect(msg).toContain("3. Carla — +5");
+    expect(msg.indexOf("1. Ana — +4 hoje")).toBeLessThan(msg.indexOf("2. Carla — +2 hoje"));
+    expect(msg.indexOf("2. Carla — +2 hoje")).toBeLessThan(msg.indexOf("3. Bruno — +1 hoje"));
   });
 
   it("lista apenas as bases em alerta", () => {
@@ -60,25 +61,24 @@ describe("buildReportMessage", () => {
       blocks: [{ id: "alerta", ativo: true }],
     });
     expect(msg).toContain("*Bases em alerta:* 2");
-    expect(msg).toContain("• Bruno (Sul) — +10");
-    expect(msg).toContain("• Carla (Norte) — +5");
+    expect(msg).toContain("• Bruno (Sul) — +1 hoje");
+    expect(msg).toContain("• Carla (Norte) — +2 hoje");
     expect(msg).not.toContain("• Ana");
   });
 
-  it("reflete a frequência e o horário escolhidos", () => {
+  it("reflete o horário escolhido e mantém a frequência diária", () => {
     const msg = buildReportMessage({
       ...base,
-      frequencia: "Semanal",
       horario: "08:30",
       blocks: noBlocks,
     });
-    expect(msg).toContain("_Semanal · 08:30 · Goiânia_");
+    expect(msg).toContain("_Diário · 08:30 · Goiânia_");
   });
 
   it("inclui todos os blocos quando todos estão ligados", () => {
     const msg = buildReportMessage({ ...base, blocks: allBlocks });
-    expect(msg).toContain("Eleitores indicados hoje");
-    expect(msg).toContain("Top líderes do dia");
+    expect(msg).toContain("Eleitores validados hoje");
+    expect(msg).toContain("Todos os líderes — produção do dia");
     expect(msg).toContain("Bases em alerta");
     expect(msg).toContain("Demandas abertas hoje");
     expect(msg).toContain("Rádio Peão IA");

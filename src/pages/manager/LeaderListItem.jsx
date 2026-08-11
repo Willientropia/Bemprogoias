@@ -44,7 +44,7 @@ export default function LeaderListItem({ campaignId, leader }) {
       <li>
         <form onSubmit={handleSave}>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} required aria-label="Nome do líder" />
-          <input type="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="WhatsApp" />
+          <input type="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="WhatsApp" required />
           <select value={locationId} onChange={(e) => setLocationId(e.target.value)} required aria-label="Ponto de atuação no mapa">
             <option value="">Selecione bairro / região</option>
             {GOIANIA_LOCATIONS.map((location) => (

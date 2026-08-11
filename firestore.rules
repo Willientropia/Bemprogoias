@@ -53,6 +53,17 @@ service cloud.firestore {
     match /campaigns/{campaignId} {
       allow read: if isSuperAdmin() || isManagerOf(campaignId) || isLeaderOf(campaignId);
       allow write: if isSuperAdmin();
+      allow update: if isManagerOf(campaignId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'reportRecipientWhatsapp',
+          'reportDeliveryTime',
+          'reportSettingsUpdatedAt'
+        ])
+        && request.resource.data.reportRecipientWhatsapp is string
+        && request.resource.data.reportRecipientWhatsapp.size() >= 8
+        && request.resource.data.reportRecipientWhatsapp.size() <= 25
+        && request.resource.data.reportDeliveryTime is string
+        && request.resource.data.reportDeliveryTime.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$');
 
       // Gestores e líderes da campanha. Isolamento por campanha vem do
       // próprio path (subcoleção), então list/query aqui é seguro por

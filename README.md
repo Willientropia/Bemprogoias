@@ -64,6 +64,10 @@ recebe 5,0, o menor recebe 1,0 e os demais são interpolados nessa faixa. Na dem
 as evidências de documento único, contato confirmado e coerência geográfica são
 simuladas e identificadas como tal na interface.
 
+O Relatório Expresso usa `reportRecipientWhatsapp` e `reportDeliveryTime` no documento
+da campanha. O gestor pode alterar somente esses campos; o fechamento é diário, inclui
+todos os líderes e o teste abre a mensagem pronta no WhatsApp configurado.
+
 ## Estrutura
 
 ```

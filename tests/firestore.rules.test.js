@@ -5,7 +5,7 @@ import {
   assertFails,
 } from "@firebase/rules-unit-testing";
 import { readFileSync } from "node:fs";
-import { Timestamp, collection, deleteDoc, doc, getDocs, getDoc, limit, orderBy, query, where, setDoc } from "firebase/firestore";
+import { Timestamp, collection, deleteDoc, doc, getDocs, getDoc, limit, orderBy, query, updateDoc, where, setDoc } from "firebase/firestore";
 
 let testEnv;
 
@@ -114,6 +114,36 @@ describe("líder não pode listar outros membros", () => {
   it("líder consegue ler o próprio perfil", async () => {
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertSucceeds(getDoc(doc(leaderA, "campaigns/campA/members/leader-a-uid")));
+  });
+});
+
+describe("configuração do Relatório Expresso", () => {
+  it("gestor salva apenas o WhatsApp e o horário do relatório da própria campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertSucceeds(updateDoc(doc(managerA, "campaigns/campA"), {
+      reportRecipientWhatsapp: "(62) 9 9999-0000",
+      reportDeliveryTime: "21:00",
+      reportSettingsUpdatedAt: Timestamp.now(),
+    }));
+  });
+
+  it("gestor não altera outros campos da campanha por este fluxo", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(updateDoc(doc(managerA, "campaigns/campA"), {
+      name: "Campanha adulterada",
+      reportRecipientWhatsapp: "(62) 9 9999-0000",
+      reportDeliveryTime: "21:00",
+      reportSettingsUpdatedAt: Timestamp.now(),
+    }));
+  });
+
+  it("gestor não configura relatório de outra campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(updateDoc(doc(managerA, "campaigns/campB"), {
+      reportRecipientWhatsapp: "(62) 9 9999-0000",
+      reportDeliveryTime: "21:00",
+      reportSettingsUpdatedAt: Timestamp.now(),
+    }));
   });
 });
 
