@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { PERF_COLORS } from "../../../data/demoPanelData";
-import { formatNumber, rating, sortLeaders, weeklyColor } from "./leaderMetrics";
+import { formatNumber, rating, ratingRange, sortLeaders, validatedVoters, weeklyColor } from "./leaderMetrics";
 import { Avatar, FilterButton, KpiCard, SectionLabel, Stars } from "./PanelBits";
 
 const SORTS = [
-  { id: "eleitores", label: "Mais eleitores" },
+  { id: "eleitores", label: "Mais validados" },
   { id: "rating", label: "Melhor rating" },
   { id: "crescimento", label: "Maior crescimento" },
 ];
@@ -18,10 +18,12 @@ export default function NetworkTab({ leaders }) {
   const sorted = useMemo(() => sortLeaders(leaders, sortMode), [leaders, sortMode]);
   const podium = sorted.slice(0, 3);
 
-  const total = leaders.reduce((acc, l) => acc + l.eleitores, 0);
+  const totalValidated = leaders.reduce((acc, leader) => acc + validatedVoters(leader), 0);
   const novos = leaders.reduce((acc, l) => acc + l.semana, 0);
-  const avgRating = leaders.reduce((acc, l) => acc + rating(l.eleitores), 0) / leaders.length;
-  const max = Math.max(...leaders.map((l) => l.eleitores));
+  const { minimum, maximum } = ratingRange(leaders);
+  const score = (leader) => rating(validatedVoters(leader), minimum, maximum);
+  const avgRating = leaders.reduce((acc, leader) => acc + score(leader), 0) / leaders.length;
+  const max = Math.max(...leaders.map(validatedVoters), 1);
 
   return (
     <div>
@@ -29,7 +31,7 @@ export default function NetworkTab({ leaders }) {
         <div>
           <h1>Rede de Indicações</h1>
           <p style={{ marginTop: 8, fontSize: 15 }}>
-            Desempenho dos líderes por eleitores trazidos à base — atualizado diariamente
+            Desempenho dos líderes pelos eleitores validados — atualizado diariamente
           </p>
         </div>
         <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
@@ -42,8 +44,8 @@ export default function NetworkTab({ leaders }) {
       </div>
 
       <div className="kpi-grid" style={{ marginTop: 22 }}>
-        <KpiCard value={formatNumber(total)} label="ELEITORES INDICADOS" color="var(--brand-700)" />
-        <KpiCard value={formatNumber(Math.round(total / leaders.length))} label="MÉDIA POR LÍDER" />
+        <KpiCard value={formatNumber(totalValidated)} label="ELEITORES VALIDADOS" color="var(--brand-700)" />
+        <KpiCard value={formatNumber(Math.round(totalValidated / leaders.length))} label="MÉDIA VALIDADA POR LÍDER" />
         <KpiCard value={avgRating.toFixed(1)} label="RATING MÉDIO DA REDE" color="#b8860b" />
         <KpiCard value={`+${formatNumber(novos)}`} label="NOVOS ESTA SEMANA" color="var(--brand-700)" />
       </div>
@@ -97,14 +99,14 @@ export default function NetworkTab({ leaders }) {
               </div>
               <div style={{ position: "relative", display: "flex", alignItems: "baseline", gap: 7 }}>
                 <b style={{ fontFamily: "var(--heading)", fontSize: 32, color: first ? "var(--gold)" : "var(--brand-700)" }}>
-                  {formatNumber(leader.eleitores)}
+                  {formatNumber(validatedVoters(leader))}
                 </b>
                 <span style={{ fontSize: 12.5, color: first ? "rgba(255,255,255,.7)" : "var(--ink-muted)" }}>
-                  eleitores · +{leader.semana} na semana
+                  validados de {formatNumber(leader.eleitores)} · +{leader.semana} na semana
                 </span>
               </div>
               <div style={{ position: "relative", marginTop: 11 }}>
-                <Stars eleitores={leader.eleitores} />
+                <Stars value={score(leader)} />
               </div>
             </div>
           );
@@ -135,7 +137,7 @@ export default function NetworkTab({ leaders }) {
               <span>#</span>
               <span>LÍDER</span>
               <span>RATING</span>
-              <span style={{ textAlign: "right" }}>ELEITORES</span>
+              <span style={{ textAlign: "right" }}>VALIDADOS</span>
               <span style={{ textAlign: "right" }}>SEMANA</span>
             </div>
 
@@ -164,14 +166,15 @@ export default function NetworkTab({ leaders }) {
                   </div>
                 </div>
                 <div>
-                  <Stars eleitores={leader.eleitores} />
+                  <Stars value={score(leader)} />
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <b style={{ fontSize: 14, color: "#243528" }}>{formatNumber(leader.eleitores)}</b>
+                  <b style={{ fontSize: 14, color: "#243528" }}>{formatNumber(validatedVoters(leader))}</b>
+                  <span style={{ display: "block", fontSize: 10, color: "var(--ink-soft)" }}>de {formatNumber(leader.eleitores)}</span>
                   <div style={{ height: 5, background: "#eef0ec", borderRadius: 999, overflow: "hidden", marginTop: 5 }}>
                     <div
                       style={{
-                        width: `${Math.round((leader.eleitores / max) * 100)}%`,
+                        width: `${Math.round((validatedVoters(leader) / max) * 100)}%`,
                         height: "100%",
                         background: PERF_COLORS[leader.perf],
                         borderRadius: 999,

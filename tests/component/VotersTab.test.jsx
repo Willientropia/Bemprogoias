@@ -10,8 +10,8 @@ vi.mock("../../src/services/voters", () => ({
 }));
 
 const leaders = [
-  { id: "leader-a", nome: "Ana", bairro: "Centro", eleitores: 3000, semana: 300 },
-  { id: "leader-b", nome: "Bruno", bairro: "Bueno", eleitores: 2000, semana: 150 },
+  { id: "leader-a", nome: "Ana", bairro: "Centro", eleitores: 44, eleitoresValidados: 40, semana: 8 },
+  { id: "leader-b", nome: "Bruno", bairro: "Bueno", eleitores: 18, eleitoresValidados: 15, semana: 3 },
 ];
 
 const voter = {
@@ -27,11 +27,12 @@ const voter = {
   locationModeLabel: "GPS do celular",
   source: "Visita em campo",
   validationStatus: "validado",
+  validationReason: "Documento sem duplicidade e contato confirmado",
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  fetchVoterStats.mockResolvedValue({ total: 5000, week: 680, validated: 4550, validationRate: 91 });
+  fetchVoterStats.mockResolvedValue({ total: 300, week: 41, validated: 273, validationRate: 91 });
   fetchVotersPage.mockResolvedValue({ voters: [voter], cursor: null, hasMore: false });
 });
 
@@ -40,10 +41,12 @@ describe("VotersTab", () => {
     render(<VotersTab campaignId="campaign-demo" leaders={leaders} />);
 
     expect(await screen.findByText("Maria Silva")).toBeInTheDocument();
-    expect(screen.getByText("5.000")).toBeInTheDocument();
-    expect(screen.getByText("91%")).toBeInTheDocument();
+    expect(screen.getByText("300")).toBeInTheDocument();
+    expect(screen.getByText(/VALIDADOS · 91%/)).toBeInTheDocument();
     expect(screen.getAllByText("Ana").length).toBeGreaterThan(0);
     expect(screen.getByText("Visita em campo")).toBeInTheDocument();
+    expect(screen.getByText("Documento sem duplicidade e contato confirmado")).toBeInTheDocument();
+    expect(screen.getByText(/Só o status/)).toBeInTheDocument();
   });
 
   it("consulta novamente ao filtrar por líder", async () => {

@@ -5,8 +5,8 @@ e da seção adicional de Eleitores.
 
 **Decisão tomada:** construir as três seções fiéis ao handoff usando uma **campanha
 de demonstração persistida no Firestore**. Os 15 líderes fictícios alimentam o mesmo
-fluxo de dados usado por uma campanha normal. A campanha também possui 5.000 eleitores
-fictícios distribuídos entre os 16 líderes atuais, incluindo Adiel.
+fluxo de dados usado por uma campanha normal. A campanha também possui 300 eleitores
+fictícios distribuídos em uma curva desigual entre os 16 líderes atuais, incluindo Adiel.
 
 **Estado geral:** código escrito; seed aplicado no Firestore, build, lint e suíte de
 testes passando. **A validação visual automatizada no navegador ainda está pendente.**
@@ -22,8 +22,9 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
 - [x] `scripts/seedDemoCampaign.js` — seed idempotente em
   `campaigns/{campaignId}/members/demo-l1..demo-l15`, com os espelhos mínimos em
   `users/{id}` necessários para edição/remoção pelas Security Rules
-- [x] `scripts/seedDemoVoters.js` — gera 5.000 eleitores únicos, geolocalizados,
-  pagináveis e vinculados aos líderes; recalcula as métricas de produção
+- [x] `scripts/seedDemoVoters.js` — mantém no máximo 300 eleitores únicos,
+  geolocalizados, pagináveis e vinculados aos líderes; remove apenas excedentes do
+  próprio seed e recalcula totais, validados e métricas de produção
 - [x] Tokens e classes do painel no `src/index.css` (`.panel-card`, sidebar,
   `.filter-btn`, `.kpi-grid`, `.switch`, `.map-pin`, `pulse-dot`, e o CSS do Leaflet)
 - [x] Sidebar à esquerda com as cinco seções do gestor, recolhimento persistido no
@@ -44,10 +45,11 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
 - [x] **Aba Rede de Indicações** (`panel/NetworkTab.jsx`) — 4 KPIs derivados, pódio
   com o 1º lugar destacado em verde escuro, tabela completa com posição, avatar,
   estrelas, barra comparativa de eleitores e "+N na semana" colorido por faixa; as
-  três ordenações (mais eleitores / melhor rating / maior crescimento) re-renderizam
+  três ordenações (mais validados / melhor rating / maior crescimento) re-renderizam
   pódio e tabela juntos
-- [x] **Eleitores** (`panel/VotersTab.jsx`) — 4 KPIs, produção comparativa por líder,
-  filtros por líder/status, busca local, tabela de evidências e paginação de 50 em 50
+- [x] **Eleitores** (`panel/VotersTab.jsx`) — 4 KPIs, produção validada por todos os
+  líderes, explicação do processo de validação, filtros por líder/status, busca local,
+  tabela com motivo da evidência e paginação de 50 em 50
 - [x] **Aba Relatório Expresso** (`panel/ReportTab.jsx`) — 4 KPIs, seleção de
   frequência, horário e escopo, toggles dos 6 blocos, lista de destinatários com o
   total **derivado da soma de pessoas** (14, não fixo), prévia da mensagem no estilo
@@ -55,8 +57,8 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
   confiança
 
 ### Regras de negócio extraídas para módulos testáveis
-- [x] `panel/leaderMetrics.js` — rating (um décimo de estrela a cada 50 eleitores,
-  limitado entre 1 e 5), ordenações, cor do "+N na semana", formatação pt-BR
+- [x] `panel/leaderMetrics.js` — rating relativo pelos eleitores validados (maior =
+  5,0; menor = 1,0), ordenações, cor do "+N na semana", formatação pt-BR
 - [x] `panel/buildReportMessage.js` — montagem da mensagem do WhatsApp, com cada
   bloco entrando só se o toggle estiver ligado
 - [x] `panel/reportScope.js` — filtros de líderes usados pela prévia conforme o
@@ -99,8 +101,8 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
 ### Para sair da demo (quando os dados reais existirem)
 - [x] **lat/lng no cadastro de líder** — o gestor escolhe um ponto de atuação e o
   cadastro persiste bairro, região e coordenadas; o Adiel existente foi migrado
-- [x] **Contagem demonstrativa de eleitores por líder** — 5.000 documentos em
-  `campaigns/{campaignId}/voters`, com totais coerentes nos membros
+- [x] **Contagem demonstrativa de eleitores por líder** — 300 documentos em
+  `campaigns/{campaignId}/voters`, sendo 273 validados, com totais coerentes nos membros
 - [ ] **Classificação de desempenho** (`alto`/`medio`/`alerta`) — o handoff recomenda
   calcular no backend por regra explícita e auditável (ex.: crescimento na semana
   contra a média da própria base), não classificar à mão

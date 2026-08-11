@@ -1,7 +1,5 @@
-import { rating } from "./leaderMetrics";
-
-export function Stars({ eleitores }) {
-  const rt = rating(eleitores);
+export function Stars({ value }) {
+  const rt = value;
   return (
     <span style={{ display: "flex", alignItems: "center", gap: 2 }}>
       {[1, 2, 3, 4, 5].map((i) => {

@@ -101,7 +101,9 @@ checar CSS/visual, que os testes não cobrem.
 
 ## O que ainda não existe
 
-- O gestor já possui consulta paginada dos eleitores e a campanha demo contém 5.000 registros.
+- O gestor já possui consulta paginada dos eleitores e a campanha demo contém 300 registros,
+  dos quais 273 estão validados. A produção e as estrelas consideram somente os validados;
+  as evidências da demo são sintéticas e aparecem identificadas na interface.
   O **cadastro pelo app do líder**, deduplicação por RG/título, os três modos de localização,
   offline-first e integração com WhatsApp continuam sendo escopo do Dev B.
 - Empacotamento Electron, Capacitor (APK) e PWA.

@@ -5,7 +5,7 @@
 Painel administrativo restrito a **gestores** da plataforma "Bem pro Brasil" (plataforma de participação popular para uma candidatura legislativa — deputado federal, deputado estadual e senador, partido Solidariedade). Enquanto o app público serve apoiadores, este painel serve a coordenação de campanha e tem exatamente **três abas**:
 
 1. **Regiões** — mapa interativo de Goiânia com a localização dos líderes regionais.
-2. **Rede de Indicações** — ranking dos líderes com rating pela quantidade de eleitores que trouxeram.
+2. **Rede de Indicações** — ranking dos líderes com rating pela quantidade de eleitores validados.
 3. **Relatório Expresso** — configuração de um bot que envia no WhatsApp os relatórios dos líderes ao fim de cada dia (ou na frequência configurada).
 
 Conceito de domínio importante: cada cidade/região/segmentação pode ter um **presidente de conselho de participação pública local**. Se a campanha tem 250 líderes, ela pode ter até 250 conselhos. O objetivo do produto é ampliar a base de eleitores e engajar o público nos projetos do mandato.
@@ -208,18 +208,18 @@ Em produção estes registros vêm da API; as coordenadas devem ser geocodificad
 
 ## Aba 2: Rede de Indicações
 
-**Propósito:** avaliar e comparar líderes pela quantidade de eleitores que trouxeram, com rating e ranking.
+**Propósito:** avaliar e comparar líderes pela quantidade de eleitores validados, com rating e ranking.
 
 ### Regra de rating (importante)
 
-`rating = clamp(1, 5, round(eleitores / 500 * 10) / 10)` — ou seja, um décimo de estrela por 50 eleitores, limitado entre 1,0 e 5,0. Exibido com **uma casa decimal**.
+`rating = 1 + 4 × (validados - mínimo) / (máximo - mínimo)` — o líder com mais eleitores validados recebe 5,0, o último recebe 1,0 e os demais são interpolados. Empates recebem a mesma nota. Exibido com **uma casa decimal**.
 
 **Componente de estrelas:** cinco ícones SVG de 14px em linha, gap 2px. Uma estrela é "cheia" quando `rating >= i - 0.25` (preenchimento e traço `#f3c41c`); vazia usa `fill: none` e traço `#cfd3ca`. À direita, o valor numérico em negrito, 12px, `#8a6d12`, com `margin-left: 5px`.
 
 ### Layout
 
-1. **Cabeçalho:** H1 "Rede de Indicações" + subtítulo "Desempenho dos líderes por eleitores trazidos à base — atualizado diariamente". À direita, três botões de ordenação (mesmo estilo dos filtros): **Mais eleitores** (padrão) / **Melhor rating** / **Maior crescimento**.
-2. **Grid de 4 KPIs** (derivados): ELEITORES INDICADOS (soma, em `#1f6b34`) · MÉDIA POR LÍDER (soma ÷ nº de líderes, arredondada) · RATING MÉDIO DA REDE (média dos ratings, 1 decimal, em `#b8860b`) · NOVOS ESTA SEMANA (soma de `semana`, prefixado com `+`, em `#1f6b34`).
+1. **Cabeçalho:** H1 "Rede de Indicações" + subtítulo "Desempenho dos líderes pelos eleitores validados — atualizado diariamente". À direita, três botões de ordenação (mesmo estilo dos filtros): **Mais validados** (padrão) / **Melhor rating** / **Maior crescimento**.
+2. **Grid de 4 KPIs** (derivados): ELEITORES VALIDADOS (soma, em `#1f6b34`) · MÉDIA VALIDADA POR LÍDER (soma ÷ nº de líderes, arredondada) · RATING MÉDIO DA REDE (média dos ratings, 1 decimal, em `#b8860b`) · NOVOS ESTA SEMANA (soma de `semana`, prefixado com `+`, em `#1f6b34`).
 3. **Pódio** — grid de 3 colunas, gap 16px, com os três primeiros da ordenação vigente:
    - O **1º lugar é destacado**: fundo `#143a1c`, borda igual ao fundo, texto branco, com o brilho radial dourado no canto superior direito; número em `#f3c41c`.
    - 2º e 3º: card branco normal, número em `#1f6b34`.
@@ -230,13 +230,13 @@ Em produção estes registros vêm da API; as coordenadas devem ser geocodificad
      - **Posição:** Spectral 700, 16px — `#b8860b` para os três primeiros, `#c2c8bf` para os demais.
      - **Líder:** avatar circular de 36px na cor do desempenho com a inicial + nome (14px peso 600) e "bairro · região" (11,5px `#9aa397`).
      - **Rating:** componente de estrelas.
-     - **Eleitores:** total em negrito 14px, e **abaixo uma barra comparativa** de 5px de altura, trilha `#eef0ec`, raio 999px, preenchida em `(eleitores / maior valor da lista) * 100%` na cor do desempenho.
-     - **Semana:** `+N` em negrito 13px, com cor por faixa — `>= 30` → `#1f6b34`; `15–29` → `#b8860b`; `< 15` → `#c0392b`.
+     - **Validados:** total em negrito 14px, e **abaixo uma barra comparativa** de 5px de altura, trilha `#eef0ec`, raio 999px, preenchida em `(validados / maior valor da lista) * 100%` na cor do desempenho.
+     - **Semana:** `+N` em negrito 13px, com cor por faixa da base demo — `>= 5` → `#1f6b34`; `2–4` → `#b8860b`; `< 2` → `#c0392b`.
 
 ### Ordenação
 
-- `eleitores` (padrão): desc por eleitores.
-- `rating`: desc por rating, com desempate por eleitores.
+- `eleitores` (padrão): desc por eleitores validados.
+- `rating`: desc por rating, com desempate por validados.
 - `crescimento`: desc por `semana`.
 
 Trocar a ordenação re-renderiza **pódio e tabela juntos** (o pódio sempre mostra o top 3 do critério vigente).

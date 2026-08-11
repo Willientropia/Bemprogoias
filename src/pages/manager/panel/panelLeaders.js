@@ -17,7 +17,11 @@ export function hasPanelMetrics(leader) {
 export function toPanelLeaders(leaders) {
   return leaders
     .filter(hasPanelMetrics)
-    .map((leader) => ({ ...leader, nome: leader.name ?? leader.nome }));
+    .map((leader) => ({
+      ...leader,
+      nome: leader.name ?? leader.nome,
+      eleitoresValidados: Number.isFinite(leader.eleitoresValidados) ? leader.eleitoresValidados : 0,
+    }));
 }
 
 export function spreadLeaderPositions(leaders, radius = 0.0018) {

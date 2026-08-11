@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Circle, Popup, useMap } from "react-le
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { GOIANIA_CENTER, PERF_COLORS, PERF_LABELS } from "../../../data/demoPanelData";
-import { formatNumber } from "./leaderMetrics";
+import { formatNumber, leaderRating, validatedVoters } from "./leaderMetrics";
 import { spreadLeaderPositions } from "./panelLeaders";
 import { Avatar, Chip, FilterButton, KpiCard, SectionLabel, Stars } from "./PanelBits";
 
@@ -15,7 +15,7 @@ const FILTERS = [
 ];
 
 function pinIcon(leader) {
-  const size = 30 + Math.round(leader.eleitores / 220);
+  const size = 30 + Math.round(validatedVoters(leader) * 0.35);
   const color = PERF_COLORS[leader.perf];
   return L.divIcon({
     className: "",
@@ -57,10 +57,10 @@ export default function RegionsTab({ leaders, active = true }) {
     [leaders, perfFilter]
   );
 
-  const listed = useMemo(() => [...visible].sort((a, b) => b.eleitores - a.eleitores), [visible]);
+  const listed = useMemo(() => [...visible].sort((a, b) => validatedVoters(b) - validatedVoters(a)), [visible]);
   const displayPositions = useMemo(() => spreadLeaderPositions(leaders), [leaders]);
 
-  const totalEleitores = leaders.reduce((acc, l) => acc + l.eleitores, 0);
+  const totalValidados = leaders.reduce((acc, leader) => acc + validatedVoters(leader), 0);
   const regioes = new Set(leaders.map((l) => l.regiao)).size;
   const emAlerta = leaders.filter((l) => l.perf === "alerta").length;
 
@@ -88,7 +88,7 @@ export default function RegionsTab({ leaders, active = true }) {
 
       <div className="kpi-grid" style={{ marginTop: 22 }}>
         <KpiCard value={leaders.length} label="LÍDERES NO MAPA" />
-        <KpiCard value={formatNumber(totalEleitores)} label="ELEITORES MAPEADOS" color="var(--brand-700)" />
+        <KpiCard value={formatNumber(totalValidados)} label="ELEITORES VALIDADOS" color="var(--brand-700)" />
         <KpiCard value={regioes} label="REGIÕES COBERTAS" />
         <KpiCard value={emAlerta} label="BASES EM ALERTA" color="var(--danger)" />
       </div>
@@ -146,12 +146,12 @@ export default function RegionsTab({ leaders, active = true }) {
                     </div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <b style={{ fontFamily: "var(--heading)", fontSize: 20, color: PERF_COLORS[leader.perf] }}>
-                        {formatNumber(leader.eleitores)}
+                        {formatNumber(validatedVoters(leader))}
                       </b>
-                      <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>eleitores</span>
+                      <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>validados de {formatNumber(leader.eleitores)}</span>
                     </div>
                     <div style={{ marginTop: 8 }}>
-                      <Stars eleitores={leader.eleitores} />
+                      <Stars value={leaderRating(leader, leaders)} />
                     </div>
                   </div>
                 </Popup>
@@ -198,25 +198,31 @@ export default function RegionsTab({ leaders, active = true }) {
                 <Chip background={`${PERF_COLORS[selected.perf]}1f`} color={PERF_COLORS[selected.perf]}>
                   {PERF_LABELS[selected.perf]}
                 </Chip>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8, marginTop: 14 }}>
+                  <div style={{ background: "#f7f7f3", borderRadius: 10, padding: 12 }}>
+                    <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 20, color: "var(--ink-strong)" }}>
+                      {formatNumber(validatedVoters(selected))}
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>VALIDADOS</div>
+                  </div>
                   <div style={{ background: "#f7f7f3", borderRadius: 10, padding: 12 }}>
                     <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 20, color: "var(--ink-strong)" }}>
                       {formatNumber(selected.eleitores)}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>ELEITORES</div>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>CADASTROS</div>
                   </div>
                   <div style={{ background: "#f7f7f3", borderRadius: 10, padding: 12 }}>
                     <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 20, color: "var(--brand-700)" }}>
                       +{selected.semana}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>NA SEMANA</div>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>7 DIAS</div>
                   </div>
                 </div>
                 <div style={{ marginTop: 14 }}>
                   <SectionLabel style={{ display: "block", fontSize: 11, letterSpacing: 0.7, marginBottom: 6 }}>
                     RATING DE INDICAÇÕES
                   </SectionLabel>
-                  <Stars eleitores={selected.eleitores} />
+                  <Stars value={leaderRating(selected, leaders)} />
                 </div>
               </div>
             )}
@@ -239,7 +245,7 @@ export default function RegionsTab({ leaders, active = true }) {
                     <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "#243528" }}>{leader.nome}</span>
                     <span style={{ display: "block", fontSize: 11.5, color: "var(--ink-soft)" }}>{leader.bairro}</span>
                   </span>
-                  <b style={{ fontSize: 13, color: PERF_COLORS[leader.perf] }}>{formatNumber(leader.eleitores)}</b>
+                  <b style={{ fontSize: 13, color: PERF_COLORS[leader.perf] }}>{formatNumber(validatedVoters(leader))}</b>
                 </button>
               ))}
             </div>

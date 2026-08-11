@@ -68,6 +68,7 @@ export async function createLeader({
     lng,
     raioKm,
     eleitores: 0,
+    eleitoresValidados: 0,
     semana: 0,
     perf: "alerta",
   });

@@ -45,8 +45,8 @@ Com `serviceAccountKey.json` na raiz, execute primeiro a simulação e depois o 
 ```bash
 npm run seed:demo -- <campaignId> --dry-run
 npm run seed:demo -- <campaignId>
-npm run seed:demo-voters -- <campaignId> --count=5000 --dry-run
-npm run seed:demo-voters -- <campaignId> --count=5000
+npm run seed:demo-voters -- <campaignId> --count=300 --dry-run
+npm run seed:demo-voters -- <campaignId> --count=300
 ```
 
 O seed é idempotente, usa os IDs `demo-l1` a `demo-l15`, marca a campanha com
@@ -55,7 +55,14 @@ não cria contas no Firebase Auth.
 
 O segundo seed cria eleitores fictícios completos em
 `campaigns/{campaignId}/voters`, distribui a produção entre os líderes e atualiza
-as métricas `eleitores`, `semana` e `perf` usadas no mapa e no ranking.
+as métricas `eleitores`, `eleitoresValidados`, `semana` e `perf` usadas no mapa e
+no ranking. A execução mantém no máximo 300 registros e remove somente excedentes
+marcados com `demoSource: "voters-demo-v1"`.
+
+As estrelas usam exclusivamente `eleitoresValidados`: o maior total da campanha
+recebe 5,0, o menor recebe 1,0 e os demais são interpolados nessa faixa. Na demo,
+as evidências de documento único, contato confirmado e coerência geográfica são
+simuladas e identificadas como tal na interface.
 
 ## Estrutura
 

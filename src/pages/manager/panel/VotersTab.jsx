@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchVoterStats, fetchVotersPage } from "../../../services/voters";
-import { formatNumber } from "./leaderMetrics";
+import { formatNumber, validatedVoters } from "./leaderMetrics";
 import { Chip, KpiCard, SectionLabel } from "./PanelBits";
 
 const STATUS_OPTIONS = [
@@ -77,10 +77,10 @@ export default function VotersTab({ campaignId, leaders }) {
   );
 
   const rankedLeaders = useMemo(
-    () => [...leaders].sort((a, b) => b.eleitores - a.eleitores).slice(0, 6),
+    () => [...leaders].sort((a, b) => validatedVoters(b) - validatedVoters(a)),
     [leaders]
   );
-  const maxLeaderTotal = rankedLeaders[0]?.eleitores || 1;
+  const maxLeaderValidated = validatedVoters(rankedLeaders[0]) || 1;
 
   const visibleVoters = useMemo(() => {
     const term = normalize(search.trim());
@@ -126,9 +126,25 @@ export default function VotersTab({ campaignId, leaders }) {
 
       <div className="kpi-grid" style={{ marginTop: 22 }}>
         <KpiCard value={formatNumber(stats.total)} label="ELEITORES NA BASE" color="var(--brand-700)" />
+        <KpiCard value={formatNumber(stats.validated)} label={`VALIDADOS · ${stats.validationRate}%`} color="var(--brand-700)" />
         <KpiCard value={`+${formatNumber(stats.week)}`} label="CADASTRADOS EM 7 DIAS" />
-        <KpiCard value={`${stats.validationRate}%`} label="CADASTROS VALIDADOS" color="var(--brand-700)" />
         <KpiCard value={leaders.filter((leader) => leader.eleitores > 0).length} label="LÍDERES COM PRODUÇÃO" />
+      </div>
+
+      <div className="panel-card voters-validation-card">
+        <div className="voters-validation-heading">
+          <div>
+            <SectionLabel>COMO UM ELEITOR É VALIDADO</SectionLabel>
+            <h3>Três evidências antes de pontuar o líder</h3>
+          </div>
+          <Chip background="var(--gold-bg)" color="#8a6d12">SIMULADO NESTA DEMO</Chip>
+        </div>
+        <div className="voters-validation-grid">
+          <div><b>1</b><span><strong>Documento único</strong>RG ou título normalizado, sem repetição na campanha.</span></div>
+          <div><b>2</b><span><strong>Contato confirmado</strong>Confirmação por link/OTP no WhatsApp ou ligação registrada.</span></div>
+          <div><b>3</b><span><strong>Coerência e auditoria</strong>Localização plausível; divergências seguem para revisão manual.</span></div>
+        </div>
+        <p>Só o status <strong>Validado</strong> entra na produção, no ranking e nas estrelas. Pendente e Em revisão valem zero até a conclusão.</p>
       </div>
 
       <div className="panel-card voters-production-card">
@@ -139,10 +155,10 @@ export default function VotersTab({ campaignId, leaders }) {
               <span className="voter-leader-position">{index + 1}</span>
               <span className="voter-leader-copy">
                 <b>{leader.nome}</b>
-                <span>{leader.bairro} · +{formatNumber(leader.semana)} na semana</span>
-                <i><span style={{ width: `${Math.round((leader.eleitores / maxLeaderTotal) * 100)}%` }} /></i>
+                <span>{leader.bairro} · {formatNumber(validatedVoters(leader))} validados de {formatNumber(leader.eleitores)}</span>
+                <i><span style={{ width: `${Math.round((validatedVoters(leader) / maxLeaderValidated) * 100)}%` }} /></i>
               </span>
-              <strong>{formatNumber(leader.eleitores)}</strong>
+              <strong>{formatNumber(validatedVoters(leader))}</strong>
             </button>
           ))}
         </div>
@@ -215,7 +231,10 @@ export default function VotersTab({ campaignId, leaders }) {
                     <td><b>{voter.bairro}</b><span>{voter.regiao}</span></td>
                     <td><b>{formatDate(voter.createdAt)}</b><span>{voter.locationModeLabel}</span></td>
                     <td>{voter.source}</td>
-                    <td><Chip background={status.background} color={status.color}>{status.label}</Chip></td>
+                    <td>
+                      <Chip background={status.background} color={status.color}>{status.label}</Chip>
+                      <span title={voter.validationReason}>{voter.validationReason ?? "Sem evidência registrada"}</span>
+                    </td>
                   </tr>
                 );
               })}

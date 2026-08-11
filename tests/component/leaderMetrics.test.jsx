@@ -1,31 +1,32 @@
 import { describe, it, expect } from "vitest";
-import { rating, sortLeaders, weeklyColor, formatNumber } from "../../src/pages/manager/panel/leaderMetrics";
+import { leaderRating, rating, sortLeaders, weeklyColor, formatNumber } from "../../src/pages/manager/panel/leaderMetrics";
 
 const leaders = [
-  { id: "a", nome: "A", eleitores: 1000, semana: 10 },
-  { id: "b", nome: "B", eleitores: 2500, semana: 50 },
-  { id: "c", nome: "C", eleitores: 500, semana: 30 },
+  { id: "a", nome: "A", eleitores: 30, eleitoresValidados: 20, semana: 10 },
+  { id: "b", nome: "B", eleitores: 50, eleitoresValidados: 40, semana: 50 },
+  { id: "c", nome: "C", eleitores: 12, eleitoresValidados: 10, semana: 30 },
 ];
 
 describe("rating", () => {
-  it("dá um décimo de estrela a cada 50 eleitores", () => {
-    expect(rating(500)).toBe(1);
-    expect(rating(1000)).toBe(2);
-    expect(rating(2500)).toBe(5);
+  it("normaliza entre o menor e o maior total validado", () => {
+    expect(rating(10, 10, 40)).toBe(1);
+    expect(rating(25, 10, 40)).toBe(3);
+    expect(rating(40, 10, 40)).toBe(5);
   });
 
-  it("nunca fica abaixo de 1", () => {
-    expect(rating(0)).toBe(1);
-    expect(rating(100)).toBe(1);
+  it("dá a mesma nota a empates e usa somente eleitores validados", () => {
+    expect(rating(12, 12, 12)).toBe(5);
+    expect(leaderRating(leaders[0], leaders)).toBe(2.3);
   });
 
-  it("nunca passa de 5", () => {
-    expect(rating(10000)).toBe(5);
+  it("mantém a escala entre 1 e 5", () => {
+    expect(rating(0, 10, 40)).toBe(1);
+    expect(rating(100, 10, 40)).toBe(5);
   });
 });
 
 describe("sortLeaders", () => {
-  it("ordena por eleitores por padrão", () => {
+  it("ordena pelos eleitores validados por padrão", () => {
     expect(sortLeaders(leaders, "eleitores").map((l) => l.id)).toEqual(["b", "a", "c"]);
   });
 
@@ -45,18 +46,18 @@ describe("sortLeaders", () => {
 });
 
 describe("weeklyColor", () => {
-  it("usa verde a partir de 30", () => {
-    expect(weeklyColor(30)).toBe("#1f6b34");
-    expect(weeklyColor(80)).toBe("#1f6b34");
+  it("usa verde a partir de 5", () => {
+    expect(weeklyColor(5)).toBe("#1f6b34");
+    expect(weeklyColor(8)).toBe("#1f6b34");
   });
 
-  it("usa âmbar entre 15 e 29", () => {
-    expect(weeklyColor(15)).toBe("#b8860b");
-    expect(weeklyColor(29)).toBe("#b8860b");
+  it("usa âmbar entre 2 e 4", () => {
+    expect(weeklyColor(2)).toBe("#b8860b");
+    expect(weeklyColor(4)).toBe("#b8860b");
   });
 
-  it("usa vermelho abaixo de 15", () => {
-    expect(weeklyColor(14)).toBe("#c0392b");
+  it("usa vermelho abaixo de 2", () => {
+    expect(weeklyColor(1)).toBe("#c0392b");
     expect(weeklyColor(0)).toBe("#c0392b");
   });
 });

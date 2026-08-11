@@ -27,10 +27,34 @@ function slugify(value) {
 }
 
 function validationStatus(index) {
-  const bucket = index % 100;
+  // Espalha os status ao longo de cada líder, evitando blocos inteiros com o
+  // mesmo resultado quando a base demo é pequena.
+  const bucket = (index * 37) % 100;
   if (bucket < 91) return "validado";
   if (bucket < 98) return "pendente";
   return "revisao";
+}
+
+function validationEvidence(status) {
+  if (status === "validado") {
+    return {
+      validationMethod: "documento_contato",
+      validationReason: "Documento sem duplicidade e contato confirmado",
+      validationChecks: { requiredFields: true, uniqueDocument: true, contactConfirmed: true, geoCoherent: true },
+    };
+  }
+  if (status === "revisao") {
+    return {
+      validationMethod: "auditoria_manual",
+      validationReason: "Divergência de localização encaminhada para auditoria",
+      validationChecks: { requiredFields: true, uniqueDocument: true, contactConfirmed: false, geoCoherent: false },
+    };
+  }
+  return {
+    validationMethod: "contato_pendente",
+    validationReason: "Aguardando confirmação do contato informado",
+    validationChecks: { requiredFields: true, uniqueDocument: true, contactConfirmed: false, geoCoherent: true },
+  };
 }
 
 function recentRate(performance) {
@@ -40,21 +64,37 @@ function recentRate(performance) {
 }
 
 export function allocateVoterCounts(leaders, total) {
-  const weights = leaders.map((leader) => Math.max(Number(leader.eleitores) || 0, 500));
+  if (leaders.length === 0) return [];
+
+  // Mantém todos os líderes visíveis, mas cria uma curva de produção clara.
+  // A ordem histórica só define quem ocupa cada faixa; o peso vem da posição,
+  // não dos antigos milhares de registros da campanha demo.
+  const minimum = total >= leaders.length * 3 ? 3 : 0;
+  const ranked = leaders
+    .map((leader, index) => ({
+      index,
+      value: Number(leader.eleitoresValidados ?? leader.eleitores) || 0,
+      tieBreaker: String(leader.id ?? index),
+    }))
+    .sort((a, b) => b.value - a.value || a.tieBreaker.localeCompare(b.tieBreaker));
+  const weights = ranked.map((_, rank) => Math.pow(leaders.length - rank, 1.8));
   const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
-  const exact = weights.map((weight) => (weight / weightTotal) * total);
-  const counts = exact.map(Math.floor);
-  let remaining = total - counts.reduce((sum, count) => sum + count, 0);
+  const distributable = total - minimum * leaders.length;
+  const exact = weights.map((weight) => (weight / weightTotal) * distributable);
+  const rankedCounts = exact.map((value) => Math.floor(value) + minimum);
+  let remaining = total - rankedCounts.reduce((sum, count) => sum + count, 0);
 
   exact
-    .map((value, index) => ({ index, fraction: value - counts[index] }))
+    .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
     .sort((a, b) => b.fraction - a.fraction)
     .forEach(({ index }) => {
       if (remaining <= 0) return;
-      counts[index] += 1;
+      rankedCounts[index] += 1;
       remaining -= 1;
     });
 
+  const counts = Array(leaders.length).fill(0);
+  ranked.forEach(({ index }, rank) => { counts[index] = rankedCounts[rank]; });
   return counts;
 }
 
@@ -67,7 +107,6 @@ export function buildDemoVoterRecords(leaders, total, now = new Date()) {
   leaders.forEach((leader, leaderIndex) => {
     const leaderTotal = counts[leaderIndex];
     const weeklyTotal = Math.max(1, Math.round(leaderTotal * recentRate(leader.perf)));
-    summaries[leader.id] = { eleitores: leaderTotal, semana: weeklyTotal, perf: leader.perf ?? "alerta" };
 
     for (let localIndex = 0; localIndex < leaderTotal; localIndex += 1) {
       // Três "dígitos" em bases diferentes geram milhares de combinações sem
@@ -90,6 +129,11 @@ export function buildDemoVoterRecords(leaders, total, now = new Date()) {
       const spread = 0.002 + fraction(globalIndex, 6) * 0.012;
       const locationMode = LOCATION_MODES[globalIndex % LOCATION_MODES.length];
       const phone = String(910000000 + globalIndex).padStart(9, "0");
+      const status = validationStatus(globalIndex);
+      const evidence = validationEvidence(status);
+      const validatedAt = status === "validado"
+        ? new Date(Math.min(now.getTime(), createdAt.getTime() + 24 * 60 * 60 * 1000))
+        : null;
 
       records.push({
         id: `demo-voter-${String(globalIndex + 1).padStart(5, "0")}`,
@@ -110,7 +154,9 @@ export function buildDemoVoterRecords(leaders, total, now = new Date()) {
         locationMode: locationMode.id,
         locationModeLabel: locationMode.label,
         source: SOURCES[globalIndex % SOURCES.length],
-        validationStatus: validationStatus(globalIndex),
+        validationStatus: status,
+        ...evidence,
+        validatedAt,
         syncStatus: "sincronizado",
         createdAt,
         isDemo: true,
@@ -118,6 +164,25 @@ export function buildDemoVoterRecords(leaders, total, now = new Date()) {
       });
       globalIndex += 1;
     }
+  });
+
+  leaders.forEach((leader) => {
+    const leaderRecords = records.filter((record) => record.leaderId === leader.id);
+    const validated = leaderRecords.filter((record) => record.validationStatus === "validado");
+    summaries[leader.id] = {
+      eleitores: leaderRecords.length,
+      eleitoresValidados: validated.length,
+      semana: validated.filter((record) => now.getTime() - record.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000).length,
+      perf: "alerta",
+    };
+  });
+
+  const performanceRanking = [...leaders].sort((a, b) => (
+    summaries[b.id].eleitoresValidados - summaries[a.id].eleitoresValidados
+  ));
+  performanceRanking.forEach((leader, index) => {
+    const percentile = index / Math.max(1, performanceRanking.length - 1);
+    summaries[leader.id].perf = percentile <= 0.3 ? "alto" : percentile <= 0.7 ? "medio" : "alerta";
   });
 
   return { records, summaries };

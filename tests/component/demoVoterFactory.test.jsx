@@ -9,22 +9,28 @@ const leaders = [
 
 describe("demoVoterFactory", () => {
   it("distribui exatamente o volume solicitado entre todos os líderes", () => {
-    const counts = allocateVoterCounts(leaders, 5000);
-    expect(counts.reduce((sum, count) => sum + count, 0)).toBe(5000);
+    const counts = allocateVoterCounts(leaders, 300);
+    expect(counts.reduce((sum, count) => sum + count, 0)).toBe(300);
     expect(counts.every((count) => count > 0)).toBe(true);
+    expect(Math.max(...counts)).toBeGreaterThan(Math.min(...counts) * 4);
   });
 
   it("gera documentos únicos, completos e vinculados aos líderes", () => {
-    const { records, summaries } = buildDemoVoterRecords(leaders, 500, new Date("2026-08-11T15:00:00Z"));
-    expect(records).toHaveLength(500);
-    expect(new Set(records.map((record) => record.id)).size).toBe(500);
-    expect(new Set(records.map((record) => record.rg)).size).toBe(500);
-    expect(new Set(records.map((record) => record.name)).size).toBe(500);
+    const { records, summaries } = buildDemoVoterRecords(leaders, 300, new Date("2026-08-11T15:00:00Z"));
+    expect(records).toHaveLength(300);
+    expect(new Set(records.map((record) => record.id)).size).toBe(300);
+    expect(new Set(records.map((record) => record.rg)).size).toBe(300);
+    expect(new Set(records.map((record) => record.name)).size).toBe(300);
     expect(Object.keys(summaries)).toEqual(["a", "b", "c"]);
-    expect(Object.values(summaries).reduce((sum, summary) => sum + summary.eleitores, 0)).toBe(500);
+    expect(Object.values(summaries).reduce((sum, summary) => sum + summary.eleitores, 0)).toBe(300);
+    expect(Object.values(summaries).reduce((sum, summary) => sum + summary.eleitoresValidados, 0))
+      .toBe(records.filter((record) => record.validationStatus === "validado").length);
     expect(records[0]).toEqual(expect.objectContaining({
       leaderId: "a",
       validationStatus: "validado",
+      validationMethod: "documento_contato",
+      validationReason: expect.any(String),
+      validatedAt: expect.any(Date),
       syncStatus: "sincronizado",
       isDemo: true,
     }));
