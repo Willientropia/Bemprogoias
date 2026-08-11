@@ -102,7 +102,7 @@ export default function RegionsTab({ leaders, active = true }) {
 
       <div className="panel-split" style={{ display: "grid", gridTemplateColumns: "1fr 336px", gap: 18, alignItems: "start" }}>
         <div className="panel-card" style={{ overflow: "hidden", padding: 0 }}>
-          <MapContainer center={GOIANIA_CENTER} zoom={11} scrollWheelZoom style={{ height: 540, width: "100%" }}>
+          <MapContainer className="panel-map" center={GOIANIA_CENTER} zoom={11} scrollWheelZoom style={{ height: 540, width: "100%" }}>
             <MapRef mapRef={mapRef} active={active} />
             <TileLayer
               url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -33,6 +33,24 @@ npm run test:rules         # só Security Rules (roda no Firestore Emulator loca
 
 `test:rules` sobe o Firestore Emulator automaticamente e o derruba ao final — não precisa de projeto Firebase real nem de rede.
 
+## Campanha de demonstração
+
+Os 15 líderes fictícios do Painel do Gestor são persistidos no Firestore, no
+mesmo caminho usado pelo app (`campaigns/{campaignId}/members`). O arquivo
+`src/data/demoPanelData.js` é apenas a fonte versionada do seed; as telas não o
+consultam diretamente.
+
+Com `serviceAccountKey.json` na raiz, execute primeiro a simulação e depois o seed:
+
+```bash
+npm run seed:demo -- <campaignId> --dry-run
+npm run seed:demo -- <campaignId>
+```
+
+O seed é idempotente, usa os IDs `demo-l1` a `demo-l15`, marca a campanha com
+`isDemo: true` e cria os espelhos mínimos em `users/{id}` exigidos pelo CRUD. Ele
+não cria contas no Firebase Auth.
+
 ## Estrutura
 
 ```

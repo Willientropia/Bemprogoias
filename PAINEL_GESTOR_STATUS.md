@@ -3,12 +3,12 @@
 Implementação do handoff em [`docs/handoff-painel-gestor/`](./docs/handoff-painel-gestor/)
 (as três abas: Regiões, Rede de Indicações, Relatório Expresso).
 
-**Decisão tomada:** construir as três abas fiéis ao handoff usando os **dados de
-demonstração** (os 15 líderes de Goiânia e os números da demo), para apresentação ao
-cliente. A troca por dados reais é um passo posterior — ver "Como trocar por dados reais".
+**Decisão tomada:** construir as três seções fiéis ao handoff usando uma **campanha
+de demonstração persistida no Firestore**. Os 15 líderes fictícios alimentam o mesmo
+fluxo de dados usado por uma campanha normal.
 
-**Estado geral:** código escrito; build, lint e suíte completa de testes passando.
-**A validação visual no navegador ainda está pendente.**
+**Estado geral:** código escrito; seed aplicado no Firestore, build, lint e suíte de
+testes passando. **A validação visual automatizada no navegador ainda está pendente.**
 
 ---
 
@@ -16,17 +16,22 @@ cliente. A troca por dados reais é um passo posterior — ver "Como trocar por 
 
 ### Infraestrutura
 - [x] `leaflet` + `react-leaflet` instalados
-- [x] `src/data/demoPanelData.js` — base de demonstração isolada e marcada com
-  `isDemoData`, com comentário no topo explicando de onde cada dado deve vir em
-  produção
-- [x] Tokens e classes do painel no `src/index.css` (`.panel-card`, `.panel-tab`,
+- [x] `src/data/demoPanelData.js` — fonte versionada dos 15 líderes usada apenas
+  pelo script de seed; o painel não lê mais a constante diretamente
+- [x] `scripts/seedDemoCampaign.js` — seed idempotente em
+  `campaigns/{campaignId}/members/demo-l1..demo-l15`, com os espelhos mínimos em
+  `users/{id}` necessários para edição/remoção pelas Security Rules
+- [x] Tokens e classes do painel no `src/index.css` (`.panel-card`, sidebar,
   `.filter-btn`, `.kpi-grid`, `.switch`, `.map-pin`, `pulse-dot`, e o CSS do Leaflet)
-- [x] Responsividade do painel: abaixo de 1100px os grids de duas colunas empilham e
-  os KPIs vão de 4 para 2 colunas
+- [x] Sidebar à esquerda com as quatro seções do gestor, recolhimento persistido no
+  desktop e drawer com backdrop/fechamento no celular
+- [x] Responsividade do painel: grids empilham, KPIs passam de 4 para 2 e depois 1
+  coluna, pódio vira lista, formulário do relatório empilha e o mapa reduz a altura
 
 ### Abas
-- [x] **Shell de navegação** (`ManagerDashboard.jsx`) com 4 abas: as 3 do handoff +
-  "Cadastro de Líderes" (o CRUD real que já existia, preservado)
+- [x] **Shell de navegação** (`ManagerDashboard.jsx`) com as seções na sidebar
+  esquerda como no handoff: Regiões, Rede de Indicações, Relatório Expresso e
+  Cadastro de Líderes
 - [x] **Aba Regiões** (`panel/RegionsTab.jsx`) — mapa Leaflet centrado em Goiânia
   (zoom 11), pinos em forma de gota dimensionados pela base, círculos de alcance
   (`400 + eleitores * 0.9` metros), popup por líder, 4 KPIs derivados dos dados,
@@ -51,6 +56,8 @@ cliente. A troca por dados reais é um passo posterior — ver "Como trocar por 
   bloco entrando só se o toggle estiver ligado
 - [x] `panel/reportScope.js` — filtros de líderes usados pela prévia conforme o
   escopo selecionado
+- [x] `panel/panelLeaders.js` — valida e adapta os documentos vindos do Firestore;
+  líderes incompletos continuam no cadastro, mas não quebram mapa/ranking
 
 ### Testes escritos e executados
 - [x] `tests/component/leaderMetrics.test.jsx` — 11 casos (rating nos limites,
@@ -60,6 +67,8 @@ cliente. A troca por dados reais é um passo posterior — ver "Como trocar por 
   crescimento, só bases em alerta listadas, frequência/horário refletidos)
 - [x] `tests/component/reportScope.test.jsx` — 5 casos (todos, Região Central,
   bases em alerta, top 20 imutável e atualização da prévia pela interface)
+- [x] Testes de layout/sidebar, integração do dashboard com as assinaturas do
+  Firestore e filtragem dos líderes aptos ao painel
 
 ---
 
@@ -67,9 +76,7 @@ cliente. A troca por dados reais é um passo posterior — ver "Como trocar por 
 
 ### Imediato (era o próximo passo)
 - [x] **Rodar `npm test`** — suíte completa passando
-- [ ] **Validar no navegador** — nenhuma das três abas foi vista rodando ainda. O
-  mapa Leaflet em particular costuma precisar de ajuste (altura do container,
-  `invalidateSize` ao trocar de aba)
+- [ ] **Validar visualmente no navegador** nos breakpoints desktop/tablet/celular
 - [x] Implementação inicial commitada no `main` (`13ceada`)
 
 ### Pontos do handoff ainda não implementados
@@ -100,20 +107,17 @@ cliente. A troca por dados reais é um passo posterior — ver "Como trocar por 
 - [ ] **Envio real no WhatsApp** — o botão de teste só muda o próprio rótulo; não há
   integração com a WhatsApp Business API
 
-### Como trocar por dados reais
-Toda a fronteira está em um lugar só: `src/data/demoPanelData.js` e a linha
-`const panelLeaders = DEMO_LEADERS` no `ManagerDashboard.jsx`. As três abas recebem os
-líderes por prop (`<RegionsTab leaders={...} />`), então basta passar os líderes do
-Firestore no formato esperado (`{ id, nome, regiao, bairro, lat, lng, eleitores,
-semana, perf }`) e remover o `DemoBanner`.
+### Fluxo dos dados
+As três seções assinam `campaigns/{campaignId}/members` pelo serviço
+`subscribeToLeaders`. O adaptador `panel/panelLeaders.js` seleciona documentos com
+`name`, `regiao`, `bairro`, `lat`, `lng`, `eleitores`, `semana` e `perf`. A fonte
+`DEMO_LEADERS` só é importada por `scripts/seedDemoCampaign.js`.
 
 ---
 
 ## Observações
 
-- O aviso de dados de demonstração (`DemoBanner`) aparece no topo das três abas do
-  handoff, para ninguém confundir número ilustrativo com dado real da campanha. Ele
-  some sozinho quando `isDemoData` virar `false`.
+- O aviso de demonstração (`DemoBanner`) depende de `campaign.isDemo` no Firestore.
 - A aba "Cadastro de Líderes" foi mantida separada justamente porque é a única que
   opera em dados reais — ela não mostra o banner.
 - O handoff é do "Bem pro Brasil"; adaptei os textos para "Bem para Goiás" (título da

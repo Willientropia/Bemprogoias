@@ -8,148 +8,143 @@ const ROLE_LABELS = {
   [ROLES.LEADER]: "Líder",
 };
 
-const navItemStyle = ({ isActive }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: 12,
-  width: "100%",
-  padding: "11px 14px",
-  borderRadius: 11,
-  fontSize: 14,
-  fontWeight: isActive ? 700 : 500,
-  background: isActive ? "var(--gold)" : "transparent",
-  color: isActive ? "var(--brand-900)" : "rgba(255,255,255,.78)",
-  textDecoration: "none",
-  transition: "all .18s",
-});
+function NavIcon({ icon }) {
+  if (icon === "map") {
+    return (
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z" /><circle cx="12" cy="10" r="2.6" />
+      </svg>
+    );
+  }
 
-function IconHome() {
+  if (icon === "network") {
+    return (
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="6" r="2.4" /><circle cx="18" cy="18" r="2.4" /><path d="m8.2 10.9 7.6-3.8m-7.6 6 7.6 3.8" />
+      </svg>
+    );
+  }
+
+  if (icon === "report") {
+    return (
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z" /><path d="M8.5 11.5h7m-7 3h4" />
+      </svg>
+    );
+  }
+
+  if (icon === "users") {
+    return (
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      </svg>
+    );
+  }
+
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V20h14V9.5" /><path d="M9.5 20v-6h5v6" />
     </svg>
   );
 }
 
-function IconUsers() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-    </svg>
-  );
+function defaultItems(role) {
+  if (role === ROLES.SUPER_ADMIN) {
+    return [{ id: "campaigns", label: "Campanhas", icon: "home", href: "/super-admin" }];
+  }
+
+  if (role === ROLES.MANAGER) {
+    return [{ id: "leaders", label: "Líderes", icon: "users", href: "/manager" }];
+  }
+
+  return [];
 }
 
-export function Sidebar() {
+export function Sidebar({
+  items,
+  activeItem,
+  onItemSelect,
+  collapsed,
+  mobileOpen,
+  onToggleCollapsed,
+  onCloseMobile,
+  contextLabel,
+}) {
   const { user, role, logout } = useAuth();
   const initial = (user?.email ?? "?").charAt(0).toUpperCase();
+  const navigationItems = items ?? defaultItems(role);
 
   return (
-    <aside
-      className="app-sidebar"
-      style={{
-        width: 248,
-        flexShrink: 0,
-        background: "var(--brand-900)",
-        display: "flex",
-        flexDirection: "column",
-        padding: "22px 16px",
-        color: "#fff",
-      }}
-    >
-      <div
-        className="sidebar-brand"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 11,
-          padding: "6px 8px 22px",
-          borderBottom: "1px solid rgba(255,255,255,.08)",
-          marginBottom: 16,
-        }}
-      >
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            background: "#fff",
-            borderRadius: 11,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            padding: 4,
-          }}
-        >
-          <img src="/logo-mark.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+    <aside className={`app-sidebar${mobileOpen ? " mobile-open" : ""}`} aria-label="Navegação principal">
+      <div className="sidebar-brand">
+        <div className="sidebar-logo">
+          <img src="/logo-mark.png" alt="" />
         </div>
         <div className="sidebar-brand-text">
-          <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 14.5, letterSpacing: 0.4, lineHeight: 1.05 }}>
-            BEM PARA GOIÁS
-          </div>
-          <div style={{ fontSize: 7.5, letterSpacing: 1.3, color: "rgba(255,255,255,.55)", marginTop: 3 }}>
-            MANDATO COM PARTICIPAÇÃO PÚBLICA
-          </div>
+          <div className="sidebar-brand-name">BEM PARA GOIÁS</div>
+          <div className="sidebar-context-label">{contextLabel ?? "MANDATO COM PARTICIPAÇÃO PÚBLICA"}</div>
         </div>
+        <button type="button" className="sidebar-mobile-close" aria-label="Fechar menu" onClick={onCloseMobile}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
       </div>
 
-      <nav style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        {role === ROLES.SUPER_ADMIN && (
-          <NavLink to="/super-admin" style={navItemStyle}>
-            <IconHome />
-            <span>Campanhas</span>
-          </NavLink>
-        )}
-        {role === ROLES.MANAGER && (
-          <NavLink to="/manager" end style={navItemStyle}>
-            <IconUsers />
-            <span>Líderes</span>
-          </NavLink>
-        )}
+      <nav className="sidebar-nav">
+        {navigationItems.map((item) => (
+          <div key={item.id} className={item.dividerBefore ? "sidebar-nav-group" : undefined}>
+            {item.href ? (
+              <NavLink
+                to={item.href}
+                end={item.end ?? true}
+                className={({ isActive }) => `sidebar-nav-item${isActive ? " active" : ""}`}
+                title={collapsed ? item.label : undefined}
+                onClick={onCloseMobile}
+              >
+                <NavIcon icon={item.icon} />
+                <span>{item.label}</span>
+              </NavLink>
+            ) : (
+              <button
+                type="button"
+                className={`sidebar-nav-item${activeItem === item.id ? " active" : ""}`}
+                aria-current={activeItem === item.id ? "page" : undefined}
+                title={collapsed ? item.label : undefined}
+                onClick={() => onItemSelect?.(item.id)}
+              >
+                <NavIcon icon={item.icon} />
+                <span>{item.label}</span>
+              </button>
+            )}
+          </div>
+        ))}
       </nav>
 
-      <div className="sidebar-footer" style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.08)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 8 }}>
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: "50%",
-              background: "var(--gold)",
-              color: "var(--brand-900)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 700,
-              fontSize: 14,
-              flexShrink: 0,
-            }}
-          >
-            {initial}
-          </div>
-          <div className="sidebar-footer-info" style={{ overflow: "hidden", flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {user?.email}
-            </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)" }}>{ROLE_LABELS[role] ?? role}</div>
-          </div>
-          <button
-            type="button"
-            onClick={logout}
-            title="Sair"
-            style={{
-              background: "none",
-              border: "none",
-              color: "rgba(255,255,255,.45)",
-              padding: 4,
-              display: "flex",
-              cursor: "pointer",
-            }}
-          >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
-            </svg>
-          </button>
+      <button
+        type="button"
+        className="sidebar-collapse-button"
+        aria-label={collapsed ? "Expandir barra lateral" : "Recolher barra lateral"}
+        aria-expanded={!collapsed}
+        onClick={onToggleCollapsed}
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d={collapsed ? "m9 18 6-6-6-6" : "m15 18-6-6 6-6"} />
+        </svg>
+        <span>{collapsed ? "Expandir" : "Recolher menu"}</span>
+      </button>
+
+      <div className="sidebar-footer">
+        <div className="sidebar-user-avatar">{initial}</div>
+        <div className="sidebar-footer-info">
+          <div className="sidebar-user-email">{user?.email}</div>
+          <div className="sidebar-user-role">{ROLE_LABELS[role] ?? role}</div>
         </div>
+        <button type="button" onClick={logout} className="sidebar-logout" title="Sair" aria-label="Sair">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
+          </svg>
+        </button>
       </div>
     </aside>
   );

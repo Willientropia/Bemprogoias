@@ -20,6 +20,14 @@ export function subscribeToCampaigns(onChange) {
   });
 }
 
+export function subscribeToCampaign(campaignId, onChange, onError) {
+  return onSnapshot(
+    doc(db, "campaigns", campaignId),
+    (snapshot) => onChange(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null),
+    onError
+  );
+}
+
 export function createCampaign({ name, minAppVersion }) {
   return addDoc(campaignsRef, {
     name,

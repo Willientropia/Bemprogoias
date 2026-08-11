@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "seed:demo": "node scripts/seedDemoCampaign.js",
     "test": "npm run test:components && npm run test:rules",
     "test:components": "vitest run",
     "pretest:rules": "node scripts/killStaleEmulator.js",

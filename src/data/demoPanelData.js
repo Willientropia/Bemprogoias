@@ -4,18 +4,13 @@
 // construído a partir do handoff de design, que especifica números e uma base
 // de 15 líderes de Goiânia para apresentação ao cliente.
 //
-// Em produção, isto deve vir do Firestore:
-//   - LEADERS  -> campaigns/{campaignId}/members onde role == 'leader',
-//                 acrescido de lat/lng (geocodificados do endereço) e das
-//                 contagens de eleitores (campaigns/{campaignId}/voters,
-//                 escopo do Dev B).
-//   - RECIPIENTS / REPORT_BLOCKS -> configuração do Relatório Expresso salva
-//                 por campanha.
+// DEMO_LEADERS é a fonte versionada do seed idempotente executado por
+// scripts/seedDemoCampaign.js. O app não lê esta constante diretamente: as
+// três telas consultam campaigns/{campaignId}/members no Firestore. Assim a
+// demonstração percorre o mesmo caminho de dados de uma campanha normal.
 //
-// Enquanto a troca não acontece, `isDemoData` sinaliza para a UI avisar que os
-// números são ilustrativos — nunca exiba isto como se fosse dado real.
-
-export const isDemoData = true;
+// RECIPIENTS / REPORT_BLOCKS continuam locais até existir persistência para a
+// configuração do Relatório Expresso.
 
 export const DEMO_LEADERS = [
   { id: "l1", nome: "Ana Ribeiro", regiao: "Região Central", bairro: "Setor Central", lat: -16.6799, lng: -49.255, eleitores: 2140, semana: 86, perf: "alto" },

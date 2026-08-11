@@ -80,7 +80,7 @@ export default function ReportTab({ leaders }) {
                 </FilterButton>
               ))}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 20 }}>
+            <div className="panel-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 20 }}>
               <div>
                 <label htmlFor="report-time">Horário do disparo</label>
                 <input id="report-time" type="time" value={horario} onChange={(e) => setHorario(e.target.value)} />
