@@ -2,27 +2,23 @@ import { useMemo, useState } from "react";
 import { DEFAULT_REPORT_BLOCKS, DEMO_RECIPIENTS, DEMO_STATIC_STATS } from "../../../data/demoPanelData";
 import { buildReportMessage } from "./buildReportMessage";
 import { Avatar, Chip, FilterButton, KpiCard, SectionLabel } from "./PanelBits";
+import { filterLeadersByScope, REPORT_SCOPES } from "./reportScope";
 
 const FREQUENCIES = ["Diário (fim do dia)", "A cada 12 horas", "A cada 6 horas", "Semanal"];
-const SCOPES = [
-  "Todos os líderes de Goiânia",
-  "Somente Região Central",
-  "Somente bases em alerta",
-  "Top 20 líderes",
-];
 
 export default function ReportTab({ leaders }) {
   const [frequencia, setFrequencia] = useState(FREQUENCIES[0]);
   const [horario, setHorario] = useState("21:00");
-  const [escopo, setEscopo] = useState(SCOPES[0]);
+  const [escopo, setEscopo] = useState(REPORT_SCOPES[0].id);
   const [blocks, setBlocks] = useState(DEFAULT_REPORT_BLOCKS);
   const [testSent, setTestSent] = useState(false);
 
   const totalRecipients = DEMO_RECIPIENTS.reduce((acc, r) => acc + r.pessoas, 0);
 
+  const scopedLeaders = useMemo(() => filterLeadersByScope(leaders, escopo), [leaders, escopo]);
   const message = useMemo(
-    () => buildReportMessage({ leaders, blocks, frequencia, horario }),
-    [leaders, blocks, frequencia, horario]
+    () => buildReportMessage({ leaders: scopedLeaders, blocks, frequencia, horario }),
+    [scopedLeaders, blocks, frequencia, horario]
   );
 
   function toggleBlock(id) {
@@ -92,8 +88,8 @@ export default function ReportTab({ leaders }) {
               <div>
                 <label htmlFor="report-scope">Escopo do relatório</label>
                 <select id="report-scope" value={escopo} onChange={(e) => setEscopo(e.target.value)}>
-                  {SCOPES.map((s) => (
-                    <option key={s}>{s}</option>
+                  {REPORT_SCOPES.map((scope) => (
+                    <option key={scope.id} value={scope.id}>{scope.label}</option>
                   ))}
                 </select>
               </div>

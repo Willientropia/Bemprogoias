@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Circle, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -24,13 +24,28 @@ function pinIcon(leader) {
   });
 }
 
-// Dá acesso à instância do mapa para o "voar até o líder" da lista lateral.
-function MapRef({ mapRef }) {
-  mapRef.current = useMap();
+// Dá acesso à instância do mapa para o "voar até o líder" da lista lateral e
+// recalcula o tamanho quando a aba volta a ficar visível, sem perder zoom/posição.
+function MapRef({ mapRef, active }) {
+  const map = useMap();
+
+  useEffect(() => {
+    mapRef.current = map;
+    return () => {
+      if (mapRef.current === map) mapRef.current = null;
+    };
+  }, [map, mapRef]);
+
+  useEffect(() => {
+    if (!active) return undefined;
+    const frame = window.requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [active, map]);
+
   return null;
 }
 
-export default function RegionsTab({ leaders }) {
+export default function RegionsTab({ leaders, active = true }) {
   const [perfFilter, setPerfFilter] = useState("todos");
   const [selectedId, setSelectedId] = useState(null);
   const mapRef = useRef(null);
@@ -64,6 +79,9 @@ export default function RegionsTab({ leaders }) {
             Mapa interativo com a localização dos líderes regionais e o alcance de cada base
           </p>
         </div>
+        <Chip background="var(--brand-50)" color="var(--brand-700)">
+          Dados sincronizados · há 4 minutos
+        </Chip>
       </div>
 
       <div className="kpi-grid" style={{ marginTop: 22 }}>
@@ -85,7 +103,7 @@ export default function RegionsTab({ leaders }) {
       <div className="panel-split" style={{ display: "grid", gridTemplateColumns: "1fr 336px", gap: 18, alignItems: "start" }}>
         <div className="panel-card" style={{ overflow: "hidden", padding: 0 }}>
           <MapContainer center={GOIANIA_CENTER} zoom={11} scrollWheelZoom style={{ height: 540, width: "100%" }}>
-            <MapRef mapRef={mapRef} />
+            <MapRef mapRef={mapRef} active={active} />
             <TileLayer
               url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

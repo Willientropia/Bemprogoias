@@ -7,8 +7,8 @@ Implementação do handoff em [`docs/handoff-painel-gestor/`](./docs/handoff-pai
 demonstração** (os 15 líderes de Goiânia e os números da demo), para apresentação ao
 cliente. A troca por dados reais é um passo posterior — ver "Como trocar por dados reais".
 
-**Estado geral:** código escrito, build e lint passando. **Ainda não rodei a suíte de
-testes completa nem validei no navegador** — foi onde a implementação parou.
+**Estado geral:** código escrito; build, lint e suíte completa de testes passando.
+**A validação visual no navegador ainda está pendente.**
 
 ---
 
@@ -49,36 +49,39 @@ testes completa nem validei no navegador** — foi onde a implementação parou.
   limitado entre 1 e 5), ordenações, cor do "+N na semana", formatação pt-BR
 - [x] `panel/buildReportMessage.js` — montagem da mensagem do WhatsApp, com cada
   bloco entrando só se o toggle estiver ligado
+- [x] `panel/reportScope.js` — filtros de líderes usados pela prévia conforme o
+  escopo selecionado
 
-### Testes escritos (mas ainda não executados)
+### Testes escritos e executados
 - [x] `tests/component/leaderMetrics.test.jsx` — 11 casos (rating nos limites,
   as três ordenações, imutabilidade do array, faixas de cor, formatação)
 - [x] `tests/component/buildReportMessage.test.jsx` — 7 casos (cabeçalho e rodapé
   sempre presentes, blocos desligados omitidos, somas corretas, ranking por
   crescimento, só bases em alerta listadas, frequência/horário refletidos)
+- [x] `tests/component/reportScope.test.jsx` — 5 casos (todos, Região Central,
+  bases em alerta, top 20 imutável e atualização da prévia pela interface)
 
 ---
 
 ## O que falta
 
 ### Imediato (era o próximo passo)
-- [ ] **Rodar `npm test`** — os 18 testes novos nunca foram executados; podem falhar
+- [x] **Rodar `npm test`** — suíte completa passando
 - [ ] **Validar no navegador** — nenhuma das três abas foi vista rodando ainda. O
   mapa Leaflet em particular costuma precisar de ajuste (altura do container,
   `invalidateSize` ao trocar de aba)
-- [ ] Commitar (nada disso foi commitado ainda)
+- [x] Implementação inicial commitada no `main` (`13ceada`)
 
 ### Pontos do handoff ainda não implementados
-- [ ] **Chip "Dados sincronizados · há 4 minutos"** no cabeçalho da aba Regiões
+- [x] **Chip "Dados sincronizados · há 4 minutos"** no cabeçalho da aba Regiões
 - [ ] **Botão "Abrir ficha do líder"** no card de líder selecionado (o handoff prevê
   o botão, mas não existe tela de ficha para onde levar)
 - [ ] **Botão "Adicionar" destinatário** — está no handoff, mas sem um fluxo real de
   cadastro de destinatário decidido, deixei de fora em vez de colocar um botão morto
-- [ ] `invalidateSize()` do mapa ao voltar para a aba Regiões (o handoff pede
-  explicitamente; hoje o mapa desmonta e remonta ao trocar de aba, o que funciona,
-  mas perde o estado de zoom/posição)
-- [ ] Escopo do relatório (`Todos os líderes` / `Somente Região Central` / etc.) é
-  exibido e selecionável, mas **ainda não filtra** o conteúdo da prévia
+- [x] `invalidateSize()` do mapa ao voltar para a aba Regiões; a aba permanece
+  montada para preservar zoom, posição, filtro e líder selecionado
+- [x] Escopo do relatório (`Todos os líderes` / `Somente Região Central` / etc.)
+  filtra o conteúdo da prévia
 
 ### Para sair da demo (quando os dados reais existirem)
 - [ ] **lat/lng no cadastro de líder** — hoje o líder tem só `regiao` como texto

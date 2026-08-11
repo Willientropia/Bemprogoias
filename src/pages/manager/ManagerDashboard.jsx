@@ -45,9 +45,15 @@ export default function ManagerDashboard() {
 
       {isDemoData && tab !== "cadastro" && <DemoBanner />}
 
-      {tab === "regioes" && <RegionsTab leaders={panelLeaders} />}
-      {tab === "rede" && <NetworkTab leaders={panelLeaders} />}
-      {tab === "expresso" && <ReportTab leaders={panelLeaders} />}
+      <section hidden={tab !== "regioes"}>
+        <RegionsTab leaders={panelLeaders} active={tab === "regioes"} />
+      </section>
+      <section hidden={tab !== "rede"}>
+        <NetworkTab leaders={panelLeaders} />
+      </section>
+      <section hidden={tab !== "expresso"}>
+        <ReportTab leaders={panelLeaders} />
+      </section>
 
       {tab === "cadastro" && (
         <div>
