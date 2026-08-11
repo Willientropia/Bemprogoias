@@ -20,10 +20,20 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+const missingFirebaseVariables = Object.entries(firebaseConfig)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingFirebaseVariables.length) {
+  throw new Error(`Configuração do Firebase incompleta: ${missingFirebaseVariables.join(", ")}`);
+}
+
 export const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-setPersistence(auth, browserLocalPersistence);
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error("Não foi possível manter a sessão do Firebase neste dispositivo.", error);
+});
 
 // Offline-first: cache local persistente com suporte a múltiplas abas,
 // necessário para o líder cadastrar eleitores em campo sem sinal (ver spec 2.7).

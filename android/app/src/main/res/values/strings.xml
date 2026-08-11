@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Bem pro Goiás</string>
+    <string name="title_activity_main">Bem pro Goiás</string>
+    <string name="package_name">br.org.bemprogoias.campo</string>
+    <string name="custom_url_scheme">br.org.bemprogoias.campo</string>
+</resources>

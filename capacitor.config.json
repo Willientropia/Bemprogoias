@@ -1,0 +1,21 @@
+{
+  "appId": "br.org.bemprogoias.campo",
+  "appName": "Bem pro Goiás",
+  "webDir": "dist",
+  "backgroundColor": "#FFFFFF",
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css",
+      "style": "LIGHT",
+      "hidden": false,
+      "animation": "NONE"
+    },
+    "Geolocation": { "enableHighAccuracy": true },
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#FFFFFF",
+      "showSpinner": false
+    }
+  }
+}

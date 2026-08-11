@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -7,11 +8,16 @@ import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
 import CampaignDetailPage from "./pages/super-admin/CampaignDetailPage";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 
+const LeaderApp = lazy(() => import("./pages/leader/LeaderApp"));
+
 function RoleHome() {
-  const { role } = useAuth();
+  const { role, loading } = useAuth();
+
+  if (loading) return <p className="app-route-loading">Conectando ao Firebase…</p>;
 
   if (role === ROLES.SUPER_ADMIN) return <Navigate to="/super-admin" replace />;
   if (role === ROLES.MANAGER) return <Navigate to="/manager" replace />;
+  if (role === ROLES.LEADER) return <Navigate to="/leader" replace />;
   return <Navigate to="/login" replace />;
 }
 
@@ -42,6 +48,16 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.MANAGER]}>
                 <ManagerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leader"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.LEADER]}>
+                <Suspense fallback={<p>Carregando aplicativo de campo…</p>}>
+                  <LeaderApp />
+                </Suspense>
               </ProtectedRoute>
             }
           />

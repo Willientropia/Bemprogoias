@@ -40,3 +40,7 @@ android/app/build
 android/.gradle
 electron/dist
 release
+
+# APKs não entram no repositório: cada um tem ~10 MB e o app busca a
+# atualização nos assets da release do GitHub, não no código-fonte.
+*.apk

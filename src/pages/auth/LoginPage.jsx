@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -16,12 +16,19 @@ const ERROR_MESSAGES = {
 };
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { user, role, loading, login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!loading && user && role) navigate("/", { replace: true });
+    if (!loading && user && !role) {
+      setError("Sua conta foi autenticada, mas ainda não possui um perfil de acesso no Firebase. Fale com o administrador da campanha.");
+    }
+  }, [loading, navigate, role, user]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -29,7 +36,6 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email, password);
-      navigate("/");
     } catch (err) {
       setError(ERROR_MESSAGES[err?.code] ?? "Não foi possível entrar. Tente novamente em instantes.");
     } finally {
@@ -38,7 +44,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="login-page" style={{ display: "flex", minHeight: "100dvh" }}>
       {/* Painel de marca */}
       <div
         style={{
@@ -63,7 +69,7 @@ export default function LoginPage() {
           </div>
           <div>
             <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 17, letterSpacing: 0.5, lineHeight: 1 }}>
-              BEM PARA GOIÁS
+              BEM PRO GOIÁS
             </div>
             <div style={{ fontSize: 8.5, letterSpacing: 1.6, color: "rgba(255,255,255,.6)", marginTop: 3 }}>
               MANDATO COM PARTICIPAÇÃO PÚBLICA
@@ -89,10 +95,12 @@ export default function LoginPage() {
       </div>
 
       {/* Formulário */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--page-bg)", padding: 40 }}>
+      <div className="login-form-panel" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--page-bg)" }}>
         <div style={{ width: "100%", maxWidth: 392 }}>
+          <img className="login-mobile-logo" src="/logo-bem-pro-brasil.png"
+            alt="BEM pro Brasil — Mandato com participação pública" />
           <h2 style={{ fontSize: 30, marginBottom: 6 }}>Entrar na plataforma</h2>
-          <p style={{ fontSize: 14.5, marginBottom: 30 }}>Acesso restrito a gestores e administradores da campanha.</p>
+          <p style={{ fontSize: 14.5, marginBottom: 30 }}>Entre com a conta cadastrada no Firebase para acessar sua área da campanha.</p>
 
           <form onSubmit={handleSubmit} style={{ background: "none", border: "none", padding: 0, margin: 0, maxWidth: "none" }}>
             <div>
@@ -124,10 +132,10 @@ export default function LoginPage() {
             )}
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || (Boolean(user) && loading)}
               style={{ width: "100%", marginTop: 8, padding: 15, fontSize: 15 }}
             >
-              {submitting ? "Entrando..." : "Entrar na plataforma"}
+              {submitting || (user && loading) ? "Consultando perfil..." : "Entrar na plataforma"}
             </button>
           </form>
         </div>

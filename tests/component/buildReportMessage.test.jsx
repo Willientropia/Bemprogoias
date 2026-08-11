@@ -23,7 +23,7 @@ const base = { leaders, frequencia: "Diário (fim do dia)", horario: "21:00" };
 describe("buildReportMessage", () => {
   it("sempre inclui cabeçalho, frequência/horário e rodapé", () => {
     const msg = buildReportMessage({ ...base, blocks: noBlocks });
-    expect(msg).toContain("*BEM PARA GOIÁS — Relatório Expresso*");
+    expect(msg).toContain("*BEM PRO GOIÁS — Relatório Expresso*");
     expect(msg).toContain("_Diário (fim do dia) · 21:00 · Goiânia_");
     expect(msg).toContain("Painel completo:");
   });

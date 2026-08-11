@@ -24,6 +24,11 @@ Atualizar este arquivo à medida que cada item avançar.
 - [x] **CRUD de Campanhas completo** (criar, editar, excluir) — Super Admin
 - [x] **CRUD de Gestores completo** (criar, editar, remover) — Super Admin, dentro de cada campanha
 - [x] **CRUD de Líderes completo** (criar, editar, remover) — Gestor, dentro da própria campanha
+- [x] **Painel do gestor redesenhado** em branco, verde e amarelo, com abas de Regiões, Rede de
+  Indicações, Relatório Expresso e Cadastro de Líderes. As três primeiras ainda exibem dados de
+  demonstração; o cadastro já opera no Firestore.
+- [x] **Mapa Leaflet/OpenStreetMap do gestor** implementado com marcadores, círculos de alcance,
+  filtros e detalhe do líder sobre a base demonstrativa.
 - [x] `TopBar` compartilhado com botão de logout
 - [x] `docs/design-reference/` — mockups visuais de referência (gerados via Claude) para a
   identidade "Universe Deep Space"
@@ -34,11 +39,12 @@ Atualizar este arquivo à medida que cada item avançar.
 
 ## Próximos passos (em ordem sugerida)
 
-### 1. Mapa do Gestor
-- [ ] Escolher biblioteca de mapa (Leaflet é o candidato mais leve/gratuito para web+Electron+Capacitor)
-- [ ] Plotar cada líder como marcador + círculo de raio (km) centrado na região (`regiao`/`raioKm`
-  já existem no perfil do líder)
-- [ ] Plotar eleitores como pontos (somente leitura, dado do Dev B)
+### 1. Conectar o painel visual do Gestor aos dados reais
+- [x] Biblioteca escolhida e instalada: Leaflet + React Leaflet.
+- [x] Marcadores, círculos de alcance e filtros implementados na interface demonstrativa.
+- [ ] Substituir `DEMO_LEADERS` pelos líderes/eleitores reais do Firestore.
+- [ ] Consumir `subscribeToLeaderLocations` para mostrar a posição ao vivo compartilhada pelo líder.
+- [ ] Plotar eleitores reais como pontos (somente leitura, dado do Dev B).
 
 ### 2. Empacotamento Electron (Windows)
 - [ ] Configurar Electron apontando para o build do Vite
@@ -91,9 +97,8 @@ Atualizar este arquivo à medida que cada item avançar.
   `test:rules` com "port taken". `scripts/killStaleEmulator.js` roda automaticamente como
   `pretest:rules` (hook `pre*` do npm) e mata qualquer processo preso na porta antes de tentar
   subir o emulador — não precisa mais matar manualmente pelo Gerenciador de Tarefas.
-- CSS/identidade visual "Universe Deep Space" (seção 5 do spec) ainda não aplicado ao código — há
-  mockups de referência em `docs/design-reference/`, mas as páginas atuais são só estrutura
-  funcional.
+- [x] Identidade visual oficial em branco, verde e amarelo aplicada aos painéis administrativos
+  e ao app de campo do líder, seguindo os mockups `Bem pro Brasil` do handoff mais recente.
 
 ## Contrato com o Dev B
 
@@ -106,3 +111,27 @@ Atualizar este arquivo à medida que cada item avançar.
   APK/PWA reusando o campo `minAppVersion`.
 - Dev A é dono do componente de mapa (gestor); Dev B reusa esse componente para o modo "pin no
   mapa" do cadastro de eleitor.
+
+## Integração entregue pelo Dev B
+
+- [x] Rota protegida `/leader` e app mobile-first do líder.
+- [x] CRUD completo de eleitores, busca, edição e exclusão.
+- [x] Deduplicação por RG/título com reservas transacionais `voterKeys`.
+- [x] Três modos de localização: GPS com permissão, endereço e pin Leaflet.
+- [x] Manifesto Android com permissões de localização e solicitação nativa durante o uso do app.
+- [x] Fluxos críticos cobertos por testes: cadastro recente/detalhe, voltar, salvar sem travar,
+  pedido de permissão GPS e encerramento do carregamento quando GPS/Firestore não respondem.
+- [x] Botão físico Voltar do Android integrado com `@capacitor/app`.
+- [x] APK 1.0.1 (`versionCode 2`) com captura GPS redundante: `LocationManager` nativo + provedor
+  do WebView, com timeout total testado.
+- [x] IndexedDB + persistência Firestore + fila/reconciliação offline.
+- [x] WhatsApp modular via `wa.me`.
+- [x] PWA instalável/service worker e Capacitor Android.
+- [x] OTA mobile via GitHub Releases e `minAppVersion`.
+- [x] Compartilhamento voluntário da localização em tempo real do líder em foreground.
+- [x] Contrato `leaderLocations` e serviço de assinatura para o mapa do gestor.
+- [x] Auth integrado ao contrato final `users/{uid}` + `members/{uid}`, sem custom claims.
+- [ ] Dev A revisar e fazer deploy de `firestore.rules`/índices.
+- [ ] Dev A usar `subscribeToLeaderLocations` no mapa do gestor.
+
+Detalhes: [`docs/DEV_B_HANDOFF.md`](./docs/DEV_B_HANDOFF.md).

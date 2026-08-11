@@ -5,6 +5,8 @@ import "leaflet/dist/leaflet.css";
 import { GOIANIA_CENTER, PERF_COLORS, PERF_LABELS } from "../../../data/demoPanelData";
 import { formatNumber } from "./leaderMetrics";
 import { Avatar, Chip, FilterButton, KpiCard, SectionLabel, Stars } from "./PanelBits";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useLiveLeaderLocations } from "../../../hooks/useLiveLeaderLocations";
 
 const FILTERS = [
   { id: "todos", label: "Todos" },
@@ -24,6 +26,24 @@ function pinIcon(leader) {
   });
 }
 
+// Marcador de quem está em campo AGORA. Cor viva e halo pulsante para se
+// distinguir do pino cinza da região cadastrada — no mapa os dois convivem.
+function liveIcon(nome) {
+  const inicial = (nome || "?").charAt(0).toUpperCase();
+  return L.divIcon({
+    className: "",
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+    html: `<div class="live-pin"><span>${inicial}</span></div>`,
+  });
+}
+
+function minutosDesde(iso) {
+  const quando = Date.parse(iso || "");
+  if (!Number.isFinite(quando)) return null;
+  return Math.max(0, Math.round((Date.now() - quando) / 60_000));
+}
+
 // Dá acesso à instância do mapa para o "voar até o líder" da lista lateral.
 function MapRef({ mapRef }) {
   mapRef.current = useMap();
@@ -33,8 +53,19 @@ function MapRef({ mapRef }) {
 export default function RegionsTab({ leaders }) {
   const [perfFilter, setPerfFilter] = useState("todos");
   const [selectedId, setSelectedId] = useState(null);
+  const [mostrarAoVivo, setMostrarAoVivo] = useState(true);
   const mapRef = useRef(null);
   const markerRefs = useRef({});
+  const { campaignId } = useAuth();
+  const { ativos: aoVivo, error: erroAoVivo } = useLiveLeaderLocations(campaignId);
+
+  // O documento de posição é indexado pelo uid do líder, então dá para casar
+  // com a lista já carregada e mostrar o nome em vez de um código.
+  const nomePorId = useMemo(() => {
+    const mapa = {};
+    leaders.forEach((l) => { mapa[l.id] = l.nome; });
+    return mapa;
+  }, [leaders]);
 
   const visible = useMemo(
     () => (perfFilter === "todos" ? leaders : leaders.filter((l) => l.perf === perfFilter)),
@@ -137,6 +168,42 @@ export default function RegionsTab({ leaders }) {
                 </Popup>
               </Marker>
             ))}
+
+            {/* Quem está compartilhando a posição agora. Desenhado por último
+                para ficar ACIMA dos pinos de região — é a informação que muda
+                e a que o gestor procura. */}
+            {mostrarAoVivo && aoVivo.map((posicao) => {
+              const nome = nomePorId[posicao.id] || "Líder em campo";
+              const minutos = minutosDesde(posicao.deviceTimestamp);
+              return (
+                <Marker
+                  key={`live-${posicao.id}`}
+                  position={[posicao.lat, posicao.lng]}
+                  icon={liveIcon(nome)}
+                  title={`${nome} — em campo agora`}
+                  zIndexOffset={1000}
+                >
+                  <Popup>
+                    <div style={{ minWidth: 180 }}>
+                      <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 15 }}>
+                        {nome}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#1a7f37", fontWeight: 600, margin: "3px 0 8px" }}>
+                        Em campo agora
+                      </div>
+                      <div style={{ fontSize: 12, color: "#8a8b80" }}>
+                        {minutos === null
+                          ? "Posição recebida"
+                          : minutos < 1 ? "Atualizado agora mesmo"
+                          : `Atualizado há ${minutos} min`}
+                        {Number.isFinite(posicao.accuracy) && posicao.accuracy > 0
+                          ? ` · precisão ~${posicao.accuracy} m` : ""}
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MapContainer>
 
           <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "13px 20px", borderTop: "1px solid var(--border)", flexWrap: "wrap" }}>
@@ -147,8 +214,31 @@ export default function RegionsTab({ leaders }) {
                 {label}
               </span>
             ))}
+            <button
+              type="button"
+              onClick={() => setMostrarAoVivo((v) => !v)}
+              title="Mostrar ou esconder quem está compartilhando a posição agora"
+              style={{
+                display: "flex", alignItems: "center", gap: 7, fontSize: 12.5,
+                border: "1px solid var(--border)", borderRadius: 999,
+                padding: "4px 11px", cursor: "pointer",
+                background: mostrarAoVivo ? "#e8f5ec" : "transparent",
+                color: mostrarAoVivo ? "#1a7f37" : "#5c6657",
+                fontWeight: mostrarAoVivo ? 600 : 500,
+              }}
+            >
+              <span className={mostrarAoVivo ? "live-dot" : ""} style={{
+                width: 9, height: 9, borderRadius: "50%",
+                background: mostrarAoVivo ? "#1a7f37" : "#b9bdb2",
+              }} />
+              {aoVivo.length > 0
+                ? `${aoVivo.length} em campo agora`
+                : "Ninguém em campo agora"}
+            </button>
             <span style={{ fontSize: 12, color: "var(--ink-soft)", marginLeft: "auto" }}>
-              O círculo representa o alcance estimado da base
+              {erroAoVivo
+                ? "Não consegui ler as posições ao vivo"
+                : "O círculo representa o alcance estimado da base"}
             </span>
           </div>
         </div>

@@ -1,8 +1,9 @@
-# Bem para Goiás
+# Bem pro Goiás
 
 Plataforma multi-campanha para acompanhamento de líderes regionais e cadastro de eleitores. Ver [`Bem_para_Goias_App_Spec.md`](./Bem_para_Goias_App_Spec.md) para a especificação completa.
 
-Stack: React (Vite) + Firebase (Auth, Firestore, Storage). Empacotado como Web, Electron (Windows), Capacitor (Android) e PWA (iOS) a partir do mesmo código-base.
+Stack: React (Vite) + Firebase (Auth, Firestore, Storage). Disponível como Web/PWA e Capacitor
+(Android) a partir do mesmo código-base; o empacotamento Electron (Windows) está planejado.
 
 ## Setup
 
@@ -45,7 +46,10 @@ src/
     auth/                 # login
     super-admin/           # painel do super admin (dono: Dev A)
     manager/                # painel do gestor (dono: Dev A)
+    leader/                 # app de campo do líder (dono: Dev B)
 ```
+
+O app do líder inclui CRUD/deduplicação de eleitores, três modos de localização, operação offline, WhatsApp, PWA/APK e compartilhamento voluntário da posição em tempo real enquanto o app está aberto. Ver [`docs/DEV_B_HANDOFF.md`](./docs/DEV_B_HANDOFF.md).
 
 ## Times
 

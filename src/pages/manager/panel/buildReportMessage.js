@@ -12,7 +12,7 @@ export function buildReportMessage({ leaders, blocks, frequencia, horario }) {
   const porCrescimento = [...leaders].sort((a, b) => b.semana - a.semana);
   const alerta = leaders.filter((l) => l.perf === "alerta");
 
-  let msg = "*BEM PARA GOIÁS — Relatório Expresso*\n";
+  let msg = "*BEM PRO GOIÁS — Relatório Expresso*\n";
   msg += `_${frequencia} · ${horario} · Goiânia_\n`;
   msg += `${DIVIDER}\n`;
 
@@ -48,6 +48,6 @@ export function buildReportMessage({ leaders, blocks, frequencia, horario }) {
     msg += `\n🤝 *Presença nos conselhos:* ${DEMO_STATIC_STATS.presencaConselhos}% dos líderes\n`;
   }
 
-  msg += `\n${DIVIDER}\nPainel completo: bemparagoias.br/gestor`;
+  msg += `\n${DIVIDER}\nPainel completo: bemprogoias.br/gestor`;
   return msg;
 }

@@ -1,19 +1,27 @@
 {
-  "name": "bem-para-goias",
+  "name": "bem-pro-goias",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview",
-    "test": "npm run test:components && npm run test:rules",
-    "test:components": "vitest run",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "npm run test:components && npm run test:unit && npm run test:rules",
+    "test:components": "vitest run --pool=threads --maxWorkers=1 --fileParallelism=false",
+    "test:unit": "node --test test/async.test.js test/normalizers.test.js test/version.test.js",
     "pretest:rules": "node scripts/killStaleEmulator.js",
-    "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.js\""
+    "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.js\"",
+    "cap:sync": "npm run build && cap sync android",
+    "android:debug": "npm run cap:sync && powershell.exe -ExecutionPolicy Bypass -File scripts/android-debug.ps1"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/app-launcher": "^8.0.1",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/geolocation": "^8.2.1",
     "firebase": "^12.17.1",
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
@@ -22,6 +30,7 @@
     "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.0",
     "@firebase/rules-unit-testing": "^5.0.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
@@ -34,6 +43,8 @@
     "jsdom": "^29.1.1",
     "oxlint": "^1.75.0",
     "vite": "^8.2.0",
+    "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.10"
   }
 }
+

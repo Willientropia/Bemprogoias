@@ -84,7 +84,7 @@ export function Sidebar() {
         </div>
         <div className="sidebar-brand-text">
           <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 14.5, letterSpacing: 0.4, lineHeight: 1.05 }}>
-            BEM PARA GOIÁS
+            BEM PRO GOIÁS
           </div>
           <div style={{ fontSize: 7.5, letterSpacing: 1.3, color: "rgba(255,255,255,.55)", marginTop: 3 }}>
             MANDATO COM PARTICIPAÇÃO PÚBLICA

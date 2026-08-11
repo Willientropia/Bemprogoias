@@ -1,4 +1,4 @@
-# Bem para Goiás — App de Acompanhamento de Líderes Regionais em Campanha
+# Bem pro Goiás — App de Acompanhamento de Líderes Regionais em Campanha
 
 **Documento de especificação + prompt de desenvolvimento**
 **Versão:** 1.0
@@ -8,7 +8,7 @@
 
 ## 1. Resumo do produto
 
-O **Bem para Goiás** é uma plataforma multi-campanha para acompanhamento de líderes regionais e cadastro de eleitores durante campanhas eleitorais. Cada campanha é isolada das demais (dados, usuários e permissões separados), funcionando como "vários apps em um só" sob um mesmo código-base.
+O **Bem pro Goiás** é uma plataforma multi-campanha para acompanhamento de líderes regionais e cadastro de eleitores durante campanhas eleitorais. Cada campanha é isolada das demais (dados, usuários e permissões separados), funcionando como "vários apps em um só" sob um mesmo código-base.
 
 A plataforma tem **três perfis de acesso**, em hierarquia:
 
@@ -173,7 +173,7 @@ Reaproveitar a linguagem visual do branding existente ("Universe Deep Space"):
 
 ## 6. Prompt de desenvolvimento (pronto para uso)
 
-> **Contexto:** Construa o "Bem para Goiás", uma plataforma multi-campanha para acompanhamento de líderes regionais e cadastro de eleitores em campanhas eleitorais, a partir de um único código-base React (JS), com backend Firebase.
+> **Contexto:** Construa o "Bem pro Goiás", uma plataforma multi-campanha para acompanhamento de líderes regionais e cadastro de eleitores em campanhas eleitorais, a partir de um único código-base React (JS), com backend Firebase.
 >
 > **Plataformas (mesmo código-base):**
 > - APK Android via **Capacitor**;
