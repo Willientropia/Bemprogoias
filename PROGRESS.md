@@ -86,6 +86,11 @@ Atualizar este arquivo à medida que cada item avançar.
   rodar o emulador. `npm test` roda os dois em sequência.
 - Testes de componente **mockam os `services/*.js`** (nunca falam com o Firebase de verdade) —
   são rápidos (~2s) e não exigem rede nem emulador. Cobrem lógica/UI, não pegam bugs visuais/CSS.
+- **O Firestore Emulator (processo Java) às vezes não encerra sozinho no Windows** após
+  `firebase emulators:exec` terminar, prendendo a porta 8080 e quebrando a próxima execução de
+  `test:rules` com "port taken". `scripts/killStaleEmulator.js` roda automaticamente como
+  `pretest:rules` (hook `pre*` do npm) e mata qualquer processo preso na porta antes de tentar
+  subir o emulador — não precisa mais matar manualmente pelo Gerenciador de Tarefas.
 - CSS/identidade visual "Universe Deep Space" (seção 5 do spec) ainda não aplicado ao código — há
   mockups de referência em `docs/design-reference/`, mas as páginas atuais são só estrutura
   funcional.

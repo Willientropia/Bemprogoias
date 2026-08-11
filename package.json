@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "npm run test:components && npm run test:rules",
     "test:components": "vitest run",
+    "pretest:rules": "node scripts/killStaleEmulator.js",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.js\""
   },
   "dependencies": {
