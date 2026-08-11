@@ -99,7 +99,13 @@ campaigns/{campaignId}/voters/{voterId}
 **Pontos de atenção:**
 
 - `leaderId` é o que as Security Rules usam para isolar: o líder só lê e escreve documentos em
-  que `leaderId == request.auth.uid`. Gravar outro valor é rejeitado pelo servidor.
+  que `leaderId == request.auth.uid`. Gravar outro valor é rejeitado pelo servidor. No `update`,
+  a regra checa o valor **antes e depois** — o líder não pode "adotar" eleitor alheio nem passar
+  o próprio para terceiros.
+- **Não existe campo `campaignId` dentro do documento**, e as regras não o exigem: o isolamento
+  já vem do path (`campaigns/{campaignId}/voters/...`). Chegou a ser proposto exigi-lo, mas seria
+  consistência de dado e não permissão, e travaria os 298 registros que já existem. Se um dia
+  aparecer necessidade de `collectionGroup('voters')`, aí o campo passa a ser necessário.
 - `validationStatus` alimenta o ranking e as estrelas do gestor — **apenas `validado` conta**.
   Quem define o status é o processo de validação, não o líder.
 - `normalizedName` existe porque o Firestore não faz busca case/acento-insensitive. Se o app do
@@ -150,6 +156,24 @@ no Firestore Emulator) — o isolamento entre campanhas foi comprovado em teste,
 | `campaigns/{id}` | leitura/escrita total | leitura + **apenas** WhatsApp e horário do relatório | leitura |
 | `campaigns/{id}/members` | leitura/escrita total | lista/lê/cria/edita apenas líderes da própria campanha | lê apenas o próprio (não lista) |
 | `campaigns/{id}/voters` | leitura/escrita total | leitura/escrita | lê/escreve **apenas os próprios** (`leaderId == uid`) |
+| `campaigns/{id}/voterKeys` | leitura/escrita total | leitura/escrita | **consulta qualquer chave** (`get`), escreve só as próprias, não lista |
+| `campaigns/{id}/leaderLocations` | leitura total | leitura | escreve **apenas o próprio** documento (id = uid) |
+
+### Coleções preparadas para o app do líder
+
+Duas coleções já têm regras publicadas e testadas, mas **ainda não são usadas por nenhum
+código** — foram criadas para o Dev B:
+
+- **`voterKeys/{keyId}`** — reserva de RG/título para a deduplicação. O líder pode fazer `get`
+  de qualquer chave (é assim que ele descobre se um eleitor já existe na campanha, mesmo que
+  seja de outro líder), mas só cria e altera as próprias. `list` é bloqueado para o líder, então
+  ele não consegue varrer a coleção inteira. O `keyId` deve ser derivado do documento
+  (ex.: `rg-123456789`), e o documento guarda ao menos `leaderId` e `voterId`.
+  Isso resolve a limitação que existia antes: o líder não pode ler `voters` alheios, mas pode
+  consultar a chave — que não expõe dado pessoal, só a existência.
+- **`leaderLocations/{leaderId}`** — posição compartilhada voluntariamente pelo líder durante o
+  trabalho. O id do documento **é** o uid do líder, então cada um só escreve o próprio. O gestor
+  lê e lista; não escreve. O líder pode apagar o próprio documento para parar de compartilhar.
 
 O isolamento em `members` e `voters` vem da estrutura do caminho (subcoleção), não de filtro de
 campo — padrão confirmado pelos testes.
@@ -202,7 +226,7 @@ Pela mesma razão, as faixas de cor de `weeklyColor` estão calibradas para a ba
 ## Testes
 
 `npm test` roda tudo: **63 testes de componente** (`tests/component/`, Vitest + Testing Library,
-mockam os `services/*.js`, ~6s) e **34 testes de Security Rules**
+mockam os `services/*.js`, ~6s) e **46 testes de Security Rules**
 (`tests/firestore.rules.test.js`, sobem e derrubam o Firestore Emulator sozinhos).
 
 Se `test:rules` falhar com "port taken", o `pretest:rules` já mata o emulador travado
@@ -224,7 +248,9 @@ suite" logo após editar um arquivo, é cache do Vite:
   não há rota para onde ir.
 - **Cadastro de eleitor pelo líder** — a coleção, as rules e os índices estão prontos; falta o
   formulário e a escrita.
-- **Deduplicação por RG/título** — nada implementado.
+- **Deduplicação por RG/título** — nenhum código ainda, mas a coleção `voterKeys` já existe com
+  regras publicadas justamente para isso (ver acima). O caminho previsto é gravar a reserva e o
+  eleitor numa transação, para que dois líderes não cadastrem o mesmo RG simultaneamente.
 - **Os três modos de localização** — o schema já prevê `locationMode`, mas a captura por GPS,
   digitação e pin no mapa não existe. O componente de mapa do gestor
   (`panel/RegionsTab.jsx`) pode servir de base para o "pin no mapa".
