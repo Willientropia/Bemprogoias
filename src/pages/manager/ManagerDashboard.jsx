@@ -3,11 +3,24 @@ import { AppLayout } from "../../components/AppLayout";
 import { Modal } from "../../components/Modal";
 import { useAuth } from "../../contexts/AuthContext";
 import { subscribeToLeaders } from "../../services/leaders";
+import { DEMO_LEADERS, isDemoData } from "../../data/demoPanelData";
+import { DemoBanner } from "./panel/PanelBits";
+import RegionsTab from "./panel/RegionsTab";
+import NetworkTab from "./panel/NetworkTab";
+import ReportTab from "./panel/ReportTab";
 import LeaderForm from "./LeaderForm";
 import LeaderListItem from "./LeaderListItem";
 
+const TABS = [
+  { id: "regioes", label: "Regiões" },
+  { id: "rede", label: "Rede de Indicações" },
+  { id: "expresso", label: "Relatório Expresso" },
+  { id: "cadastro", label: "Cadastro de Líderes" },
+];
+
 export default function ManagerDashboard() {
   const { campaignId } = useAuth();
+  const [tab, setTab] = useState("regioes");
   const [leaders, setLeaders] = useState([]);
   const [formOpen, setFormOpen] = useState(false);
 
@@ -16,35 +29,48 @@ export default function ManagerDashboard() {
     return subscribeToLeaders(campaignId, setLeaders);
   }, [campaignId]);
 
+  // As três primeiras abas seguem o handoff de design e rodam sobre a base de
+  // demonstração; a aba de cadastro opera nos líderes reais do Firestore.
+  const panelLeaders = DEMO_LEADERS;
+
   return (
-    <AppLayout title="Líderes" subtitle="Cadastre e acompanhe os líderes regionais da sua campanha.">
-      <div className="section-head">
-        <h2>Líderes cadastrados</h2>
-        <button type="submit" onClick={() => setFormOpen(true)} disabled={!campaignId}>
-          Novo líder
-        </button>
-      </div>
-
-      {leaders.length === 0 && <p>Nenhum líder cadastrado ainda.</p>}
-      <ul>
-        {leaders.map((leader) => (
-          <LeaderListItem key={leader.id} campaignId={campaignId} leader={leader} />
+    <AppLayout>
+      <div className="panel-tabs">
+        {TABS.map((t) => (
+          <button key={t.id} type="button" className={`panel-tab${tab === t.id ? " on" : ""}`} onClick={() => setTab(t.id)}>
+            {t.label}
+          </button>
         ))}
-      </ul>
-
-      <h2 style={{ marginTop: 36, marginBottom: 14 }}>Mapa de influência</h2>
-      <div
-        style={{
-          background: "var(--gold-bg)",
-          border: "1px solid var(--gold-border)",
-          borderRadius: 13,
-          padding: "16px 18px",
-          fontSize: 13.5,
-          color: "#7a6210",
-        }}
-      >
-        Em construção — os líderes serão plotados com seu raio de influência.
       </div>
+
+      {isDemoData && tab !== "cadastro" && <DemoBanner />}
+
+      {tab === "regioes" && <RegionsTab leaders={panelLeaders} />}
+      {tab === "rede" && <NetworkTab leaders={panelLeaders} />}
+      {tab === "expresso" && <ReportTab leaders={panelLeaders} />}
+
+      {tab === "cadastro" && (
+        <div>
+          <h1>Cadastro de Líderes</h1>
+          <p style={{ marginTop: 8, fontSize: 15, marginBottom: 24 }}>
+            Líderes reais da sua campanha — eles recebem acesso ao app para cadastrar eleitores em campo.
+          </p>
+
+          <div className="section-head">
+            <h2>Líderes cadastrados</h2>
+            <button type="submit" onClick={() => setFormOpen(true)} disabled={!campaignId}>
+              Novo líder
+            </button>
+          </div>
+
+          {leaders.length === 0 && <p>Nenhum líder cadastrado ainda.</p>}
+          <ul>
+            {leaders.map((leader) => (
+              <LeaderListItem key={leader.id} campaignId={campaignId} leader={leader} />
+            ))}
+          </ul>
+        </div>
+      )}
 
       <Modal
         open={formOpen}
