@@ -1,7 +1,7 @@
 {
   "name": "bem-pro-goias",
   "private": true,
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,10 +12,11 @@
     "seed:demo-voters": "node scripts/seedDemoVoters.js",
     "test": "npm run test:components && npm run test:unit && npm run test:rules",
     "test:components": "vitest run --pool=threads --maxWorkers=1 --fileParallelism=false",
-    "test:unit": "node --test test/async.test.js test/normalizers.test.js test/version.test.js",
+    "test:unit": "node --test test/async.test.js test/normalizers.test.js test/version.test.js test/appVersion.test.js",
     "pretest:rules": "node scripts/killStaleEmulator.js",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.js\"",
-    "cap:sync": "npm run build && cap sync android",
+    "check:versions": "node scripts/checkVersions.js",
+    "cap:sync": "npm run check:versions && npm run build && cap sync android",
     "android:debug": "npm run cap:sync && powershell.exe -ExecutionPolicy Bypass -File scripts/android-debug.ps1"
   },
   "dependencies": {

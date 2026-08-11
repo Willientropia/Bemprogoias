@@ -1,10 +1,15 @@
-import { defineConfig, loadEnv } from 'vite';
+import { readFileSync } from 'node:fs';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  const version = env.VITE_APP_VERSION || process.env.npm_package_version || '1.0.0';
+// A versão vem do package.json e de nenhum outro lugar. Antes ela podia vir de
+// VITE_APP_VERSION no .env, que não é versionado: um valor esquecido lá fazia o
+// app se declarar mais antigo do que era e pedir atualização para sempre, já
+// que o checkForAppUpdate compara com a tag da release.
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
+
+export default defineConfig(() => {
   return {
     plugins: [
       react(),
