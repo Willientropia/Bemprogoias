@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { updateManager } from "../../services/managers";
+import { deleteManager, updateManager } from "../../services/managers";
 
 export default function ManagerListItem({ campaignId, manager }) {
   const [editing, setEditing] = useState(false);
@@ -16,6 +16,13 @@ export default function ManagerListItem({ campaignId, manager }) {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleDelete() {
+    if (!confirm(`Remover o gestor "${manager.name}"? O login continua existindo, mas ele perde acesso ao sistema.`)) {
+      return;
+    }
+    await deleteManager(campaignId, manager.id);
   }
 
   if (editing) {
@@ -51,6 +58,9 @@ export default function ManagerListItem({ campaignId, manager }) {
       {manager.whatsapp && <span> — {manager.whatsapp}</span>}
       <button type="button" onClick={() => setEditing(true)}>
         Editar
+      </button>
+      <button type="button" onClick={handleDelete}>
+        Remover
       </button>
     </li>
   );

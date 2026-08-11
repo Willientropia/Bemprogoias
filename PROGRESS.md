@@ -22,29 +22,29 @@ Atualizar este arquivo à medida que cada item avançar.
   rodando no Firestore Emulator via `npm run test:rules`) — cobrem isolamento entre campanhas,
   inclusive um vazamento real que os testes pegaram e foi corrigido (ver Notas).
 - [x] **CRUD de Campanhas completo** (criar, editar, excluir) — Super Admin
-- [x] **CRUD de Gestores completo** (criar, editar, listar) — Super Admin, dentro de cada campanha
-- [x] **CRUD de Líderes** (criar, listar) — Gestor, dentro da própria campanha
+- [x] **CRUD de Gestores completo** (criar, editar, remover) — Super Admin, dentro de cada campanha
+- [x] **CRUD de Líderes completo** (criar, editar, remover) — Gestor, dentro da própria campanha
 - [x] `TopBar` compartilhado com botão de logout
 - [x] `docs/design-reference/` — mockups visuais de referência (gerados via Claude) para a
   identidade "Universe Deep Space"
+- [x] **Suite de testes automatizados unificada** (`npm test`) — testes de componente (Vitest +
+  Testing Library, `tests/component/`) cobrindo `ProtectedRoute`, `CampaignForm`,
+  `ManagerListItem`; mais os testes de Security Rules já existentes. Roda tudo com um comando só,
+  sem precisar abrir o app manualmente para validar mudanças — ver seção "Testes" no `README.md`.
 
 ## Próximos passos (em ordem sugerida)
 
-### 1. Completar CRUD de Líderes
-- [ ] Editar líder (mesmo padrão do `ManagerListItem`)
-- [ ] Remover líder
-
-### 2. Mapa do Gestor
+### 1. Mapa do Gestor
 - [ ] Escolher biblioteca de mapa (Leaflet é o candidato mais leve/gratuito para web+Electron+Capacitor)
 - [ ] Plotar cada líder como marcador + círculo de raio (km) centrado na região (`regiao`/`raioKm`
   já existem no perfil do líder)
 - [ ] Plotar eleitores como pontos (somente leitura, dado do Dev B)
 
-### 3. Empacotamento Electron (Windows)
+### 2. Empacotamento Electron (Windows)
 - [ ] Configurar Electron apontando para o build do Vite
 - [ ] Restringir o shell Electron a rotas de `super_admin`/`manager` (líder não usa desktop)
 
-### 4. Auto-update / OTA
+### 3. Auto-update / OTA
 - [ ] Integração com GitHub Releases API
 - [ ] Electron auto-update (ex: `electron-updater`)
 - [ ] Campo `minAppVersion` em `campaigns/{campaignId}` no Firebase para forçar atualização
@@ -70,6 +70,22 @@ Atualizar este arquivo à medida que cada item avançar.
   automaticamente para campos isolados. Só índices compostos precisam ser declarados.
 - **Exclusão de campanha não faz cascade delete** — apagar uma campanha hoje não remove
   `members`/`voters` associados (ficam órfãos). Resolver mais adiante.
+- **Remover gestor/líder não apaga o login no Firebase Auth**, só os documentos de perfil
+  (`members/{uid}` + `users/{uid}`). Apagar o login exigiria Admin SDK, fora do alcance do client.
+  Na prática não é um problema de segurança — sem perfil, a pessoa consegue logar mas não acessa
+  nada (nenhuma rota nem dado libera sem `role`/`campaignId`) — só deixa um usuário "morto" na
+  lista do Firebase Auth. Se isso incomodar, dá pra limpar manualmente pelo Console ou por outro
+  script tipo `createSuperAdmin.js`.
+- Testes de rules cobrem hoje: leitura/listagem isolada por campanha, criação/edição restrita por
+  papel, e remoção (`delete`) de `members`/`users` restrita a quem deveria (super_admin sempre;
+  gestor só remove líderes da própria campanha).
+- **Dois configs de Vitest** (`vitest.config.js` para componentes/jsdom,
+  `vitest.rules.config.js` para rules/emulador) porque não dá para compartilhar um único
+  `include`/`environment` — os testes de rules precisam do Firestore Emulator (via
+  `firebase emulators:exec`) e ambiente Node puro, os de componente precisam de jsdom e não devem
+  rodar o emulador. `npm test` roda os dois em sequência.
+- Testes de componente **mockam os `services/*.js`** (nunca falam com o Firebase de verdade) —
+  são rápidos (~2s) e não exigem rede nem emulador. Cobrem lógica/UI, não pegam bugs visuais/CSS.
 - CSS/identidade visual "Universe Deep Space" (seção 5 do spec) ainda não aplicado ao código — há
   mockups de referência em `docs/design-reference/`, mas as páginas atuais são só estrutura
   funcional.

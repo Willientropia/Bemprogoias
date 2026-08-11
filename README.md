@@ -21,7 +21,17 @@ npx firebase use bemprogoias-80ab1
 
 - `firestore.rules` — Security Rules (isolamento por `campaignId` e papel: `super_admin` / `manager` / `leader`)
 - `firestore.indexes.json` — índices para deduplicação de eleitores por RG/título
-- Papéis atribuídos via Auth custom claims (`role`, `campaignId`)
+- Papéis atribuídos via documentos Firestore (`users/{uid}` + `campaigns/{campaignId}/members/{uid}`), não custom claims — ver [`ESTADO_ATUAL.md`](./ESTADO_ATUAL.md) para o desenho completo
+
+## Testes
+
+```bash
+npm test              # roda tudo: testes de componente + Security Rules
+npm run test:components   # só componentes React (Vitest + Testing Library, rápido, sem Firebase)
+npm run test:rules         # só Security Rules (roda no Firestore Emulator local)
+```
+
+`test:rules` sobe o Firestore Emulator automaticamente e o derruba ao final — não precisa de projeto Firebase real nem de rede.
 
 ## Estrutura
 
@@ -63,4 +73,5 @@ Checklist para quem está entrando no projeto agora (ex: Dev B):
    ```bash
    npm run dev
    ```
-6. **Ler antes de codar:** [`PROGRESS.md`](./PROGRESS.md) (o que já está pronto e o que falta) e [`Bem_para_Goias_App_Spec.md`](./Bem_para_Goias_App_Spec.md) seção 4 (divisão de trabalho e o que é dono de quem).
+6. **Ler antes de codar:** [`ESTADO_ATUAL.md`](./ESTADO_ATUAL.md) (como o sistema funciona hoje), [`PROGRESS.md`](./PROGRESS.md) (o que já está pronto e o que falta) e [`Bem_para_Goias_App_Spec.md`](./Bem_para_Goias_App_Spec.md) seção 4 (divisão de trabalho e o que é dono de quem).
+7. **Rodar os testes** (`npm test`) para confirmar que o ambiente está funcionando antes de começar a mexer em código.

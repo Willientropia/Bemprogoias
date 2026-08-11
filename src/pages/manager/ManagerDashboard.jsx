@@ -3,6 +3,7 @@ import { TopBar } from "../../components/TopBar";
 import { useAuth } from "../../contexts/AuthContext";
 import { subscribeToLeaders } from "../../services/leaders";
 import LeaderForm from "./LeaderForm";
+import LeaderListItem from "./LeaderListItem";
 
 export default function ManagerDashboard() {
   const { campaignId } = useAuth();
@@ -24,12 +25,7 @@ export default function ManagerDashboard() {
       {leaders.length === 0 && <p>Nenhum líder cadastrado ainda.</p>}
       <ul>
         {leaders.map((leader) => (
-          <li key={leader.id}>
-            <strong>{leader.name}</strong> — {leader.email}
-            {leader.whatsapp && <span> — {leader.whatsapp}</span>}
-            {leader.regiao && <span> — {leader.regiao}</span>}
-            {leader.raioKm && <span> — raio {leader.raioKm}km</span>}
-          </li>
+          <LeaderListItem key={leader.id} campaignId={campaignId} leader={leader} />
         ))}
       </ul>
 

@@ -75,13 +75,20 @@ não de filtro de campo — é o padrão seguro confirmado pelos testes.
 
 - **`/login`** — tela de login (email + senha).
 - **`/super-admin`** — CRUD completo de campanhas (criar, editar, excluir, listar).
-- **`/super-admin/campaigns/:campaignId`** — CRUD de gestores daquela campanha (criar, editar,
-  listar; excluir ainda não implementado na UI).
-- **`/manager`** — CRUD de líderes da própria campanha (criar, listar; editar/excluir ainda não
-  implementados).
+- **`/super-admin/campaigns/:campaignId`** — CRUD completo de gestores daquela campanha (criar,
+  editar, remover, listar).
+- **`/manager`** — CRUD completo de líderes da própria campanha (criar, editar, remover, listar).
 
 Todo painel autenticado mostra uma barra superior (`TopBar`) com o e-mail, papel do usuário
 logado e botão de logout.
+
+## Testes
+
+`npm test` roda tudo: testes de componente (`tests/component/`, Vitest + Testing Library, mockam
+os `services/*.js`, não tocam o Firebase real, ~2s) e testes de Security Rules
+(`tests/firestore.rules.test.js`, sobem e derrubam o Firestore Emulator sozinhos). Não é preciso
+abrir o app manualmente no navegador para validar a maior parte das mudanças de lógica — só para
+checar CSS/visual, que os testes não cobrem.
 
 ## Ambiente e credenciais
 
@@ -93,8 +100,6 @@ logado e botão de logout.
 
 ## O que ainda não existe
 
-- Editar/remover líder (só criar/listar por enquanto).
-- Excluir gestor pela UI.
 - CRUD de Eleitores, deduplicação por RG/título, os três modos de localização, offline-first,
   integração com WhatsApp — tudo isso é escopo do Dev B (trilha "Campo & Eleitores").
 - Mapa com líderes/raio de influência.

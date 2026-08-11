@@ -5,7 +5,7 @@ import {
   assertFails,
 } from "@firebase/rules-unit-testing";
 import { readFileSync } from "node:fs";
-import { collection, doc, getDocs, getDoc, query, where, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, getDoc, query, where, setDoc } from "firebase/firestore";
 
 let testEnv;
 
@@ -127,5 +127,43 @@ describe("espelho users/{uid} escrito pelo gestor ao criar líder", () => {
     await assertFails(
       setDoc(doc(managerA, "users/sneaky-admin-uid"), { role: "super_admin", campaignId: "campA" })
     );
+  });
+});
+
+describe("remoção de líder pelo gestor", () => {
+  it("gestor consegue remover um líder da própria campanha (members + users)", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, "users", "disposable-leader-uid"), { role: "leader", campaignId: "campA" });
+      await setDoc(doc(db, "campaigns/campA/members", "disposable-leader-uid"), { role: "leader" });
+    });
+
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertSucceeds(deleteDoc(doc(managerA, "campaigns/campA/members/disposable-leader-uid")));
+    await assertSucceeds(deleteDoc(doc(managerA, "users/disposable-leader-uid")));
+  });
+
+  it("gestor não consegue remover um gestor (só super_admin)", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(deleteDoc(doc(managerA, "campaigns/campA/members/manager-a-uid")));
+  });
+
+  it("gestor não consegue remover líder de outra campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(deleteDoc(doc(managerA, "campaigns/campB/members/leader-b-uid")));
+  });
+});
+
+describe("remoção pelo super_admin", () => {
+  it("super_admin consegue remover um gestor", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, "users", "disposable-manager-uid"), { role: "manager", campaignId: "campA" });
+      await setDoc(doc(db, "campaigns/campA/members", "disposable-manager-uid"), { role: "manager" });
+    });
+
+    const admin = testEnv.authenticatedContext("admin-uid").firestore();
+    await assertSucceeds(deleteDoc(doc(admin, "campaigns/campA/members/disposable-manager-uid")));
+    await assertSucceeds(deleteDoc(doc(admin, "users/disposable-manager-uid")));
   });
 });
