@@ -20,6 +20,14 @@ export function subscribeToCampaigns(onChange) {
   });
 }
 
+export function subscribeToCampaign(campaignId, onChange, onError) {
+  return onSnapshot(
+    doc(db, "campaigns", campaignId),
+    (snapshot) => onChange(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null),
+    onError
+  );
+}
+
 export function createCampaign({ name, minAppVersion }) {
   return addDoc(campaignsRef, {
     name,
@@ -32,6 +40,14 @@ export function updateCampaign(campaignId, { name, minAppVersion }) {
   return updateDoc(doc(db, "campaigns", campaignId), {
     name,
     minAppVersion: minAppVersion || null,
+  });
+}
+
+export function updateReportSettings(campaignId, { whatsapp, deliveryTime }) {
+  return updateDoc(doc(db, "campaigns", campaignId), {
+    reportRecipientWhatsapp: whatsapp.trim(),
+    reportDeliveryTime: deliveryTime,
+    reportSettingsUpdatedAt: serverTimestamp(),
   });
 }
 

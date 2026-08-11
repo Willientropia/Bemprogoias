@@ -1,7 +1,5 @@
-import { rating } from "./leaderMetrics";
-
-export function Stars({ eleitores }) {
-  const rt = rating(eleitores);
+export function Stars({ value }) {
+  const rt = value;
   return (
     <span style={{ display: "flex", alignItems: "center", gap: 2 }}>
       {[1, 2, 3, 4, 5].map((i) => {
@@ -97,8 +95,8 @@ export function DemoBanner() {
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}>
         <circle cx="12" cy="12" r="9" /><path d="M12 8h.01M11 12h1v4h1" />
       </svg>
-      Dados de demonstração. Os números abaixo são ilustrativos e serão substituídos
-      pelos dados reais da campanha.
+      Campanha de demonstração. Os líderes e indicadores abaixo são fictícios e
+      existem apenas para apresentar o funcionamento do painel.
     </div>
   );
 }

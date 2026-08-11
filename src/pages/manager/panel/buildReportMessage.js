@@ -1,37 +1,39 @@
 import { DEMO_STATIC_STATS } from "../../../data/demoPanelData";
-import { formatNumber } from "./leaderMetrics";
+import { formatNumber, validatedVoters } from "./leaderMetrics";
 
 const DIVIDER = "━━━━━━━━━━━━━━━━";
 
 // Monta a mensagem exatamente como ela chega no WhatsApp (com *negrito* e
 // _itálico_ do próprio WhatsApp). Cada bloco só entra se o toggle estiver ligado.
-export function buildReportMessage({ leaders, blocks, frequencia, horario }) {
+export function buildReportMessage({ leaders, blocks, horario }) {
   const ativos = new Set(blocks.filter((b) => b.ativo).map((b) => b.id));
-  const novos = leaders.reduce((acc, l) => acc + l.semana, 0);
-  const total = leaders.reduce((acc, l) => acc + l.eleitores, 0);
-  const porCrescimento = [...leaders].sort((a, b) => b.semana - a.semana);
+  const novos = leaders.reduce((acc, leader) => acc + (Number(leader.hoje) || 0), 0);
+  const totalValidated = leaders.reduce((acc, leader) => acc + validatedVoters(leader), 0);
+  const porCrescimento = [...leaders].sort((a, b) => (
+    (Number(b.hoje) || 0) - (Number(a.hoje) || 0)
+    || validatedVoters(b) - validatedVoters(a)
+    || a.nome.localeCompare(b.nome)
+  ));
   const alerta = leaders.filter((l) => l.perf === "alerta");
 
   let msg = "*BEM PRO GOIÁS — Relatório Expresso*\n";
-  msg += `_${frequencia} · ${horario} · Goiânia_\n`;
+  msg += `_Diário · ${horario} · Goiânia_\n`;
   msg += `${DIVIDER}\n`;
 
   if (ativos.has("resumo")) {
-    msg += `\n📊 *Eleitores indicados hoje:* ${formatNumber(novos)}\n`;
-    msg += `Base total: ${formatNumber(total)} eleitores\n`;
+    msg += `\n📊 *Eleitores validados hoje:* ${formatNumber(novos)}\n`;
+    msg += `Base validada: ${formatNumber(totalValidated)} eleitores\n`;
   }
 
-  if (ativos.has("ranking")) {
-    msg += "\n🏆 *Top líderes do dia*\n";
-    porCrescimento.slice(0, 5).forEach((l, i) => {
-      msg += `${i + 1}. ${l.nome} — +${l.semana}\n`;
-    });
-  }
+  msg += `\n📋 *Todos os líderes — produção do dia (${leaders.length})*\n`;
+  porCrescimento.forEach((leader, index) => {
+    msg += `${index + 1}. ${leader.nome} — +${Number(leader.hoje) || 0} hoje · ${formatNumber(validatedVoters(leader))} validados\n`;
+  });
 
   if (ativos.has("alerta")) {
     msg += `\n⚠️ *Bases em alerta:* ${alerta.length}\n`;
     alerta.forEach((l) => {
-      msg += `• ${l.nome} (${l.bairro}) — +${l.semana}\n`;
+      msg += `• ${l.nome} (${l.bairro}) — +${Number(l.hoje) || 0} hoje\n`;
     });
   }
 

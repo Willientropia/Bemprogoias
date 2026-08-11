@@ -1,21 +1,26 @@
 import { collection, doc, onSnapshot, query, updateDoc, where, writeBatch } from "firebase/firestore";
 import { db } from "./firebase";
 
-export function subscribeToLeaders(campaignId, onChange) {
+export function subscribeToLeaders(campaignId, onChange, onError) {
   const q = query(
     collection(db, `campaigns/${campaignId}/members`),
     where("role", "==", "leader")
   );
-  return onSnapshot(q, (snapshot) => {
-    onChange(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => onChange(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    onError
+  );
 }
 
-export function updateLeader(campaignId, uid, { name, whatsapp, regiao, raioKm }) {
+export function updateLeader(campaignId, uid, { name, whatsapp, regiao, bairro, lat, lng, raioKm }) {
   return updateDoc(doc(db, `campaigns/${campaignId}/members`, uid), {
     name,
     whatsapp,
     regiao,
+    bairro,
+    lat,
+    lng,
     raioKm,
   });
 }

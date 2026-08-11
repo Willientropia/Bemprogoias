@@ -39,12 +39,14 @@ Atualizar este arquivo à medida que cada item avançar.
 
 ## Próximos passos (em ordem sugerida)
 
-### 1. Conectar o painel visual do Gestor aos dados reais
-- [x] Biblioteca escolhida e instalada: Leaflet + React Leaflet.
-- [x] Marcadores, círculos de alcance e filtros implementados na interface demonstrativa.
-- [ ] Substituir `DEMO_LEADERS` pelos líderes/eleitores reais do Firestore.
-- [ ] Consumir `subscribeToLeaderLocations` para mostrar a posição ao vivo compartilhada pelo líder.
-- [ ] Plotar eleitores reais como pontos (somente leitura, dado do Dev B).
+### 1. Mapa do Gestor
+- [x] Leaflet + React Leaflet implementados
+- [x] Plotar cada líder como marcador + círculo de `raioKm`, com filtros de desempenho
+- [x] Cadastro do líder exige um ponto de atuação e salva `bairro`, `regiao`, `lat` e `lng`
+- [ ] Plotar eleitores como pontos (somente leitura, dado do Dev B)
+- [x] Página paginada de eleitores para o gestor, com filtros, indicadores e produção por líder
+- [x] Posição ao vivo do líder no mapa, via `subscribeToLeaderLocations`
+- [ ] Substituir `DEMO_LEADERS` pelos líderes reais do Firestore
 
 ### 2. Empacotamento Electron (Windows)
 - [ ] Configurar Electron apontando para o build do Vite

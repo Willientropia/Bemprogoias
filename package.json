@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview --host 0.0.0.0",
+    "seed:demo": "node scripts/seedDemoCampaign.js",
+    "seed:demo-voters": "node scripts/seedDemoVoters.js",
     "test": "npm run test:components && npm run test:unit && npm run test:rules",
     "test:components": "vitest run --pool=threads --maxWorkers=1 --fileParallelism=false",
     "test:unit": "node --test test/async.test.js test/normalizers.test.js test/version.test.js",

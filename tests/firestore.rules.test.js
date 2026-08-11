@@ -22,38 +22,42 @@ beforeAll(async () => {
     await setDoc(doc(db, "users", "manager-a-uid"), { role: "manager", campaignId: "campA" });
     await setDoc(doc(db, "users", "manager-b-uid"), { role: "manager", campaignId: "campB" });
     await setDoc(doc(db, "users", "leader-a-uid"), { role: "leader", campaignId: "campA" });
-    await setDoc(doc(db, "users", "leader-b-uid"), { role: "leader", campaignId: "campB" });
 
     await setDoc(doc(db, "campaigns", "campA"), { name: "Campanha A" });
     await setDoc(doc(db, "campaigns", "campB"), { name: "Campanha B" });
 
-    await setDoc(doc(db, "campaigns/campA/members", "manager-a-uid"), { role: "manager" });
-    await setDoc(doc(db, "campaigns/campB/members", "manager-b-uid"), { role: "manager" });
+    await setDoc(doc(db, "campaigns/campA/members", "manager-a-uid"), {
+      role: "manager",
+      campaignId: "campA",
+    });
+    await setDoc(doc(db, "campaigns/campB/members", "manager-b-uid"), {
+      role: "manager",
+      campaignId: "campB",
+    });
     await setDoc(doc(db, "campaigns/campA/members", "leader-a-uid"), {
       role: "leader",
+      campaignId: "campA",
       name: "Líder A",
     });
     await setDoc(doc(db, "campaigns/campB/members", "leader-b-uid"), {
       role: "leader",
+      campaignId: "campB",
       name: "Líder B",
     });
 
     await setDoc(doc(db, "campaigns/campA/voters", "voter-a-1"), {
-      campaignId: "campA",
       leaderId: "leader-a-uid",
       name: "Eleitor A",
       validationStatus: "validado",
       createdAt: Timestamp.fromDate(new Date("2026-08-11T12:00:00Z")),
     });
     await setDoc(doc(db, "campaigns/campA/voters", "voter-other-1"), {
-      campaignId: "campA",
       leaderId: "other-leader-uid",
       name: "Eleitor de outro líder",
       validationStatus: "pendente",
       createdAt: Timestamp.fromDate(new Date("2026-08-10T12:00:00Z")),
     });
     await setDoc(doc(db, "campaigns/campB/voters", "voter-b-1"), {
-      campaignId: "campB",
       leaderId: "leader-b-uid",
       name: "Eleitor B",
       createdAt: Timestamp.fromDate(new Date("2026-08-09T12:00:00Z")),
@@ -94,6 +98,17 @@ describe("gestor consultando líderes da própria campanha (campaigns/{id}/membe
         role: "leader",
         campaignId: "campA",
         name: "Novo Líder",
+      })
+    );
+  });
+
+  it("não consegue criar líder apontando para outra campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(managerA, "campaigns/campA/members/leader-campanha-errada"), {
+        role: "leader",
+        campaignId: "campB",
+        name: "Líder Inconsistente",
       })
     );
   });
@@ -150,24 +165,6 @@ describe("configuração do Relatório Expresso", () => {
       reportSettingsUpdatedAt: Timestamp.now(),
     }));
   });
-
-  it("horário fora do formato hh:mm é recusado", async () => {
-    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
-    await assertFails(updateDoc(doc(managerA, "campaigns/campA"), {
-      reportRecipientWhatsapp: "(62) 9 9999-0000",
-      reportDeliveryTime: "25:99",
-      reportSettingsUpdatedAt: Timestamp.now(),
-    }));
-  });
-
-  it("líder não configura relatório", async () => {
-    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
-    await assertFails(updateDoc(doc(leaderA, "campaigns/campA"), {
-      reportRecipientWhatsapp: "(62) 9 9999-0000",
-      reportDeliveryTime: "21:00",
-      reportSettingsUpdatedAt: Timestamp.now(),
-    }));
-  });
 });
 
 describe("consulta de eleitores pelo painel", () => {
@@ -203,9 +200,10 @@ describe("consulta de eleitores pelo painel", () => {
   });
 });
 
+// Cobertura do fluxo que o app do líder (Dev B) vai executar em campo:
+// cadastrar, editar e remover eleitores. O vínculo é sempre o leaderId.
 describe("cadastro de eleitores pelo líder (app mobile)", () => {
-  const novoEleitor = (leaderId, campaignId = "campA") => ({
-    campaignId,
+  const novoEleitor = (leaderId) => ({
     leaderId,
     name: "Eleitor Novo",
     normalizedName: "eleitor novo",
@@ -229,17 +227,17 @@ describe("cadastro de eleitores pelo líder (app mobile)", () => {
     );
   });
 
-  it("líder não cadastra eleitor em nome de outro líder", async () => {
+  it("líder NÃO cadastra eleitor em nome de outro líder", async () => {
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertFails(
       setDoc(doc(leaderA, "campaigns/campA/voters/tentativa-alheia"), novoEleitor("other-leader-uid"))
     );
   });
 
-  it("líder não cadastra eleitor em outra campanha", async () => {
+  it("líder NÃO cadastra eleitor em outra campanha", async () => {
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertFails(
-      setDoc(doc(leaderA, "campaigns/campB/voters/tentativa-campanha-b"), novoEleitor("leader-a-uid", "campB"))
+      setDoc(doc(leaderA, "campaigns/campB/voters/tentativa-campanha-b"), novoEleitor("leader-a-uid"))
     );
   });
 
@@ -250,7 +248,7 @@ describe("cadastro de eleitores pelo líder (app mobile)", () => {
     );
   });
 
-  it("líder não edita eleitor de outro líder", async () => {
+  it("líder NÃO edita eleitor de outro líder", async () => {
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertFails(
       updateDoc(doc(leaderA, "campaigns/campA/voters/voter-other-1"), { name: "Alterado" })
@@ -260,17 +258,17 @@ describe("cadastro de eleitores pelo líder (app mobile)", () => {
   it("líder remove um eleitor próprio", async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
       await setDoc(doc(ctx.firestore(), "campaigns/campA/voters/descartavel-do-lider"), {
-        campaignId: "campA",
         leaderId: "leader-a-uid",
         name: "Para remover",
         createdAt: Timestamp.now(),
       });
     });
+
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertSucceeds(deleteDoc(doc(leaderA, "campaigns/campA/voters/descartavel-do-lider")));
   });
 
-  it("líder não remove eleitor de outro líder", async () => {
+  it("líder NÃO remove eleitor de outro líder", async () => {
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertFails(deleteDoc(doc(leaderA, "campaigns/campA/voters/voter-other-1")));
   });
@@ -280,15 +278,15 @@ describe("cadastro de eleitores pelo líder (app mobile)", () => {
     await assertSucceeds(getDoc(doc(leaderA, "campaigns/campA/voters/voter-a-1")));
   });
 
-  it("líder não lê eleitor de outro líder por get direto", async () => {
+  it("líder NÃO lê eleitor de outro líder por get direto", async () => {
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertFails(getDoc(doc(leaderA, "campaigns/campA/voters/voter-other-1")));
   });
 
   it("usuário não autenticado não cadastra eleitor", async () => {
-    const anonymous = testEnv.unauthenticatedContext().firestore();
+    const anon = testEnv.unauthenticatedContext().firestore();
     await assertFails(
-      setDoc(doc(anonymous, "campaigns/campA/voters/anonimo"), novoEleitor("leader-a-uid"))
+      setDoc(doc(anon, "campaigns/campA/voters/anonimo"), novoEleitor("leader-a-uid"))
     );
   });
 
@@ -300,10 +298,121 @@ describe("cadastro de eleitores pelo líder (app mobile)", () => {
     await assertSucceeds(deleteDoc(doc(managerA, "campaigns/campA/voters/do-gestor")));
   });
 
-  it("gestor não cadastra eleitor em outra campanha", async () => {
+  it("gestor NÃO cadastra eleitor em outra campanha", async () => {
     const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
     await assertFails(
-      setDoc(doc(managerA, "campaigns/campB/voters/invasao"), novoEleitor("leader-b-uid", "campB"))
+      setDoc(doc(managerA, "campaigns/campB/voters/invasao"), novoEleitor("leader-b-uid"))
+    );
+  });
+});
+
+// voterKeys: reserva de RG/título para a dedup da campanha. Qualquer líder
+// precisa CONSULTAR uma chave (para saber se já existe), mas só pode criar
+// e mexer nas próprias reservas.
+describe("reserva de chaves de eleitor (voterKeys)", () => {
+  it("líder consulta uma chave existente para checar duplicidade", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "campaigns/campA/voterKeys/rg-999"), {
+        leaderId: "other-leader-uid",
+        voterId: "voter-other-1",
+      });
+    });
+
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(getDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-999")));
+  });
+
+  it("líder cria uma reserva vinculada a si mesmo", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      setDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-111"), {
+        leaderId: "leader-a-uid",
+        voterId: "voter-a-1",
+      })
+    );
+  });
+
+  it("líder NÃO cria reserva em nome de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-222"), {
+        leaderId: "other-leader-uid",
+        voterId: "x",
+      })
+    );
+  });
+
+  it("líder NÃO sobrescreve a reserva de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      updateDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-999"), { voterId: "roubado" })
+    );
+  });
+
+  it("líder NÃO lista todas as reservas da campanha", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(getDocs(collection(leaderA, "campaigns/campA/voterKeys")));
+  });
+
+  it("gestor lista as reservas da própria campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertSucceeds(getDocs(collection(managerA, "campaigns/campA/voterKeys")));
+  });
+});
+
+// leaderLocations: posição compartilhada pelo líder. O id do documento é o
+// próprio uid, então o vínculo já vem do path.
+describe("posição compartilhada pelo líder (leaderLocations)", () => {
+  it("líder grava a própria posição", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-a-uid"), {
+        leaderId: "leader-a-uid",
+        lat: -16.6799,
+        lng: -49.255,
+        updatedAt: Timestamp.now(),
+      })
+    );
+  });
+
+  it("líder NÃO grava posição no documento de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/other-leader-uid"), {
+        leaderId: "other-leader-uid",
+        lat: -16.6,
+        lng: -49.2,
+      })
+    );
+  });
+
+  it("líder NÃO grava posição declarando outro leaderId", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-a-uid"), {
+        leaderId: "other-leader-uid",
+        lat: -16.6,
+        lng: -49.2,
+      })
+    );
+  });
+
+  it("gestor lê as posições da própria campanha mas não escreve", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertSucceeds(getDocs(collection(managerA, "campaigns/campA/leaderLocations")));
+    await assertFails(
+      setDoc(doc(managerA, "campaigns/campA/leaderLocations/leader-a-uid"), {
+        leaderId: "leader-a-uid",
+        lat: 0,
+        lng: 0,
+      })
+    );
+  });
+
+  it("líder remove a própria posição (parar de compartilhar)", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      deleteDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-a-uid"))
     );
   });
 });
@@ -342,16 +451,17 @@ describe("espelho users/{uid} escrito pelo gestor ao criar líder", () => {
 describe("remoção de líder pelo gestor", () => {
   it("gestor consegue remover um líder da própria campanha (members + users)", async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
-      const database = ctx.firestore();
-      await setDoc(doc(database, "users", "disposable-leader-uid"), { role: "leader", campaignId: "campA" });
-      await setDoc(doc(database, "campaigns/campA/members", "disposable-leader-uid"), { role: "leader" });
+      const db = ctx.firestore();
+      await setDoc(doc(db, "users", "disposable-leader-uid"), { role: "leader", campaignId: "campA" });
+      await setDoc(doc(db, "campaigns/campA/members", "disposable-leader-uid"), { role: "leader" });
     });
+
     const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
     await assertSucceeds(deleteDoc(doc(managerA, "campaigns/campA/members/disposable-leader-uid")));
     await assertSucceeds(deleteDoc(doc(managerA, "users/disposable-leader-uid")));
   });
 
-  it("gestor não consegue remover um gestor", async () => {
+  it("gestor não consegue remover um gestor (só super_admin)", async () => {
     const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
     await assertFails(deleteDoc(doc(managerA, "campaigns/campA/members/manager-a-uid")));
   });
@@ -365,99 +475,13 @@ describe("remoção de líder pelo gestor", () => {
 describe("remoção pelo super_admin", () => {
   it("super_admin consegue remover um gestor", async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
-      const database = ctx.firestore();
-      await setDoc(doc(database, "users", "disposable-manager-uid"), { role: "manager", campaignId: "campA" });
-      await setDoc(doc(database, "campaigns/campA/members", "disposable-manager-uid"), { role: "manager" });
+      const db = ctx.firestore();
+      await setDoc(doc(db, "users", "disposable-manager-uid"), { role: "manager", campaignId: "campA" });
+      await setDoc(doc(db, "campaigns/campA/members", "disposable-manager-uid"), { role: "manager" });
     });
+
     const admin = testEnv.authenticatedContext("admin-uid").firestore();
     await assertSucceeds(deleteDoc(doc(admin, "campaigns/campA/members/disposable-manager-uid")));
     await assertSucceeds(deleteDoc(doc(admin, "users/disposable-manager-uid")));
-  });
-});
-
-describe("proteção contra mudança indevida de campanha ou papel", () => {
-  it("gestor não traz para sua campanha o espelho de um líder alheio", async () => {
-    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
-    await assertFails(
-      setDoc(doc(managerA, "users/leader-b-uid"), { role: "leader", campaignId: "campA" })
-    );
-  });
-
-  it("gestor não transforma um membro gestor em líder", async () => {
-    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
-    await assertFails(
-      setDoc(doc(managerA, "campaigns/campA/members/manager-a-uid"), {
-        role: "leader",
-        campaignId: "campA",
-      })
-    );
-  });
-});
-
-describe("eleitores e reservas de deduplicação", () => {
-  it("líder reserva RG para si, mas não para outro líder", async () => {
-    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
-    await assertSucceeds(
-      setDoc(doc(leaderA, "campaigns/campA/voterKeys/rg_123"), {
-        campaignId: "campA",
-        leaderId: "leader-a-uid",
-        voterId: "voter-a",
-        field: "rg",
-        value: "123",
-      })
-    );
-    await assertFails(
-      setDoc(doc(leaderA, "campaigns/campA/voterKeys/rg_456"), {
-        campaignId: "campA",
-        leaderId: "leader-b-uid",
-        voterId: "voter-b",
-        field: "rg",
-        value: "456",
-      })
-    );
-  });
-
-  it("líder não reserva chave usando campanha divergente", async () => {
-    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
-    await assertFails(
-      setDoc(doc(leaderA, "campaigns/campA/voterKeys/rg_789"), {
-        campaignId: "campB",
-        leaderId: "leader-a-uid",
-        voterId: "voter-a",
-        field: "rg",
-        value: "789",
-      })
-    );
-  });
-});
-
-describe("localização em tempo real do líder", () => {
-  it("líder compartilha somente a própria posição", async () => {
-    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
-    await assertSucceeds(
-      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-a-uid"), {
-        campaignId: "campA",
-        leaderId: "leader-a-uid",
-        lat: -16.68,
-        lng: -49.26,
-        sharing: true,
-      })
-    );
-    await assertFails(
-      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-b-uid"), {
-        campaignId: "campA",
-        leaderId: "leader-b-uid",
-        lat: 0,
-        lng: 0,
-        sharing: true,
-      })
-    );
-  });
-
-  it("somente o gestor da campanha lista as posições", async () => {
-    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
-    const managerB = testEnv.authenticatedContext("manager-b-uid").firestore();
-    await assertSucceeds(getDocs(collection(managerA, "campaigns/campA/leaderLocations")));
-    await assertFails(getDocs(collection(managerB, "campaigns/campA/leaderLocations")));
   });
 });

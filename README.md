@@ -34,6 +34,41 @@ npm run test:rules         # só Security Rules (roda no Firestore Emulator loca
 
 `test:rules` sobe o Firestore Emulator automaticamente e o derruba ao final — não precisa de projeto Firebase real nem de rede.
 
+## Campanha de demonstração
+
+Os 15 líderes fictícios do Painel do Gestor são persistidos no Firestore, no
+mesmo caminho usado pelo app (`campaigns/{campaignId}/members`). O arquivo
+`src/data/demoPanelData.js` é apenas a fonte versionada do seed; as telas não o
+consultam diretamente.
+
+Com `serviceAccountKey.json` na raiz, execute primeiro a simulação e depois o seed:
+
+```bash
+npm run seed:demo -- <campaignId> --dry-run
+npm run seed:demo -- <campaignId>
+npm run seed:demo-voters -- <campaignId> --count=300 --dry-run
+npm run seed:demo-voters -- <campaignId> --count=300
+```
+
+O seed é idempotente, usa os IDs `demo-l1` a `demo-l15`, marca a campanha com
+`isDemo: true` e cria os espelhos mínimos em `users/{id}` exigidos pelo CRUD. Ele
+não cria contas no Firebase Auth.
+
+O segundo seed cria eleitores fictícios completos em
+`campaigns/{campaignId}/voters`, distribui a produção entre os líderes e atualiza
+as métricas `eleitores`, `eleitoresValidados`, `semana` e `perf` usadas no mapa e
+no ranking. A execução mantém no máximo 300 registros e remove somente excedentes
+marcados com `demoSource: "voters-demo-v1"`.
+
+As estrelas usam exclusivamente `eleitoresValidados`: o maior total da campanha
+recebe 5,0, o menor recebe 1,0 e os demais são interpolados nessa faixa. Na demo,
+as evidências de documento único, contato confirmado e coerência geográfica são
+simuladas e identificadas como tal na interface.
+
+O Relatório Expresso usa `reportRecipientWhatsapp` e `reportDeliveryTime` no documento
+da campanha. O gestor pode alterar somente esses campos; o fechamento é diário, inclui
+todos os líderes e o teste abre a mensagem pronta no WhatsApp configurado.
+
 ## Estrutura
 
 ```

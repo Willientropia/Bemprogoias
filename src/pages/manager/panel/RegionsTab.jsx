@@ -1,9 +1,11 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Circle, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { GOIANIA_CENTER, PERF_COLORS, PERF_LABELS } from "../../../data/demoPanelData";
-import { formatNumber } from "./leaderMetrics";
+import { whatsappUrl } from "../../../utils/whatsapp";
+import { formatNumber, leaderRating, validatedVoters } from "./leaderMetrics";
+import { spreadLeaderPositions } from "./panelLeaders";
 import { Avatar, Chip, FilterButton, KpiCard, SectionLabel, Stars } from "./PanelBits";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useLiveLeaderLocations } from "../../../hooks/useLiveLeaderLocations";
@@ -16,7 +18,7 @@ const FILTERS = [
 ];
 
 function pinIcon(leader) {
-  const size = 30 + Math.round(leader.eleitores / 220);
+  const size = 30 + Math.round(validatedVoters(leader) * 0.35);
   const color = PERF_COLORS[leader.perf];
   return L.divIcon({
     className: "",
@@ -44,13 +46,28 @@ function minutosDesde(iso) {
   return Math.max(0, Math.round((Date.now() - quando) / 60_000));
 }
 
-// Dá acesso à instância do mapa para o "voar até o líder" da lista lateral.
-function MapRef({ mapRef }) {
-  mapRef.current = useMap();
+// Dá acesso à instância do mapa para o "voar até o líder" da lista lateral e
+// recalcula o tamanho quando a aba volta a ficar visível, sem perder zoom/posição.
+function MapRef({ mapRef, active }) {
+  const map = useMap();
+
+  useEffect(() => {
+    mapRef.current = map;
+    return () => {
+      if (mapRef.current === map) mapRef.current = null;
+    };
+  }, [map, mapRef]);
+
+  useEffect(() => {
+    if (!active) return undefined;
+    const frame = window.requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [active, map]);
+
   return null;
 }
 
-export default function RegionsTab({ leaders }) {
+export default function RegionsTab({ leaders, active = true }) {
   const [perfFilter, setPerfFilter] = useState("todos");
   const [selectedId, setSelectedId] = useState(null);
   const [mostrarAoVivo, setMostrarAoVivo] = useState(true);
@@ -72,9 +89,10 @@ export default function RegionsTab({ leaders }) {
     [leaders, perfFilter]
   );
 
-  const listed = useMemo(() => [...visible].sort((a, b) => b.eleitores - a.eleitores), [visible]);
+  const listed = useMemo(() => [...visible].sort((a, b) => validatedVoters(b) - validatedVoters(a)), [visible]);
+  const displayPositions = useMemo(() => spreadLeaderPositions(leaders), [leaders]);
 
-  const totalEleitores = leaders.reduce((acc, l) => acc + l.eleitores, 0);
+  const totalValidados = leaders.reduce((acc, leader) => acc + validatedVoters(leader), 0);
   const regioes = new Set(leaders.map((l) => l.regiao)).size;
   const emAlerta = leaders.filter((l) => l.perf === "alerta").length;
 
@@ -82,7 +100,7 @@ export default function RegionsTab({ leaders }) {
 
   function focusLeader(leader) {
     setSelectedId(leader.id);
-    mapRef.current?.setView([leader.lat, leader.lng], 14, { animate: true });
+    mapRef.current?.setView(displayPositions.get(leader.id) ?? [leader.lat, leader.lng], 14, { animate: true });
     markerRefs.current[leader.id]?.openPopup();
   }
 
@@ -95,11 +113,14 @@ export default function RegionsTab({ leaders }) {
             Mapa interativo com a localização dos líderes regionais e o alcance de cada base
           </p>
         </div>
+        <Chip background="var(--brand-50)" color="var(--brand-700)">
+          Dados sincronizados · há 4 minutos
+        </Chip>
       </div>
 
       <div className="kpi-grid" style={{ marginTop: 22 }}>
         <KpiCard value={leaders.length} label="LÍDERES NO MAPA" />
-        <KpiCard value={formatNumber(totalEleitores)} label="ELEITORES MAPEADOS" color="var(--brand-700)" />
+        <KpiCard value={formatNumber(totalValidados)} label="ELEITORES VALIDADOS" color="var(--brand-700)" />
         <KpiCard value={regioes} label="REGIÕES COBERTAS" />
         <KpiCard value={emAlerta} label="BASES EM ALERTA" color="var(--danger)" />
       </div>
@@ -115,8 +136,8 @@ export default function RegionsTab({ leaders }) {
 
       <div className="panel-split" style={{ display: "grid", gridTemplateColumns: "1fr 336px", gap: 18, alignItems: "start" }}>
         <div className="panel-card" style={{ overflow: "hidden", padding: 0 }}>
-          <MapContainer center={GOIANIA_CENTER} zoom={11} scrollWheelZoom style={{ height: 540, width: "100%" }}>
-            <MapRef mapRef={mapRef} />
+          <MapContainer className="panel-map" center={GOIANIA_CENTER} zoom={11} scrollWheelZoom style={{ height: 540, width: "100%" }}>
+            <MapRef mapRef={mapRef} active={active} />
             <TileLayer
               url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -125,8 +146,8 @@ export default function RegionsTab({ leaders }) {
             {visible.map((leader) => (
               <Circle
                 key={`c-${leader.id}`}
-                center={[leader.lat, leader.lng]}
-                radius={400 + leader.eleitores * 0.9}
+                center={displayPositions.get(leader.id) ?? [leader.lat, leader.lng]}
+                radius={Number.isFinite(leader.raioKm) ? leader.raioKm * 1000 : 400 + leader.eleitores * 0.9}
                 pathOptions={{
                   color: PERF_COLORS[leader.perf],
                   weight: 1.4,
@@ -139,7 +160,7 @@ export default function RegionsTab({ leaders }) {
             {visible.map((leader) => (
               <Marker
                 key={leader.id}
-                position={[leader.lat, leader.lng]}
+                position={displayPositions.get(leader.id) ?? [leader.lat, leader.lng]}
                 icon={pinIcon(leader)}
                 title={leader.nome}
                 ref={(ref) => {
@@ -157,12 +178,12 @@ export default function RegionsTab({ leaders }) {
                     </div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <b style={{ fontFamily: "var(--heading)", fontSize: 20, color: PERF_COLORS[leader.perf] }}>
-                        {formatNumber(leader.eleitores)}
+                        {formatNumber(validatedVoters(leader))}
                       </b>
-                      <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>eleitores</span>
+                      <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>validados de {formatNumber(leader.eleitores)}</span>
                     </div>
                     <div style={{ marginTop: 8 }}>
-                      <Stars eleitores={leader.eleitores} />
+                      <Stars value={leaderRating(leader, leaders)} />
                     </div>
                   </div>
                 </Popup>
@@ -268,25 +289,47 @@ export default function RegionsTab({ leaders }) {
                 <Chip background={`${PERF_COLORS[selected.perf]}1f`} color={PERF_COLORS[selected.perf]}>
                   {PERF_LABELS[selected.perf]}
                 </Chip>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 14 }}>
+                <div className="leader-whatsapp-contact">
+                  <div>
+                    <span>WHATSAPP DO LÍDER</span>
+                    <strong>{selected.whatsapp || "Não cadastrado"}</strong>
+                  </div>
+                  {selected.whatsapp && (
+                    <a
+                      href={whatsappUrl(selected.whatsapp, `Olá, ${selected.nome}!`)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="whatsapp-link"
+                    >
+                      Conversar
+                    </a>
+                  )}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8, marginTop: 14 }}>
+                  <div style={{ background: "#f7f7f3", borderRadius: 10, padding: 12 }}>
+                    <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 20, color: "var(--ink-strong)" }}>
+                      {formatNumber(validatedVoters(selected))}
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>VALIDADOS</div>
+                  </div>
                   <div style={{ background: "#f7f7f3", borderRadius: 10, padding: 12 }}>
                     <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 20, color: "var(--ink-strong)" }}>
                       {formatNumber(selected.eleitores)}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>ELEITORES</div>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>CADASTROS</div>
                   </div>
                   <div style={{ background: "#f7f7f3", borderRadius: 10, padding: 12 }}>
                     <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 20, color: "var(--brand-700)" }}>
                       +{selected.semana}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>NA SEMANA</div>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, marginTop: 3 }}>7 DIAS</div>
                   </div>
                 </div>
                 <div style={{ marginTop: 14 }}>
                   <SectionLabel style={{ display: "block", fontSize: 11, letterSpacing: 0.7, marginBottom: 6 }}>
                     RATING DE INDICAÇÕES
                   </SectionLabel>
-                  <Stars eleitores={selected.eleitores} />
+                  <Stars value={leaderRating(selected, leaders)} />
                 </div>
               </div>
             )}
@@ -309,7 +352,7 @@ export default function RegionsTab({ leaders }) {
                     <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "#243528" }}>{leader.nome}</span>
                     <span style={{ display: "block", fontSize: 11.5, color: "var(--ink-soft)" }}>{leader.bairro}</span>
                   </span>
-                  <b style={{ fontSize: 13, color: PERF_COLORS[leader.perf] }}>{formatNumber(leader.eleitores)}</b>
+                  <b style={{ fontSize: 13, color: PERF_COLORS[leader.perf] }}>{formatNumber(validatedVoters(leader))}</b>
                 </button>
               ))}
             </div>
