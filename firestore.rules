@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return request.auth.token.role;
+    }
+
+    function campaignId() {
+      return request.auth.token.campaignId;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && role() == 'super_admin';
+    }
+
+    function isManagerOf(cId) {
+      return isSignedIn() && role() == 'manager' && campaignId() == cId;
+    }
+
+    function isLeaderOf(cId) {
+      return isSignedIn() && role() == 'leader' && campaignId() == cId;
+    }
+
+    match /campaigns/{campaignId} {
+      allow read: if isSuperAdmin() || isManagerOf(campaignId) || isLeaderOf(campaignId);
+      allow write: if isSuperAdmin();
+
+      match /managers/{managerId} {
+        allow read: if isSuperAdmin() || isManagerOf(campaignId);
+        allow write: if isSuperAdmin();
+      }
+
+      match /leaders/{leaderId} {
+        allow read: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId) && leaderId == request.auth.uid);
+        allow write: if isSuperAdmin() || isManagerOf(campaignId);
+      }
+
+      match /voters/{voterId} {
+        allow read: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId) && resource.data.leaderId == request.auth.uid);
+
+        allow create: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId) && request.resource.data.leaderId == request.auth.uid);
+
+        allow update, delete: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId) && resource.data.leaderId == request.auth.uid);
+      }
+    }
+  }
+}
