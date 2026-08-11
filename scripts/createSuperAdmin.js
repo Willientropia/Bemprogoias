@@ -1,4 +1,5 @@
-// Cria (ou reaproveita) um usuário Auth e aplica a custom claim role=super_admin.
+// Cria (ou reaproveita) um usuário Auth e grava o perfil users/{uid}
+// com role=super_admin no Firestore.
 //
 // Uso:
 //   node scripts/createSuperAdmin.js <email> <senha>
@@ -9,6 +10,7 @@
 
 import { initializeApp, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 import { readFileSync } from "node:fs";
 
 const [, , email, password] = process.argv;
@@ -25,6 +27,7 @@ const serviceAccount = JSON.parse(
 initializeApp({ credential: cert(serviceAccount) });
 
 const auth = getAuth();
+const db = getFirestore();
 
 async function main() {
   let user;
@@ -36,9 +39,11 @@ async function main() {
     console.log(`Usuário criado: ${user.uid}`);
   }
 
-  await auth.setCustomUserClaims(user.uid, { role: "super_admin" });
-  console.log(`Claim role=super_admin aplicada a ${email}.`);
-  console.log("Se o usuário já estava logado em algum dispositivo, é preciso deslogar/logar de novo para o token atualizar.");
+  await db.collection("users").doc(user.uid).set(
+    { role: "super_admin", email, createdAt: new Date().toISOString() },
+    { merge: true }
+  );
+  console.log(`Perfil users/${user.uid} gravado com role=super_admin.`);
 }
 
 main().then(() => process.exit(0)).catch((err) => {

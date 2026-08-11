@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { deleteCampaign, subscribeToCampaigns } from "../../services/campaigns";
 import { TopBar } from "../../components/TopBar";
 import CampaignForm from "./CampaignForm";
@@ -33,6 +34,7 @@ export default function SuperAdminDashboard() {
           <li key={campaign.id}>
             <strong>{campaign.name}</strong>
             {campaign.minAppVersion && <span> — v. mínima: {campaign.minAppVersion}</span>}
+            <Link to={`/super-admin/campaigns/${campaign.id}`}>Gestores</Link>
             <button type="button" onClick={() => setEditingCampaign(campaign)}>
               Editar
             </button>

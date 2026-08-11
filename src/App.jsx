@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ROLES } from "./config/roles";
 import LoginPage from "./pages/auth/LoginPage";
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
+import CampaignDetailPage from "./pages/super-admin/CampaignDetailPage";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 
 function RoleHome() {
@@ -25,6 +26,14 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
                 <SuperAdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/super-admin/campaigns/:campaignId"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
+                <CampaignDetailPage />
               </ProtectedRoute>
             }
           />

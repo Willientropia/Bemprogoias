@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import { auth, db } from "../services/firebase";
 
 const AuthContext = createContext(null);
 
@@ -11,7 +12,11 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (firebaseUser) => {
+    let unsubscribeProfile = () => {};
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      unsubscribeProfile();
+
       if (!firebaseUser) {
         setUser(null);
         setRole(null);
@@ -20,12 +25,20 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      const tokenResult = await firebaseUser.getIdTokenResult(true);
       setUser(firebaseUser);
-      setRole(tokenResult.claims.role ?? null);
-      setCampaignId(tokenResult.claims.campaignId ?? null);
-      setLoading(false);
+
+      unsubscribeProfile = onSnapshot(doc(db, "users", firebaseUser.uid), (snap) => {
+        const profile = snap.data();
+        setRole(profile?.role ?? null);
+        setCampaignId(profile?.campaignId ?? null);
+        setLoading(false);
+      });
     });
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeProfile();
+    };
   }, []);
 
   const login = (email, password) => signInWithEmailAndPassword(auth, email, password);

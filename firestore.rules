@@ -7,39 +7,64 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function role() {
-      return request.auth.token.role;
+    // users/{uid} guarda só o essencial pra sessão saber quem é o usuário:
+    // role + campaignId. Sempre um get() de doc único — nunca list — então
+    // não há risco de vazamento entre campanhas aqui.
+    function myProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
-    function campaignId() {
-      return request.auth.token.campaignId;
+    function myRole() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? myProfile().role
+        : null;
+    }
+
+    function myCampaignId() {
+      return myProfile().campaignId;
     }
 
     function isSuperAdmin() {
-      return isSignedIn() && role() == 'super_admin';
+      return isSignedIn() && myRole() == 'super_admin';
     }
 
     function isManagerOf(cId) {
-      return isSignedIn() && role() == 'manager' && campaignId() == cId;
+      return isSignedIn() && myRole() == 'manager' && myCampaignId() == cId;
     }
 
     function isLeaderOf(cId) {
-      return isSignedIn() && role() == 'leader' && campaignId() == cId;
+      return isSignedIn() && myRole() == 'leader' && myCampaignId() == cId;
+    }
+
+    // users/{uid}: espelho mínimo (role, campaignId) usado só para a própria
+    // sessão descobrir quem é. Cada usuário lê apenas o próprio. Super_admin
+    // escreve qualquer um; gestor só pode espelhar líderes da própria
+    // campanha (perfil completo "de verdade" fica em
+    // campaigns/{campaignId}/members/{uid}, ver abaixo).
+    match /users/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isSuperAdmin());
+      allow create, update: if isSuperAdmin()
+        || (isSignedIn() && request.resource.data.role == 'leader'
+            && isManagerOf(request.resource.data.campaignId));
+      allow delete: if isSuperAdmin()
+        || (isSignedIn() && resource.data.role == 'leader' && isManagerOf(resource.data.campaignId));
     }
 
     match /campaigns/{campaignId} {
       allow read: if isSuperAdmin() || isManagerOf(campaignId) || isLeaderOf(campaignId);
       allow write: if isSuperAdmin();
 
-      match /managers/{managerId} {
-        allow read: if isSuperAdmin() || isManagerOf(campaignId);
-        allow write: if isSuperAdmin();
-      }
-
-      match /leaders/{leaderId} {
+      // Gestores e líderes da campanha. Isolamento por campanha vem do
+      // próprio path (subcoleção), então list/query aqui é seguro por
+      // construção — diferente de uma coleção users plana na raiz.
+      match /members/{uid} {
         allow read: if isSuperAdmin() || isManagerOf(campaignId)
-          || (isLeaderOf(campaignId) && leaderId == request.auth.uid);
-        allow write: if isSuperAdmin() || isManagerOf(campaignId);
+          || (isLeaderOf(campaignId) && uid == request.auth.uid);
+        allow list: if isSuperAdmin() || isManagerOf(campaignId);
+        allow create, update: if isSuperAdmin()
+          || (isManagerOf(campaignId) && request.resource.data.role == 'leader');
+        allow delete: if isSuperAdmin()
+          || (isManagerOf(campaignId) && resource.data.role == 'leader');
       }
 
       match /voters/{voterId} {
