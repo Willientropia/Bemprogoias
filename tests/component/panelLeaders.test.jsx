@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hasPanelMetrics, toPanelLeaders } from "../../src/pages/manager/panel/panelLeaders";
+import { hasPanelMetrics, spreadLeaderPositions, toPanelLeaders } from "../../src/pages/manager/panel/panelLeaders";
 
 const completeLeader = {
   id: "demo-l1",
@@ -32,5 +32,13 @@ describe("panelLeaders", () => {
     const leaders = [completeLeader, { id: "incompleto", name: "Incompleto" }];
     expect(toPanelLeaders(leaders).map((leader) => leader.id)).toEqual(["demo-l1"]);
     expect(leaders[0]).not.toHaveProperty("nome");
+  });
+
+  it("separa visualmente líderes cadastrados no mesmo ponto do mapa", () => {
+    const adiel = { ...completeLeader, id: "adiel" };
+    const positions = spreadLeaderPositions([completeLeader, adiel]);
+
+    expect(positions.get(completeLeader.id)).not.toEqual(positions.get(adiel.id));
+    expect(positions.get(completeLeader.id)).toHaveLength(2);
   });
 });

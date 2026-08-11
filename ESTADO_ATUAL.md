@@ -77,10 +77,11 @@ não de filtro de campo — é o padrão seguro confirmado pelos testes.
 - **`/super-admin`** — CRUD completo de campanhas (criar, editar, excluir, listar).
 - **`/super-admin/campaigns/:campaignId`** — CRUD completo de gestores daquela campanha (criar,
   editar, remover, listar).
-- **`/manager`** — CRUD completo de líderes da própria campanha (criar, editar, remover, listar).
+- **`/manager`** — painel responsivo do gestor com mapa de regiões, ranking da rede,
+  consulta paginada de eleitores, Relatório Expresso e CRUD de líderes.
 
-Todo painel autenticado mostra uma barra superior (`TopBar`) com o e-mail, papel do usuário
-logado e botão de logout.
+Todo painel autenticado usa uma sidebar esquerda recolhível no desktop e drawer no celular,
+com e-mail, papel do usuário e botão de logout.
 
 ## Testes
 
@@ -100,9 +101,9 @@ checar CSS/visual, que os testes não cobrem.
 
 ## O que ainda não existe
 
-- CRUD de Eleitores, deduplicação por RG/título, os três modos de localização, offline-first,
-  integração com WhatsApp — tudo isso é escopo do Dev B (trilha "Campo & Eleitores").
-- Mapa com líderes/raio de influência.
+- O gestor já possui consulta paginada dos eleitores e a campanha demo contém 5.000 registros.
+  O **cadastro pelo app do líder**, deduplicação por RG/título, os três modos de localização,
+  offline-first e integração com WhatsApp continuam sendo escopo do Dev B.
 - Empacotamento Electron, Capacitor (APK) e PWA.
 - Auto-update / OTA via GitHub Releases.
 - Identidade visual "Universe Deep Space" aplicada ao código (há mockups de referência em
@@ -113,9 +114,9 @@ checar CSS/visual, que os testes não cobrem.
 - O login do líder já funciona (criado pelo Gestor) e o perfil dele — incluindo `regiao` e
   `raioKm` — já está disponível em `campaigns/{campaignId}/members/{uid}`. Não é preciso mexer
   nesse fluxo, só consumir os dados de lá.
-- A subcoleção `campaigns/{campaignId}/voters/{voterId}` já está prevista nas Security Rules
-  (leitura/escrita restrita ao próprio líder, via `leaderId == uid`), mas **nenhum código de
-  cadastro de eleitor existe ainda** — é o ponto de partida do Dev B.
+- A subcoleção `campaigns/{campaignId}/voters/{voterId}` já está prevista nas Security Rules e
+  é consumida pelo painel do gestor. O seed de demonstração documenta o contrato de campos;
+  o CRUD de campo pelo líder ainda é o ponto de partida do Dev B.
 - Ao criar a UI do líder, usar `useAuth()` (`src/contexts/AuthContext.jsx`) para obter `user.uid`
   e `campaignId` — mesmo padrão já usado em `ManagerDashboard.jsx`.
 - Onboarding completo (acesso ao repo, `.env`, Firebase Console) está no

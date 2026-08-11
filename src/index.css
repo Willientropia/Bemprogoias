@@ -140,6 +140,18 @@ input::placeholder {
   color: var(--ink-soft);
 }
 
+.form-hint {
+  margin-top: -4px;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.leader-location-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(110px, 1fr);
+  gap: 12px;
+}
+
 /* ---------- Botões ---------- */
 
 button {
@@ -634,6 +646,198 @@ button.sidebar-logout:hover {
   color: var(--danger);
 }
 
+.panel-page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.voters-production-card {
+  padding: 22px;
+  margin-top: 20px;
+}
+
+.voters-production-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 15px;
+}
+
+button.voter-leader-summary {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid #efefe9;
+  background: #fafaf7;
+  color: var(--ink);
+  text-align: left;
+}
+
+button.voter-leader-summary:hover {
+  border-color: #c9ddcf;
+  background: var(--brand-50);
+}
+
+.voter-leader-position {
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--brand-900);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.voter-leader-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.voter-leader-copy b,
+.voter-leader-copy > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.voter-leader-copy b {
+  color: #243528;
+  font-size: 13px;
+}
+
+.voter-leader-copy > span {
+  margin-top: 1px;
+  color: var(--ink-soft);
+  font-size: 10.5px;
+}
+
+.voter-leader-copy i {
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6e9e3;
+}
+
+.voter-leader-copy i span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand-700);
+}
+
+.voter-leader-summary > strong {
+  flex-shrink: 0;
+  color: var(--brand-700);
+  font: 700 16px var(--heading);
+}
+
+.voters-toolbar {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.85fr) minmax(165px, 0.65fr) minmax(240px, 1.5fr);
+  gap: 13px;
+  margin: 20px 0 14px;
+}
+
+.voters-table-card {
+  overflow: hidden;
+}
+
+.voters-table-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.voters-table-heading p {
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.voters-table-scroll {
+  overflow-x: auto;
+}
+
+.voters-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.voters-table th {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #f7f7f3;
+  color: var(--ink-soft);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-align: left;
+}
+
+.voters-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #f0efe9;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  vertical-align: middle;
+}
+
+.voters-table tbody tr:hover {
+  background: #fcfcf9;
+}
+
+.voters-table td b,
+.voters-table td > span:not([style]) {
+  display: block;
+}
+
+.voters-table td b {
+  color: #243528;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.voters-table td > span:not([style]) {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 10.5px;
+}
+
+.voters-table td.voters-empty {
+  padding: 34px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.voters-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  border-top: 1px solid var(--border);
+  background: #fafaf7;
+}
+
+.voters-load-more button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
 button.filter-btn {
   background: var(--surface);
   border: 1px solid #e0e0d9;
@@ -893,6 +1097,10 @@ button.switch.on i {
   .panel-podium {
     grid-template-columns: 1fr !important;
   }
+
+  .voters-production-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 620px) {
@@ -913,8 +1121,25 @@ button.switch.on i {
     grid-template-columns: 1fr !important;
   }
 
+  .leader-location-grid {
+    grid-template-columns: 1fr;
+  }
+
   .panel-map {
     height: 430px !important;
+  }
+
+  .voters-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .voters-production-card {
+    padding: 17px 14px;
+  }
+
+  .voters-table-heading {
+    align-items: flex-start;
+    padding-inline: 15px;
   }
 
   li {

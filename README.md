@@ -45,11 +45,17 @@ Com `serviceAccountKey.json` na raiz, execute primeiro a simulação e depois o 
 ```bash
 npm run seed:demo -- <campaignId> --dry-run
 npm run seed:demo -- <campaignId>
+npm run seed:demo-voters -- <campaignId> --count=5000 --dry-run
+npm run seed:demo-voters -- <campaignId> --count=5000
 ```
 
 O seed é idempotente, usa os IDs `demo-l1` a `demo-l15`, marca a campanha com
 `isDemo: true` e cria os espelhos mínimos em `users/{id}` exigidos pelo CRUD. Ele
 não cria contas no Firebase Auth.
+
+O segundo seed cria eleitores fictícios completos em
+`campaigns/{campaignId}/voters`, distribui a produção entre os líderes e atualiza
+as métricas `eleitores`, `semana` e `perf` usadas no mapa e no ranking.
 
 ## Estrutura
 

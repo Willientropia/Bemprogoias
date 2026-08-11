@@ -13,11 +13,14 @@ export function subscribeToLeaders(campaignId, onChange, onError) {
   );
 }
 
-export function updateLeader(campaignId, uid, { name, whatsapp, regiao, raioKm }) {
+export function updateLeader(campaignId, uid, { name, whatsapp, regiao, bairro, lat, lng, raioKm }) {
   return updateDoc(doc(db, `campaigns/${campaignId}/members`, uid), {
     name,
     whatsapp,
     regiao,
+    bairro,
+    lat,
+    lng,
     raioKm,
   });
 }

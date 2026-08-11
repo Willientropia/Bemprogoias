@@ -1,11 +1,12 @@
 # Painel do Gestor — status da implementação
 
 Implementação do handoff em [`docs/handoff-painel-gestor/`](./docs/handoff-painel-gestor/)
-(as três abas: Regiões, Rede de Indicações, Relatório Expresso).
+e da seção adicional de Eleitores.
 
 **Decisão tomada:** construir as três seções fiéis ao handoff usando uma **campanha
 de demonstração persistida no Firestore**. Os 15 líderes fictícios alimentam o mesmo
-fluxo de dados usado por uma campanha normal.
+fluxo de dados usado por uma campanha normal. A campanha também possui 5.000 eleitores
+fictícios distribuídos entre os 16 líderes atuais, incluindo Adiel.
 
 **Estado geral:** código escrito; seed aplicado no Firestore, build, lint e suíte de
 testes passando. **A validação visual automatizada no navegador ainda está pendente.**
@@ -21,17 +22,19 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
 - [x] `scripts/seedDemoCampaign.js` — seed idempotente em
   `campaigns/{campaignId}/members/demo-l1..demo-l15`, com os espelhos mínimos em
   `users/{id}` necessários para edição/remoção pelas Security Rules
+- [x] `scripts/seedDemoVoters.js` — gera 5.000 eleitores únicos, geolocalizados,
+  pagináveis e vinculados aos líderes; recalcula as métricas de produção
 - [x] Tokens e classes do painel no `src/index.css` (`.panel-card`, sidebar,
   `.filter-btn`, `.kpi-grid`, `.switch`, `.map-pin`, `pulse-dot`, e o CSS do Leaflet)
-- [x] Sidebar à esquerda com as quatro seções do gestor, recolhimento persistido no
+- [x] Sidebar à esquerda com as cinco seções do gestor, recolhimento persistido no
   desktop e drawer com backdrop/fechamento no celular
 - [x] Responsividade do painel: grids empilham, KPIs passam de 4 para 2 e depois 1
   coluna, pódio vira lista, formulário do relatório empilha e o mapa reduz a altura
 
 ### Abas
 - [x] **Shell de navegação** (`ManagerDashboard.jsx`) com as seções na sidebar
-  esquerda como no handoff: Regiões, Rede de Indicações, Relatório Expresso e
-  Cadastro de Líderes
+  esquerda: Regiões, Rede de Indicações, Eleitores, Relatório Expresso e Cadastro
+  de Líderes
 - [x] **Aba Regiões** (`panel/RegionsTab.jsx`) — mapa Leaflet centrado em Goiânia
   (zoom 11), pinos em forma de gota dimensionados pela base, círculos de alcance
   (`400 + eleitores * 0.9` metros), popup por líder, 4 KPIs derivados dos dados,
@@ -43,6 +46,8 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
   estrelas, barra comparativa de eleitores e "+N na semana" colorido por faixa; as
   três ordenações (mais eleitores / melhor rating / maior crescimento) re-renderizam
   pódio e tabela juntos
+- [x] **Eleitores** (`panel/VotersTab.jsx`) — 4 KPIs, produção comparativa por líder,
+  filtros por líder/status, busca local, tabela de evidências e paginação de 50 em 50
 - [x] **Aba Relatório Expresso** (`panel/ReportTab.jsx`) — 4 KPIs, seleção de
   frequência, horário e escopo, toggles dos 6 blocos, lista de destinatários com o
   total **derivado da soma de pessoas** (14, não fixo), prévia da mensagem no estilo
@@ -69,6 +74,7 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
   bases em alerta, top 20 imutável e atualização da prévia pela interface)
 - [x] Testes de layout/sidebar, integração do dashboard com as assinaturas do
   Firestore e filtragem dos líderes aptos ao painel
+- [x] Testes do cadastro geolocalizado, gerador de eleitores e página de consulta
 
 ---
 
@@ -91,11 +97,10 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
   filtra o conteúdo da prévia
 
 ### Para sair da demo (quando os dados reais existirem)
-- [ ] **lat/lng no cadastro de líder** — hoje o líder tem só `regiao` como texto
-  livre. O mapa precisa de coordenadas; o caminho natural é geocodificar o endereço
-  no momento do cadastro
-- [ ] **Contagem de eleitores por líder** — depende da coleção
-  `campaigns/{campaignId}/voters`, que é escopo do Dev B e ainda não existe
+- [x] **lat/lng no cadastro de líder** — o gestor escolhe um ponto de atuação e o
+  cadastro persiste bairro, região e coordenadas; o Adiel existente foi migrado
+- [x] **Contagem demonstrativa de eleitores por líder** — 5.000 documentos em
+  `campaigns/{campaignId}/voters`, com totais coerentes nos membros
 - [ ] **Classificação de desempenho** (`alto`/`medio`/`alerta`) — o handoff recomenda
   calcular no backend por regra explícita e auditável (ex.: crescimento na semana
   contra a média da própria base), não classificar à mão
@@ -108,10 +113,12 @@ testes passando. **A validação visual automatizada no navegador ainda está pe
   integração com a WhatsApp Business API
 
 ### Fluxo dos dados
-As três seções assinam `campaigns/{campaignId}/members` pelo serviço
+As seções analíticas assinam `campaigns/{campaignId}/members` pelo serviço
 `subscribeToLeaders`. O adaptador `panel/panelLeaders.js` seleciona documentos com
 `name`, `regiao`, `bairro`, `lat`, `lng`, `eleitores`, `semana` e `perf`. A fonte
 `DEMO_LEADERS` só é importada por `scripts/seedDemoCampaign.js`.
+A seção Eleitores usa consultas paginadas em `services/voters.js` e índices compostos
+de `leaderId`, `validationStatus` e `createdAt`.
 
 ---
 

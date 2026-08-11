@@ -1,7 +1,15 @@
 import { useState } from "react";
+import { GOIANIA_LOCATIONS } from "../../data/goianiaLocations";
 import { createLeader } from "../../services/userProvisioning";
 
-const emptyForm = { name: "", email: "", password: "", whatsapp: "", regiao: "", raioKm: "" };
+const emptyForm = {
+  name: "",
+  email: "",
+  password: "",
+  whatsapp: "",
+  locationId: "",
+  raioKm: "5",
+};
 
 export default function LeaderForm({ campaignId, onCreated, onCancel }) {
   const [form, setForm] = useState(emptyForm);
@@ -10,10 +18,27 @@ export default function LeaderForm({ campaignId, onCreated, onCancel }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    const location = GOIANIA_LOCATIONS.find((item) => item.id === form.locationId);
+    if (!location) {
+      setError("Selecione um ponto de atuação para posicionar o líder no mapa.");
+      return;
+    }
+
     setError("");
     setSaving(true);
     try {
-      await createLeader({ ...form, raioKm: Number(form.raioKm) || null, campaignId });
+      await createLeader({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        whatsapp: form.whatsapp,
+        campaignId,
+        regiao: location.regiao,
+        bairro: location.bairro,
+        lat: location.lat,
+        lng: location.lng,
+        raioKm: Number(form.raioKm) || 5,
+      });
       setForm(emptyForm);
       onCreated?.();
     } catch (err) {
@@ -34,7 +59,7 @@ export default function LeaderForm({ campaignId, onCreated, onCancel }) {
           type="text"
           placeholder="Nome completo"
           value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+          onChange={(e) => setForm((current) => ({ ...current, name: e.target.value }))}
           required
         />
       </div>
@@ -45,7 +70,7 @@ export default function LeaderForm({ campaignId, onCreated, onCancel }) {
           type="email"
           placeholder="E-mail (login)"
           value={form.email}
-          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+          onChange={(e) => setForm((current) => ({ ...current, email: e.target.value }))}
           required
         />
       </div>
@@ -56,7 +81,7 @@ export default function LeaderForm({ campaignId, onCreated, onCancel }) {
           type="password"
           placeholder="Senha inicial"
           value={form.password}
-          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+          onChange={(e) => setForm((current) => ({ ...current, password: e.target.value }))}
           minLength={6}
           required
         />
@@ -68,33 +93,40 @@ export default function LeaderForm({ campaignId, onCreated, onCancel }) {
           type="tel"
           placeholder="(62) 9 0000-0000"
           value={form.whatsapp}
-          onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
+          onChange={(e) => setForm((current) => ({ ...current, whatsapp: e.target.value }))}
         />
       </div>
-      <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 2 }}>
-          <label htmlFor="leader-regiao">Região de atuação</label>
-          <input
-            id="leader-regiao"
-            type="text"
-            placeholder="Ex: Setor Bueno"
-            value={form.regiao}
-            onChange={(e) => setForm((f) => ({ ...f, regiao: e.target.value }))}
-          />
+      <div className="leader-location-grid">
+        <div>
+          <label htmlFor="leader-location">Ponto de atuação no mapa</label>
+          <select
+            id="leader-location"
+            value={form.locationId}
+            onChange={(e) => setForm((current) => ({ ...current, locationId: e.target.value }))}
+            required
+          >
+            <option value="">Selecione bairro / região</option>
+            {GOIANIA_LOCATIONS.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.bairro} · {location.regiao}
+              </option>
+            ))}
+          </select>
         </div>
-        <div style={{ flex: 1 }}>
+        <div>
           <label htmlFor="leader-raio">Raio (km)</label>
           <input
             id="leader-raio"
             type="number"
-            placeholder="5"
             value={form.raioKm}
-            onChange={(e) => setForm((f) => ({ ...f, raioKm: e.target.value }))}
-            min="0"
-            step="0.1"
+            onChange={(e) => setForm((current) => ({ ...current, raioKm: e.target.value }))}
+            min="0.5"
+            step="0.5"
+            required
           />
         </div>
       </div>
+      <p className="form-hint">O ponto selecionado posiciona o líder e seu raio de influência no mapa.</p>
       {error && <p role="alert" className="alert-box">{error}</p>}
       <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
         <button type="submit" disabled={saving}>

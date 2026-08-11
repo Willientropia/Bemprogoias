@@ -43,7 +43,18 @@ export async function createManager({ email, password, name, whatsapp, campaignI
   return uid;
 }
 
-export async function createLeader({ email, password, name, whatsapp, campaignId, regiao, raioKm }) {
+export async function createLeader({
+  email,
+  password,
+  name,
+  whatsapp,
+  campaignId,
+  regiao,
+  bairro,
+  lat,
+  lng,
+  raioKm,
+}) {
   const uid = await createAuthUser(email, password);
   await writeProfile(uid, {
     role: "leader",
@@ -52,7 +63,13 @@ export async function createLeader({ email, password, name, whatsapp, campaignId
     whatsapp,
     email,
     regiao,
+    bairro,
+    lat,
+    lng,
     raioKm,
+    eleitores: 0,
+    semana: 0,
+    perf: "alerta",
   });
   return uid;
 }

@@ -9,12 +9,14 @@ import { toPanelLeaders } from "./panel/panelLeaders";
 import RegionsTab from "./panel/RegionsTab";
 import NetworkTab from "./panel/NetworkTab";
 import ReportTab from "./panel/ReportTab";
+import VotersTab from "./panel/VotersTab";
 import LeaderForm from "./LeaderForm";
 import LeaderListItem from "./LeaderListItem";
 
 const MANAGER_NAV_ITEMS = [
   { id: "regioes", label: "Regiões", icon: "map" },
   { id: "rede", label: "Rede de Indicações", icon: "network" },
+  { id: "eleitores", label: "Eleitores", icon: "voters" },
   { id: "expresso", label: "Relatório Expresso", icon: "report" },
   { id: "cadastro", label: "Cadastro de Líderes", icon: "users", dividerBefore: true },
 ];
@@ -101,6 +103,14 @@ export default function ManagerDashboard() {
       <section hidden={tab !== "expresso"}>
         <PanelDataState loading={loadingLeaders} error={loadError} leadersCount={panelLeaders.length} />
         {hasPanelData && <ReportTab leaders={panelLeaders} />}
+      </section>
+      <section hidden={tab !== "eleitores"}>
+        {tab === "eleitores" && (
+          <>
+            <PanelDataState loading={loadingLeaders} error={loadError} leadersCount={panelLeaders.length} />
+            {hasPanelData && <VotersTab campaignId={campaignId} leaders={panelLeaders} />}
+          </>
+        )}
       </section>
 
       {tab === "cadastro" && (

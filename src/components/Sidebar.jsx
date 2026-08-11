@@ -33,6 +33,14 @@ function NavIcon({ icon }) {
     );
   }
 
+  if (icon === "voters") {
+    return (
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 5h11M9 12h11M9 19h11" /><circle cx="4" cy="5" r="1.5" /><circle cx="4" cy="12" r="1.5" /><circle cx="4" cy="19" r="1.5" />
+      </svg>
+    );
+  }
+
   if (icon === "users") {
     return (
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

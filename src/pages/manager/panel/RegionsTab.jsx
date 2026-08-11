@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { GOIANIA_CENTER, PERF_COLORS, PERF_LABELS } from "../../../data/demoPanelData";
 import { formatNumber } from "./leaderMetrics";
+import { spreadLeaderPositions } from "./panelLeaders";
 import { Avatar, Chip, FilterButton, KpiCard, SectionLabel, Stars } from "./PanelBits";
 
 const FILTERS = [
@@ -57,6 +58,7 @@ export default function RegionsTab({ leaders, active = true }) {
   );
 
   const listed = useMemo(() => [...visible].sort((a, b) => b.eleitores - a.eleitores), [visible]);
+  const displayPositions = useMemo(() => spreadLeaderPositions(leaders), [leaders]);
 
   const totalEleitores = leaders.reduce((acc, l) => acc + l.eleitores, 0);
   const regioes = new Set(leaders.map((l) => l.regiao)).size;
@@ -66,7 +68,7 @@ export default function RegionsTab({ leaders, active = true }) {
 
   function focusLeader(leader) {
     setSelectedId(leader.id);
-    mapRef.current?.setView([leader.lat, leader.lng], 14, { animate: true });
+    mapRef.current?.setView(displayPositions.get(leader.id) ?? [leader.lat, leader.lng], 14, { animate: true });
     markerRefs.current[leader.id]?.openPopup();
   }
 
@@ -112,8 +114,8 @@ export default function RegionsTab({ leaders, active = true }) {
             {visible.map((leader) => (
               <Circle
                 key={`c-${leader.id}`}
-                center={[leader.lat, leader.lng]}
-                radius={400 + leader.eleitores * 0.9}
+                center={displayPositions.get(leader.id) ?? [leader.lat, leader.lng]}
+                radius={Number.isFinite(leader.raioKm) ? leader.raioKm * 1000 : 400 + leader.eleitores * 0.9}
                 pathOptions={{
                   color: PERF_COLORS[leader.perf],
                   weight: 1.4,
@@ -126,7 +128,7 @@ export default function RegionsTab({ leaders, active = true }) {
             {visible.map((leader) => (
               <Marker
                 key={leader.id}
-                position={[leader.lat, leader.lng]}
+                position={displayPositions.get(leader.id) ?? [leader.lat, leader.lng]}
                 icon={pinIcon(leader)}
                 title={leader.nome}
                 ref={(ref) => {

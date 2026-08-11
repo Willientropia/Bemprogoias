@@ -35,10 +35,11 @@ Atualizar este arquivo à medida que cada item avançar.
 ## Próximos passos (em ordem sugerida)
 
 ### 1. Mapa do Gestor
-- [ ] Escolher biblioteca de mapa (Leaflet é o candidato mais leve/gratuito para web+Electron+Capacitor)
-- [ ] Plotar cada líder como marcador + círculo de raio (km) centrado na região (`regiao`/`raioKm`
-  já existem no perfil do líder)
+- [x] Leaflet + React Leaflet implementados
+- [x] Plotar cada líder como marcador + círculo de `raioKm`, com filtros de desempenho
+- [x] Cadastro do líder exige um ponto de atuação e salva `bairro`, `regiao`, `lat` e `lng`
 - [ ] Plotar eleitores como pontos (somente leitura, dado do Dev B)
+- [x] Página paginada de eleitores para o gestor, com filtros, indicadores e produção por líder
 
 ### 2. Empacotamento Electron (Windows)
 - [ ] Configurar Electron apontando para o build do Vite

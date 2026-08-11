@@ -5,7 +5,7 @@ import {
   assertFails,
 } from "@firebase/rules-unit-testing";
 import { readFileSync } from "node:fs";
-import { collection, deleteDoc, doc, getDocs, getDoc, query, where, setDoc } from "firebase/firestore";
+import { Timestamp, collection, deleteDoc, doc, getDocs, getDoc, limit, orderBy, query, where, setDoc } from "firebase/firestore";
 
 let testEnv;
 
@@ -35,6 +35,24 @@ beforeAll(async () => {
     await setDoc(doc(db, "campaigns/campB/members", "leader-b-uid"), {
       role: "leader",
       name: "Líder B",
+    });
+
+    await setDoc(doc(db, "campaigns/campA/voters", "voter-a-1"), {
+      leaderId: "leader-a-uid",
+      name: "Eleitor A",
+      validationStatus: "validado",
+      createdAt: Timestamp.fromDate(new Date("2026-08-11T12:00:00Z")),
+    });
+    await setDoc(doc(db, "campaigns/campA/voters", "voter-other-1"), {
+      leaderId: "other-leader-uid",
+      name: "Eleitor de outro líder",
+      validationStatus: "pendente",
+      createdAt: Timestamp.fromDate(new Date("2026-08-10T12:00:00Z")),
+    });
+    await setDoc(doc(db, "campaigns/campB/voters", "voter-b-1"), {
+      leaderId: "leader-b-uid",
+      name: "Eleitor B",
+      createdAt: Timestamp.fromDate(new Date("2026-08-09T12:00:00Z")),
     });
   });
 });
@@ -96,6 +114,39 @@ describe("líder não pode listar outros membros", () => {
   it("líder consegue ler o próprio perfil", async () => {
     const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
     await assertSucceeds(getDoc(doc(leaderA, "campaigns/campA/members/leader-a-uid")));
+  });
+});
+
+describe("consulta de eleitores pelo painel", () => {
+  it("gestor pagina os eleitores da própria campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    const votersQuery = query(
+      collection(managerA, "campaigns/campA/voters"),
+      orderBy("createdAt", "desc"),
+      limit(50)
+    );
+    const snapshot = await assertSucceeds(getDocs(votersQuery));
+    expect(snapshot.size).toBe(2);
+  });
+
+  it("gestor não consulta eleitores de outra campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(getDocs(collection(managerA, "campaigns/campB/voters")));
+  });
+
+  it("líder consulta somente eleitores vinculados ao próprio uid", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    const ownVoters = query(
+      collection(leaderA, "campaigns/campA/voters"),
+      where("leaderId", "==", "leader-a-uid")
+    );
+    const snapshot = await assertSucceeds(getDocs(ownVoters));
+    expect(snapshot.docs.map((document) => document.id)).toEqual(["voter-a-1"]);
+  });
+
+  it("líder não lista os eleitores de todos os líderes", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(getDocs(collection(leaderA, "campaigns/campA/voters")));
   });
 });
 

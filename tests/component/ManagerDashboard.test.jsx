@@ -23,6 +23,9 @@ vi.mock("../../src/pages/manager/panel/NetworkTab", () => ({
 vi.mock("../../src/pages/manager/panel/ReportTab", () => ({
   default: ({ leaders }) => <div>Relatório com {leaders.length} líder</div>,
 }));
+vi.mock("../../src/pages/manager/panel/VotersTab", () => ({
+  default: ({ leaders }) => <div>Eleitores de {leaders.length} líder</div>,
+}));
 
 const persistedLeader = {
   id: "demo-l1",
