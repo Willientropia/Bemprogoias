@@ -23,7 +23,9 @@ if (process.platform === "win32") {
     output
       .split("\n")
       .map((line) => line.trim().split(/\s+/).pop())
-      .filter((pid) => pid && /^\d+$/.test(pid))
+      // PID 0 é o processo System (aparece em conexões TIME_WAIT) e não pode
+      // nem deve ser finalizado — filtrar evita um erro ruidoso a cada run.
+      .filter((pid) => pid && /^\d+$/.test(pid) && pid !== "0")
   )];
 
   for (const pid of pids) {

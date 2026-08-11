@@ -26,14 +26,22 @@ beforeAll(async () => {
     await setDoc(doc(db, "campaigns", "campA"), { name: "Campanha A" });
     await setDoc(doc(db, "campaigns", "campB"), { name: "Campanha B" });
 
-    await setDoc(doc(db, "campaigns/campA/members", "manager-a-uid"), { role: "manager" });
-    await setDoc(doc(db, "campaigns/campB/members", "manager-b-uid"), { role: "manager" });
+    await setDoc(doc(db, "campaigns/campA/members", "manager-a-uid"), {
+      role: "manager",
+      campaignId: "campA",
+    });
+    await setDoc(doc(db, "campaigns/campB/members", "manager-b-uid"), {
+      role: "manager",
+      campaignId: "campB",
+    });
     await setDoc(doc(db, "campaigns/campA/members", "leader-a-uid"), {
       role: "leader",
+      campaignId: "campA",
       name: "Líder A",
     });
     await setDoc(doc(db, "campaigns/campB/members", "leader-b-uid"), {
       role: "leader",
+      campaignId: "campB",
       name: "Líder B",
     });
 
@@ -88,7 +96,19 @@ describe("gestor consultando líderes da própria campanha (campaigns/{id}/membe
     await assertSucceeds(
       setDoc(doc(managerA, "campaigns/campA/members/new-leader-uid"), {
         role: "leader",
+        campaignId: "campA",
         name: "Novo Líder",
+      })
+    );
+  });
+
+  it("não consegue criar líder apontando para outra campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(managerA, "campaigns/campA/members/leader-campanha-errada"), {
+        role: "leader",
+        campaignId: "campB",
+        name: "Líder Inconsistente",
       })
     );
   });
@@ -282,6 +302,117 @@ describe("cadastro de eleitores pelo líder (app mobile)", () => {
     const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
     await assertFails(
       setDoc(doc(managerA, "campaigns/campB/voters/invasao"), novoEleitor("leader-b-uid"))
+    );
+  });
+});
+
+// voterKeys: reserva de RG/título para a dedup da campanha. Qualquer líder
+// precisa CONSULTAR uma chave (para saber se já existe), mas só pode criar
+// e mexer nas próprias reservas.
+describe("reserva de chaves de eleitor (voterKeys)", () => {
+  it("líder consulta uma chave existente para checar duplicidade", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "campaigns/campA/voterKeys/rg-999"), {
+        leaderId: "other-leader-uid",
+        voterId: "voter-other-1",
+      });
+    });
+
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(getDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-999")));
+  });
+
+  it("líder cria uma reserva vinculada a si mesmo", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      setDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-111"), {
+        leaderId: "leader-a-uid",
+        voterId: "voter-a-1",
+      })
+    );
+  });
+
+  it("líder NÃO cria reserva em nome de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-222"), {
+        leaderId: "other-leader-uid",
+        voterId: "x",
+      })
+    );
+  });
+
+  it("líder NÃO sobrescreve a reserva de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      updateDoc(doc(leaderA, "campaigns/campA/voterKeys/rg-999"), { voterId: "roubado" })
+    );
+  });
+
+  it("líder NÃO lista todas as reservas da campanha", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(getDocs(collection(leaderA, "campaigns/campA/voterKeys")));
+  });
+
+  it("gestor lista as reservas da própria campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertSucceeds(getDocs(collection(managerA, "campaigns/campA/voterKeys")));
+  });
+});
+
+// leaderLocations: posição compartilhada pelo líder. O id do documento é o
+// próprio uid, então o vínculo já vem do path.
+describe("posição compartilhada pelo líder (leaderLocations)", () => {
+  it("líder grava a própria posição", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-a-uid"), {
+        leaderId: "leader-a-uid",
+        lat: -16.6799,
+        lng: -49.255,
+        updatedAt: Timestamp.now(),
+      })
+    );
+  });
+
+  it("líder NÃO grava posição no documento de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/other-leader-uid"), {
+        leaderId: "other-leader-uid",
+        lat: -16.6,
+        lng: -49.2,
+      })
+    );
+  });
+
+  it("líder NÃO grava posição declarando outro leaderId", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-a-uid"), {
+        leaderId: "other-leader-uid",
+        lat: -16.6,
+        lng: -49.2,
+      })
+    );
+  });
+
+  it("gestor lê as posições da própria campanha mas não escreve", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertSucceeds(getDocs(collection(managerA, "campaigns/campA/leaderLocations")));
+    await assertFails(
+      setDoc(doc(managerA, "campaigns/campA/leaderLocations/leader-a-uid"), {
+        leaderId: "leader-a-uid",
+        lat: 0,
+        lng: 0,
+      })
+    );
+  });
+
+  it("líder remove a própria posição (parar de compartilhar)", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      deleteDoc(doc(leaderA, "campaigns/campA/leaderLocations/leader-a-uid"))
     );
   });
 });

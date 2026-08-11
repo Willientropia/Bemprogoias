@@ -41,11 +41,23 @@ service cloud.firestore {
     // escreve qualquer um; gestor só pode espelhar líderes da própria
     // campanha (perfil completo "de verdade" fica em
     // campaigns/{campaignId}/members/{uid}, ver abaixo).
+    //
+    // create e update são separados de propósito: no update é preciso checar
+    // resource.data (o documento que JÁ existe), senão um gestor poderia
+    // sobrescrever o espelho de um gestor mandando role:'leader' no payload.
     match /users/{uid} {
       allow read: if isSignedIn() && (request.auth.uid == uid || isSuperAdmin());
-      allow create, update: if isSuperAdmin()
+      allow create: if isSuperAdmin()
         || (isSignedIn() && request.resource.data.role == 'leader'
             && isManagerOf(request.resource.data.campaignId));
+
+      allow update: if isSuperAdmin()
+        || (isSignedIn()
+            && resource.data.role == 'leader'
+            && request.resource.data.role == 'leader'
+            && isManagerOf(resource.data.campaignId)
+            && request.resource.data.campaignId == resource.data.campaignId);
+
       allow delete: if isSuperAdmin()
         || (isSignedIn() && resource.data.role == 'leader' && isManagerOf(resource.data.campaignId));
     }
@@ -53,6 +65,11 @@ service cloud.firestore {
     match /campaigns/{campaignId} {
       allow read: if isSuperAdmin() || isManagerOf(campaignId) || isLeaderOf(campaignId);
       allow write: if isSuperAdmin();
+
+      // O gestor configura para onde e a que hora sai o relatório da campanha
+      // dele. hasOnly limita a exatamente estes três campos: sem isso, um
+      // update legítimo de relatório seria brecha para reescrever qualquer
+      // outra coisa do documento da campanha.
       allow update: if isManagerOf(campaignId)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'reportRecipientWhatsapp',
@@ -72,12 +89,25 @@ service cloud.firestore {
         allow read: if isSuperAdmin() || isManagerOf(campaignId)
           || (isLeaderOf(campaignId) && uid == request.auth.uid);
         allow list: if isSuperAdmin() || isManagerOf(campaignId);
-        allow create, update: if isSuperAdmin()
-          || (isManagerOf(campaignId) && request.resource.data.role == 'leader');
+        allow create: if isSuperAdmin()
+          || (isManagerOf(campaignId)
+            && request.resource.data.role == 'leader'
+            && request.resource.data.campaignId == campaignId);
+        allow update: if isSuperAdmin()
+          || (isManagerOf(campaignId)
+            && resource.data.role == 'leader'
+            && request.resource.data.role == 'leader'
+            && request.resource.data.campaignId == campaignId);
         allow delete: if isSuperAdmin()
           || (isManagerOf(campaignId) && resource.data.role == 'leader');
       }
 
+      // O isolamento entre campanhas vem do path (subcoleção), não de um campo
+      // dentro do documento — por isso NÃO exigimos campaignId no payload aqui.
+      // Exigir custaria migrar os registros existentes e faria toda escrita
+      // futura falhar com permission-denied por um campo de consistência, não
+      // de permissão. Se um dia houver collection group query sobre voters,
+      // aí o campo passa a ser necessário e esta decisão deve ser revista.
       match /voters/{voterId} {
         allow read: if isSuperAdmin() || isManagerOf(campaignId)
           || (isLeaderOf(campaignId) && resource.data.leaderId == request.auth.uid);
@@ -85,8 +115,43 @@ service cloud.firestore {
         allow create: if isSuperAdmin() || isManagerOf(campaignId)
           || (isLeaderOf(campaignId) && request.resource.data.leaderId == request.auth.uid);
 
-        allow update, delete: if isSuperAdmin() || isManagerOf(campaignId)
+        // No update, checar resource.data (documento atual) impede que o líder
+        // "adote" o eleitor de outro; checar request.resource.data impede que
+        // ele passe o próprio eleitor para terceiros.
+        allow update: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId)
+            && resource.data.leaderId == request.auth.uid
+            && request.resource.data.leaderId == request.auth.uid);
+
+        allow delete: if isSuperAdmin() || isManagerOf(campaignId)
           || (isLeaderOf(campaignId) && resource.data.leaderId == request.auth.uid);
+      }
+
+      // Reserva atômica de RG/título para impedir duplicidade na campanha.
+      match /voterKeys/{keyId} {
+        allow get: if isSuperAdmin() || isManagerOf(campaignId) || isLeaderOf(campaignId);
+        allow list: if isSuperAdmin() || isManagerOf(campaignId);
+        allow create: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId) && request.resource.data.leaderId == request.auth.uid);
+        allow update: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId)
+            && resource.data.leaderId == request.auth.uid
+            && request.resource.data.leaderId == request.auth.uid);
+        allow delete: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId) && resource.data.leaderId == request.auth.uid);
+      }
+
+      // Posição voluntariamente compartilhada pelo líder durante o trabalho.
+      // O id do documento é o próprio uid do líder, então o vínculo já vem do
+      // path; request.resource.data.leaderId reforça a coerência do payload.
+      match /leaderLocations/{leaderId} {
+        allow get: if isSuperAdmin() || isManagerOf(campaignId)
+          || (isLeaderOf(campaignId) && leaderId == request.auth.uid);
+        allow list: if isSuperAdmin() || isManagerOf(campaignId);
+        allow create, update: if isLeaderOf(campaignId)
+          && leaderId == request.auth.uid
+          && request.resource.data.leaderId == request.auth.uid;
+        allow delete: if isLeaderOf(campaignId) && leaderId == request.auth.uid;
       }
     }
   }
