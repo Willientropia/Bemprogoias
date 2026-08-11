@@ -37,29 +37,38 @@ export default function CampaignForm({ editingCampaign, onDone }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>{editingCampaign ? "Editar campanha" : "Nova campanha"}</h2>
-      <input
-        type="text"
-        placeholder="Nome da campanha"
-        value={form.name}
-        onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-        required
-      />
-      <input
-        type="text"
-        placeholder="Versão mínima obrigatória (ex: 1.0.0) — opcional"
-        value={form.minAppVersion}
-        onChange={(e) => setForm((f) => ({ ...f, minAppVersion: e.target.value }))}
-      />
+      <div>
+        <label htmlFor="campaign-name">Nome da campanha</label>
+        <input
+          id="campaign-name"
+          type="text"
+          placeholder="Nome da campanha"
+          value={form.name}
+          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="campaign-version">Versão mínima do app (opcional)</label>
+        <input
+          id="campaign-version"
+          type="text"
+          placeholder="Ex: 1.0.0"
+          value={form.minAppVersion}
+          onChange={(e) => setForm((f) => ({ ...f, minAppVersion: e.target.value }))}
+        />
+      </div>
       {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={saving}>
-        {saving ? "Salvando..." : editingCampaign ? "Salvar alterações" : "Criar campanha"}
-      </button>
-      {editingCampaign && (
-        <button type="button" onClick={() => onDone?.()}>
-          Cancelar
+      <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+        <button type="submit" disabled={saving}>
+          {saving ? "Salvando..." : editingCampaign ? "Salvar alterações" : "Criar campanha"}
         </button>
-      )}
+        {onDone && (
+          <button type="button" onClick={() => onDone()}>
+            Cancelar
+          </button>
+        )}
+      </div>
     </form>
   );
 }

@@ -3,7 +3,7 @@ import { createManager } from "../../services/userProvisioning";
 
 const emptyForm = { name: "", email: "", password: "", whatsapp: "" };
 
-export default function ManagerForm({ campaignId, onCreated }) {
+export default function ManagerForm({ campaignId, onCreated, onCancel }) {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -27,39 +27,61 @@ export default function ManagerForm({ campaignId, onCreated }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Novo gestor</h3>
-      <input
-        type="text"
-        placeholder="Nome completo"
-        value={form.name}
-        onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-        required
-      />
-      <input
-        type="email"
-        placeholder="E-mail (login)"
-        value={form.email}
-        onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Senha inicial"
-        value={form.password}
-        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-        minLength={6}
-        required
-      />
-      <input
-        type="tel"
-        placeholder="WhatsApp"
-        value={form.whatsapp}
-        onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
-      />
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={saving}>
-        {saving ? "Criando..." : "Criar gestor"}
-      </button>
+      <div>
+        <label htmlFor="manager-name">Nome completo</label>
+        <input
+          id="manager-name"
+          type="text"
+          placeholder="Nome completo"
+          value={form.name}
+          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="manager-email">E-mail (login)</label>
+        <input
+          id="manager-email"
+          type="email"
+          placeholder="E-mail (login)"
+          value={form.email}
+          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="manager-password">Senha inicial</label>
+        <input
+          id="manager-password"
+          type="password"
+          placeholder="Senha inicial"
+          value={form.password}
+          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+          minLength={6}
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="manager-whatsapp">WhatsApp</label>
+        <input
+          id="manager-whatsapp"
+          type="tel"
+          placeholder="(62) 9 0000-0000"
+          value={form.whatsapp}
+          onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
+        />
+      </div>
+      {error && <p role="alert" className="alert-box">{error}</p>}
+      <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+        <button type="submit" disabled={saving}>
+          {saving ? "Criando..." : "Criar gestor"}
+        </button>
+        {onCancel && (
+          <button type="button" onClick={onCancel}>
+            Cancelar
+          </button>
+        )}
+      </div>
     </form>
   );
 }

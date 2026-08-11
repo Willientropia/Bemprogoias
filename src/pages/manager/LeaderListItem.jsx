@@ -70,16 +70,19 @@ export default function LeaderListItem({ campaignId, leader }) {
 
   return (
     <li>
-      <strong>{leader.name}</strong> — {leader.email}
-      {leader.whatsapp && <span> — {leader.whatsapp}</span>}
-      {leader.regiao && <span> — {leader.regiao}</span>}
-      {leader.raioKm && <span> — raio {leader.raioKm}km</span>}
-      <button type="button" onClick={() => setEditing(true)}>
-        Editar
-      </button>
-      <button type="button" onClick={handleDelete}>
-        Remover
-      </button>
+      <strong>{leader.name}</strong>
+      <span>{leader.email}</span>
+      {leader.whatsapp && <span>{leader.whatsapp}</span>}
+      {leader.regiao && <span>{leader.regiao}</span>}
+      {leader.raioKm && <span>raio {leader.raioKm} km</span>}
+      <div className="item-actions" style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+        <button type="button" onClick={() => setEditing(true)}>
+          Editar
+        </button>
+        <button type="button" onClick={handleDelete}>
+          Remover
+        </button>
+      </div>
     </li>
   );
 }

@@ -54,14 +54,17 @@ export default function ManagerListItem({ campaignId, manager }) {
 
   return (
     <li>
-      <strong>{manager.name}</strong> — {manager.email}
-      {manager.whatsapp && <span> — {manager.whatsapp}</span>}
-      <button type="button" onClick={() => setEditing(true)}>
-        Editar
-      </button>
-      <button type="button" onClick={handleDelete}>
-        Remover
-      </button>
+      <strong>{manager.name}</strong>
+      <span>{manager.email}</span>
+      {manager.whatsapp && <span>{manager.whatsapp}</span>}
+      <div className="item-actions" style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+        <button type="button" onClick={() => setEditing(true)}>
+          Editar
+        </button>
+        <button type="button" onClick={handleDelete}>
+          Remover
+        </button>
+      </div>
     </li>
   );
 }

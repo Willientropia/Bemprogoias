@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bem pro Brasil — Painel do Gestor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#f4f4f2;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1c2b1f}
+  a{color:#1f6b34;text-decoration:none}
+  a:hover{color:#143a1c}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#cfcfc8;border-radius:8px;border:2px solid #f4f4f2}
+  ::-webkit-scrollbar-track{background:transparent}
+  @keyframes bg-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+  .nav-btn{display:flex;align-items:center;gap:11px;width:100%;padding:11px 13px;border:none;border-radius:10px;background:transparent;color:rgba(255,255,255,.72);font-family:'Public Sans',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;text-align:left;transition:background .18s,color .18s}
+  .nav-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+  .nav-btn.on{background:#f3c41c;color:#143a1c;font-weight:700}
+  .card{background:#fff;border:1px solid #e8e8e3;border-radius:14px}
+  .h1{font-family:'Spectral',serif;font-weight:700;font-size:36px;color:#16331c;line-height:1.05}
+  .sub{color:#6b7669;font-size:15px;margin-top:8px}
+  .kpi{font-family:'Spectral',serif;font-weight:700;font-size:31px;line-height:1;color:#16331c}
+  .kpi-l{font-size:11.5px;font-weight:600;letter-spacing:.7px;color:#9aa397;margin-top:6px}
+  .sec-l{font-size:12px;font-weight:700;letter-spacing:1.5px;color:#9aa397}
+  .chip{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:4px 11px;white-space:nowrap}
+  .fbtn{background:#fff;border:1px solid #e0e0d9;border-radius:9px;padding:8px 14px;font-family:'Public Sans',sans-serif;font-size:12.5px;font-weight:600;color:#5c6657;cursor:pointer;transition:all .18s}
+  .fbtn:hover{border-color:#1f6b34;color:#1f6b34}
+  .fbtn.on{background:#143a1c;border-color:#143a1c;color:#fff}
+  .leaflet-container{font-family:'Public Sans',sans-serif;background:#e8ecdf}
+  .leaflet-popup-content-wrapper{border-radius:13px;box-shadow:0 12px 34px rgba(20,58,28,.22)}
+  .leaflet-popup-content{margin:14px 16px;font-family:'Public Sans',sans-serif}
+  .pin{display:flex;align-items:center;justify-content:center;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);border:2.5px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.32);font-family:'Spectral',serif;font-weight:700;color:#fff}
+  .pin span{transform:rotate(45deg);font-size:12px}
+  .row{display:flex;align-items:center;gap:14px;padding:15px 20px;border-bottom:1px solid #f0efe9}
+  .row:last-child{border-bottom:none}
+  .av{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Spectral',serif;font-weight:700;font-size:16px;color:#fff}
+  .sw{width:44px;height:26px;border-radius:999px;border:none;cursor:pointer;position:relative;transition:background .22s;flex-shrink:0}
+  .sw i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .22s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .sw.on i{transform:translateX(18px)}
+  input,select{font-family:'Public Sans',sans-serif}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login" style="display:flex;align-items:stretch;min-height:100vh;width:100%">
+  <div style="width:44%;background:#143a1c;color:#fff;display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:38px 44px;position:relative;overflow-y:auto">
+    <div style="position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(243,196,28,.15),transparent 70%);top:-190px;right:-150px;pointer-events:none"></div>
+    <div style="position:relative;background:#fff;border-radius:22px;padding:20px 26px;box-shadow:0 22px 60px rgba(0,0,0,.32);align-self:flex-start;max-width:300px;flex-shrink:0">
+      <img src="logo-brasil-full.png" alt="Bem pro Brasil" style="width:100%;max-width:248px;height:auto;display:block">
+    </div>
+    <div style="position:relative">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(243,196,28,.16);border:1px solid rgba(243,196,28,.4);color:#f3c41c;font-size:11px;letter-spacing:2px;font-weight:700;border-radius:999px;padding:7px 14px;margin-bottom:18px">ACESSO RESTRITO · GESTORES</div>
+      <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:clamp(30px,3.4vw,42px);line-height:1.08;margin-bottom:14px">Coordene a<br>base que elege.</h1>
+      <p style="font-size:15px;line-height:1.55;color:rgba(255,255,255,.78);max-width:430px">Mapa dos líderes, desempenho da rede de indicações e relatórios automáticos no WhatsApp — a operação do mandato em um só painel.</p>
+      <div style="display:flex;gap:30px;margin-top:26px;flex-wrap:wrap">
+        <div><div style="font-family:'Spectral',serif;font-size:28px;font-weight:700;color:#f3c41c">250</div><div style="font-size:12px;color:rgba(255,255,255,.6)">líderes ativos</div></div>
+        <div><div style="font-family:'Spectral',serif;font-size:28px;font-weight:700;color:#f3c41c">12</div><div style="font-size:12px;color:rgba(255,255,255,.6)">regiões mapeadas</div></div>
+        <div><div style="font-family:'Spectral',serif;font-size:28px;font-weight:700;color:#f3c41c">38.4k</div><div style="font-size:12px;color:rgba(255,255,255,.6)">eleitores na base</div></div>
+      </div>
+    </div>
+    <div style="position:relative;font-size:11px;color:rgba(255,255,255,.4);flex-shrink:0">Solidariedade · Candidatura legislativa · Painel interno</div>
+  </div>
+
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:38px 44px;overflow-y:auto">
+    <div style="width:100%;max-width:390px">
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:28px;color:#16331c">Entrar como gestor</h2>
+      <p style="color:#6b7669;font-size:14px;margin-top:7px;margin-bottom:26px">Use suas credenciais de coordenação.</p>
+      <label style="display:block;font-size:12.5px;font-weight:600;color:#3a4a3d;margin-bottom:7px">Nome do gestor</label>
+      <input id="gNome" placeholder="Ex: Ana Ribeiro" style="width:100%;padding:13px 15px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-size:14px;outline:none;margin-bottom:16px">
+      <label style="display:block;font-size:12.5px;font-weight:600;color:#3a4a3d;margin-bottom:7px">Código de gestor</label>
+      <input id="gCode" placeholder="Ex: GESTOR2026" style="width:100%;padding:13px 15px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-size:14px;outline:none;letter-spacing:1px">
+      <div id="gErr" style="display:none;font-size:12.5px;color:#c0392b;margin-top:9px"></div>
+      <button id="gEnter" style="width:100%;margin-top:20px;background:#1f6b34;color:#fff;border:none;border-radius:11px;padding:15px;font-family:'Public Sans',sans-serif;font-weight:700;font-size:14.5px;cursor:pointer">Acessar painel</button>
+      <div style="margin-top:18px;background:#fdf8e3;border:1px solid #efe3ab;border-radius:11px;padding:13px 15px;font-size:12.5px;color:#8a6d12">Demonstração: use o código <b>GESTOR2026</b>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" style="display:none;height:100vh;width:100%">
+  <div style="display:flex;height:100vh;width:100%">
+
+    <aside style="width:250px;flex-shrink:0;background:#143a1c;display:flex;flex-direction:column;padding:22px 16px;color:#fff">
+      <div style="display:flex;align-items:center;gap:11px;padding:6px 8px 20px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:16px">
+        <div style="width:44px;height:44px;background:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:4px">
+          <img src="logo-brasil-mark.png" alt="Bem pro Brasil" style="width:100%;height:100%;object-fit:contain">
+        </div>
+        <div>
+          <div style="font-family:'Spectral',serif;font-weight:700;font-size:14.5px;letter-spacing:.4px;line-height:1.05">BEM PRO BRASIL</div>
+          <div style="font-size:7.5px;letter-spacing:1.3px;color:#f3c41c;margin-top:3px">PAINEL DO GESTOR</div>
+        </div>
+      </div>
+
+      <nav style="display:flex;flex-direction:column;gap:3px">
+        <button class="nav-btn on" data-tab="mapa">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          <span>Regiões</span>
+        </button>
+        <button class="nav-btn" data-tab="rede">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9 15.8 7.1M8.2 13.1 15.8 16.9"/></svg>
+          <span>Rede de Indicações</span>
+        </button>
+        <button class="nav-btn" data-tab="expresso">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 11.5h7M8.5 14.5h4"/></svg>
+          <span>Relatório Expresso</span>
+        </button>
+      </nav>
+
+      <div style="margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px">
+          <div id="gAv" style="width:34px;height:34px;border-radius:50%;background:#f3c41c;color:#143a1c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">A</div>
+          <div style="overflow:hidden;flex:1">
+            <div id="gName" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Ana Ribeiro</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5)">Gestora · Goiânia</div>
+          </div>
+          <button id="gOut" title="Sair" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;padding:4px;display:flex">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main style="flex:1;overflow-y:auto;background:#f4f4f2">
+      <div style="max-width:1240px;margin:0 auto;padding:40px 44px 70px">
+
+        <!-- ===== REGIÕES / MAPA ===== -->
+        <section id="tab-mapa" style="animation:bg-fade .4s ease both">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+            <div>
+              <h1 class="h1">Regiões de Goiânia</h1>
+              <p class="sub">Mapa interativo com a localização dos líderes regionais e o alcance de cada base</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;background:#143a1c;color:#fff;border-radius:12px;padding:11px 16px">
+              <span style="width:8px;height:8px;border-radius:50%;background:#7fe0a0;animation:pulse-dot 1.5s infinite"></span>
+              <div style="line-height:1.15"><div style="font-size:11.5px;color:rgba(255,255,255,.6)">Dados sincronizados</div><div style="font-size:13px;font-weight:700">há 4 minutos</div></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:22px">
+            <div class="card" style="padding:19px"><div class="kpi" id="kLid">—</div><div class="kpi-l">LÍDERES NO MAPA</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="kEle" style="color:#1f6b34">—</div><div class="kpi-l">ELEITORES MAPEADOS</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="kReg">—</div><div class="kpi-l">REGIÕES COBERTAS</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="kAlerta" style="color:#c0392b">—</div><div class="kpi-l">BASES EM ALERTA</div></div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:9px;margin:22px 0 14px;flex-wrap:wrap">
+            <span class="sec-l" style="margin-right:4px">DESEMPENHO</span>
+            <button class="fbtn on" data-perf="todos">Todos</button>
+            <button class="fbtn" data-perf="alto">Alto</button>
+            <button class="fbtn" data-perf="medio">Médio</button>
+            <button class="fbtn" data-perf="alerta">Em alerta</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 336px;gap:18px;align-items:start">
+            <div class="card" style="overflow:hidden;padding:0">
+              <div id="map" style="height:540px;width:100%"></div>
+              <div style="display:flex;align-items:center;gap:20px;padding:13px 20px;border-top:1px solid #e8e8e3;flex-wrap:wrap">
+                <span style="font-size:11.5px;font-weight:700;letter-spacing:1px;color:#9aa397">LEGENDA</span>
+                <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c6657"><span style="width:11px;height:11px;border-radius:50%;background:#1f6b34"></span>Alto desempenho</span>
+                <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c6657"><span style="width:11px;height:11px;border-radius:50%;background:#d9a520"></span>Desempenho médio</span>
+                <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c6657"><span style="width:11px;height:11px;border-radius:50%;background:#c0392b"></span>Base em alerta</span>
+                <span style="font-size:12px;color:#9aa397;margin-left:auto">O círculo representa o alcance estimado da base</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="card" style="padding:18px 20px">
+                <div class="sec-l" style="margin-bottom:12px">LÍDER SELECIONADO</div>
+                <div id="detail">
+                  <p style="font-size:13.5px;color:#8a8b80;line-height:1.55">Clique em um marcador do mapa para ver o líder da região, sua base de eleitores e o histórico de atividade.</p>
+                </div>
+              </div>
+              <div class="card" style="padding:0;overflow:hidden">
+                <div style="padding:16px 20px 12px"><div class="sec-l">LÍDERES POR REGIÃO</div></div>
+                <div id="mapList" style="max-height:300px;overflow-y:auto"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== REDE DE INDICAÇÕES ===== -->
+        <section id="tab-rede" style="display:none;animation:bg-fade .4s ease both">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+            <div>
+              <h1 class="h1">Rede de Indicações</h1>
+              <p class="sub">Desempenho dos líderes por eleitores trazidos à base — atualizado diariamente</p>
+            </div>
+            <div style="display:flex;gap:9px">
+              <button class="fbtn on" data-sort="eleitores">Mais eleitores</button>
+              <button class="fbtn" data-sort="rating">Melhor rating</button>
+              <button class="fbtn" data-sort="crescimento">Maior crescimento</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:22px">
+            <div class="card" style="padding:19px"><div class="kpi" id="rTot" style="color:#1f6b34">—</div><div class="kpi-l">ELEITORES INDICADOS</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="rMed">—</div><div class="kpi-l">MÉDIA POR LÍDER</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="rStar" style="color:#b8860b">—</div><div class="kpi-l">RATING MÉDIO DA REDE</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="rNovos" style="color:#1f6b34">—</div><div class="kpi-l">NOVOS ESTA SEMANA</div></div>
+          </div>
+
+          <div id="podium" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px"></div>
+
+          <div class="sec-l" style="margin:28px 0 13px">CLASSIFICAÇÃO COMPLETA DOS LÍDERES</div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="display:grid;grid-template-columns:52px 1fr 132px 108px 92px;gap:14px;padding:12px 20px;background:#f7f7f3;border-bottom:1px solid #e8e8e3;font-size:11px;font-weight:700;letter-spacing:.8px;color:#9aa397">
+              <span>#</span><span>LÍDER</span><span>RATING</span><span style="text-align:right">ELEITORES</span><span style="text-align:right">SEMANA</span>
+            </div>
+            <div id="rankList"></div>
+          </div>
+        </section>
+
+        <!-- ===== RELATÓRIO EXPRESSO ===== -->
+        <section id="tab-expresso" style="display:none;animation:bg-fade .4s ease both">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+            <div>
+              <div style="display:flex;align-items:center;gap:11px">
+                <h1 class="h1">Relatório Expresso</h1>
+                <span class="chip" style="display:flex;align-items:center;gap:6px;background:#e3f1e8;color:#1f6b34"><span style="width:7px;height:7px;border-radius:50%;background:#1f6b34;animation:pulse-dot 1.5s infinite"></span>BOT ATIVO</span>
+              </div>
+              <p class="sub">Um bot envia no WhatsApp o consolidado dos líderes ao fim de cada dia — e na frequência que você definir</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;background:#25d366;color:#fff;border-radius:12px;padding:11px 16px">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1a11 11 0 0 1-5.9-5.1c-.4-.8-.6-1.5-.6-2.1 0-.6.3-1.2.7-1.6.2-.2.4-.3.6-.3h.5c.2 0 .4 0 .5.4l.8 1.8c.1.2 0 .4-.1.5l-.3.4c-.2.2-.3.3-.2.5.5 1 1.4 1.9 2.5 2.4.2.1.4.1.5-.1l.5-.6c.2-.2.3-.2.5-.1l1.7.8c.3.2.4.3.4.5-.1.2-.1.5-.1.6Z"/></svg>
+              <div style="line-height:1.15"><div style="font-size:11.5px;opacity:.85">Conectado</div><div style="font-size:13px;font-weight:700">WhatsApp Business</div></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:22px">
+            <div class="card" style="padding:19px"><div class="kpi" style="color:#1f6b34">1.284</div><div class="kpi-l">RELATÓRIOS ENVIADOS</div></div>
+            <div class="card" style="padding:19px"><div class="kpi">98,6%</div><div class="kpi-l">TAXA DE ENTREGA</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="eNext">21:00</div><div class="kpi-l">PRÓXIMO ENVIO</div></div>
+            <div class="card" style="padding:19px"><div class="kpi" id="eDest">—</div><div class="kpi-l">DESTINATÁRIOS</div></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 372px;gap:18px;margin-top:20px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div class="card" style="padding:24px 26px">
+                <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:18px;color:#16331c;margin-bottom:4px">Frequência de envio</h3>
+                <p style="font-size:13px;color:#8a8b80;margin-bottom:16px">Com que intervalo o bot dispara o consolidado dos líderes</p>
+                <div style="display:flex;gap:9px;flex-wrap:wrap">
+                  <button class="fbtn on" data-freq="Diário (fim do dia)">Diário (fim do dia)</button>
+                  <button class="fbtn" data-freq="A cada 12 horas">A cada 12 horas</button>
+                  <button class="fbtn" data-freq="A cada 6 horas">A cada 6 horas</button>
+                  <button class="fbtn" data-freq="Semanal">Semanal</button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+                  <div>
+                    <label style="display:block;font-size:12.5px;font-weight:600;color:#3a4a3d;margin-bottom:7px">Horário do disparo</label>
+                    <input id="eTime" type="time" value="21:00" style="width:100%;padding:12px 14px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-size:14px;outline:none">
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:12.5px;font-weight:600;color:#3a4a3d;margin-bottom:7px">Escopo do relatório</label>
+                    <select id="eScope" style="width:100%;padding:12px 14px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-size:14px;outline:none;cursor:pointer">
+                      <option>Todos os líderes de Goiânia</option>
+                      <option>Somente Região Central</option>
+                      <option>Somente bases em alerta</option>
+                      <option>Top 20 líderes</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" style="padding:24px 26px">
+                <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:18px;color:#16331c;margin-bottom:4px">O que entra no relatório</h3>
+                <p style="font-size:13px;color:#8a8b80;margin-bottom:6px">Os blocos ativados aparecem na mensagem do WhatsApp</p>
+                <div id="eBlocks"></div>
+              </div>
+
+              <div class="card" style="padding:24px 26px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                  <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:18px;color:#16331c">Destinatários</h3>
+                  <button class="fbtn" style="display:flex;align-items:center;gap:7px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Adicionar</button>
+                </div>
+                <div id="eRecips" style="display:flex;flex-direction:column;gap:9px"></div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="card" style="padding:0;overflow:hidden">
+                <div style="padding:16px 20px;border-bottom:1px solid #e8e8e3;display:flex;align-items:center;justify-content:between;gap:9px">
+                  <div class="sec-l" style="flex:1">PRÉVIA DA MENSAGEM</div>
+                  <span style="font-size:11px;color:#9aa397" id="pvWhen">hoje 21:00</span>
+                </div>
+                <div style="background:#e6ddd4;padding:18px 16px 22px;min-height:430px">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:#143a1c;display:flex;align-items:center;justify-content:center;padding:3px;flex-shrink:0"><img src="logo-brasil-mark.png" alt="" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1) sepia(1) saturate(6) hue-rotate(3deg)"></div>
+                    <div style="line-height:1.2"><div style="font-size:13px;font-weight:700;color:#16331c">Relatório Expresso</div><div style="font-size:11px;color:#6b7669">bot oficial · online</div></div>
+                  </div>
+                  <div style="background:#dcf8c6;border-radius:12px 12px 12px 3px;padding:13px 15px;box-shadow:0 1px 2px rgba(0,0,0,.12);font-size:13px;line-height:1.62;color:#1c2b1f;white-space:pre-line" id="pvMsg"></div>
+                  <div style="text-align:right;font-size:10.5px;color:#7a8a7d;margin-top:6px" id="pvTime">21:00 ✓✓</div>
+                </div>
+              </div>
+              <button id="eTest" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#25d366;color:#fff;border:none;border-radius:12px;padding:15px;font-family:'Public Sans',sans-serif;font-weight:700;font-size:14.5px;cursor:pointer">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
+                <span id="eTestL">Enviar teste agora</span>
+              </button>
+              <div style="display:flex;align-items:flex-start;gap:10px;background:#eef4f0;border:1px solid #d8e6dd;border-radius:12px;padding:14px 16px;color:#3a5a45;font-size:12.5px;line-height:1.5">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1f6b34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                Envio por WhatsApp Business API com registro de entrega. Nenhum dado do eleitor sai da plataforma — o relatório traz apenas números consolidados.
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// ================= DADOS =================
+var LEADERS = [
+  { n:'Ana Ribeiro',      r:'Região Central',   b:'Setor Central',            lat:-16.6799, lng:-49.2550, v:2140, w:86, p:'alto'   },
+  { n:'Carlos Mendes',    r:'Região Sul',       b:'Setor Bueno',              lat:-16.7050, lng:-49.2790, v:1980, w:74, p:'alto'   },
+  { n:'Júlia Faria',      r:'Região Sul',       b:'Setor Marista',            lat:-16.6960, lng:-49.2680, v:1410, w:39, p:'medio'  },
+  { n:'Pedro Oliveira',   r:'Região Oeste',     b:'Setor Oeste',              lat:-16.6820, lng:-49.2720, v:1660, w:58, p:'alto'   },
+  { n:'Sandra Lima',      r:'Região Oeste',     b:'Setor Campinas',           lat:-16.6700, lng:-49.2960, v:1230, w:31, p:'medio'  },
+  { n:'Rafael Souza',     r:'Região Norte',     b:'Setor Norte Ferroviário',  lat:-16.6620, lng:-49.2560, v:980,  w:12, p:'alerta' },
+  { n:'Marcos Antunes',   r:'Região Leste',     b:'Jardim Goiás',             lat:-16.7000, lng:-49.2380, v:1870, w:69, p:'alto'   },
+  { n:'Luana Ferreira',   r:'Região Leste',     b:'Vila Nova',                lat:-16.6720, lng:-49.2380, v:1120, w:27, p:'medio'  },
+  { n:'Roberto Dias',     r:'Região Sudoeste',  b:'Jardim América',           lat:-16.7080, lng:-49.3010, v:1540, w:44, p:'medio'  },
+  { n:'Patrícia Gomes',   r:'Região Sul',       b:'Setor Pedro Ludovico',     lat:-16.7180, lng:-49.2600, v:1290, w:35, p:'medio'  },
+  { n:'Eduardo Lima',     r:'Região Norte',     b:'Goiânia 2',                lat:-16.6300, lng:-49.2900, v:760,  w:8,  p:'alerta' },
+  { n:'Carla Mendonça',   r:'Região Sudoeste',  b:'Vila Pedroso',             lat:-16.6600, lng:-49.2100, v:640,  w:6,  p:'alerta' },
+  { n:'Vitor Camargo',    r:'Aparecida de Goiânia', b:'Centro',               lat:-16.8230, lng:-49.2440, v:2020, w:78, p:'alto'   },
+  { n:'Helena Prado',     r:'Senador Canedo',   b:'Centro',                   lat:-16.7080, lng:-49.0930, v:1180, w:29, p:'medio'  },
+  { n:'Bruno Teixeira',   r:'Trindade',         b:'Centro',                   lat:-16.6510, lng:-49.4890, v:1350, w:41, p:'medio'  }
+];
+var PCOLOR = { alto:'#1f6b34', medio:'#d9a520', alerta:'#c0392b' };
+var PLABEL = { alto:'Alto desempenho', medio:'Desempenho médio', alerta:'Base em alerta' };
+
+var RECIPS = [
+  { n:'Ana Ribeiro',    f:'(62) 9 9123-4567', role:'Coordenação geral', c:1 },
+  { n:'Carlos Mendes',  f:'(62) 9 9871-2210', role:'Coordenação Sul', c:1 },
+  { n:'Equipe Marketing', f:'(62) 9 9440-1188', role:'Grupo — 6 membros', c:6 },
+  { n:'Coordenadores Regionais', f:'(62) 9 9317-4402', role:'Grupo — 5 membros', c:5 },
+  { n:'Gabinete',       f:'(62) 9 9002-7755', role:'Chefia de gabinete', c:1 }
+];
+var RECIP_TOTAL = RECIPS.reduce(function(a,r){ return a+r.c; },0);
+var BLOCKS = [
+  { k:'Resumo de eleitores indicados', on:true },
+  { k:'Ranking dos 5 melhores líderes', on:true },
+  { k:'Bases em alerta (queda de desempenho)', on:true },
+  { k:'Demandas abertas no dia', on:true },
+  { k:'Sentimento das redes (Rádio Peão IA)', on:false },
+  { k:'Presença nas reuniões de conselho', on:false }
+];
+
+var fmt = function(n){ return n.toLocaleString('pt-BR'); };
+var rating = function(v){ return Math.max(1, Math.min(5, Math.round(v/500*10)/10)); };
+var stars = function(v){
+  var rt = rating(v), out = '';
+  for (var i=1;i<=5;i++){
+    var full = rt >= i - 0.25;
+    out += '<svg width="14" height="14" viewBox="0 0 24 24" fill="'+(full?'#f3c41c':'none')+'" stroke="'+(full?'#f3c41c':'#cfd3ca')+'" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 17.3 6.2 20.8l1.6-6.6L2.6 9.8l6.8-.5z"/></svg>';
+  }
+  return '<span style="display:flex;align-items:center;gap:2px">'+out+'<b style="font-size:12px;color:#8a6d12;margin-left:5px">'+rt.toFixed(1)+'</b></span>';
+};
+
+// ================= LOGIN =================
+var $ = function(id){ return document.getElementById(id); };
+function enter(){
+  var code = ($('gCode').value||'').trim().toUpperCase();
+  if (code !== 'GESTOR2026'){
+    $('gErr').style.display='block';
+    $('gErr').textContent='Código inválido. Use GESTOR2026 para a demonstração.';
+    return;
+  }
+  var nm = ($('gNome').value||'').trim() || 'Ana Ribeiro';
+  $('gName').textContent = nm;
+  $('gAv').textContent = nm.charAt(0).toUpperCase();
+  $('login').style.display='none';
+  $('app').style.display='block';
+  setTimeout(function(){ initMap(); }, 60);
+}
+$('gEnter').addEventListener('click', enter);
+$('gCode').addEventListener('keydown', function(e){ if(e.key==='Enter') enter(); });
+$('gOut').addEventListener('click', function(){ $('app').style.display='none'; $('login').style.display='flex'; });
+
+// ================= NAV =================
+var tabs = ['mapa','rede','expresso'];
+document.querySelectorAll('.nav-btn').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.nav-btn').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    var t = b.getAttribute('data-tab');
+    tabs.forEach(function(k){ $('tab-'+k).style.display = (k===t) ? 'block' : 'none'; });
+    document.querySelector('main').scrollTop = 0;
+    if (t==='mapa' && window.__map) setTimeout(function(){ window.__map.invalidateSize(); }, 80);
+  });
+});
+
+// ================= MAPA =================
+var markers = [], circles = [], perfFilter = 'todos';
+
+function initMap(){
+  if (window.__map) return;
+  var map = L.map('map', { zoomControl:true, scrollWheelZoom:true }).setView([-16.6869,-49.2648], 11);
+  window.__map = map;
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  LEADERS.forEach(function(l, i){
+    var col = PCOLOR[l.p];
+    var size = 30 + Math.round(l.v/220);
+    var circle = L.circle([l.lat,l.lng], {
+      radius: 400 + l.v*0.9, color: col, weight: 1.4, opacity:.55, fillColor: col, fillOpacity:.13
+    }).addTo(map);
+    var icon = L.divIcon({
+      className:'', iconSize:[size,size], iconAnchor:[size/2,size],
+      html:'<div class="pin" style="width:'+size+'px;height:'+size+'px;background:'+col+'"><span>'+l.n.charAt(0)+'</span></div>'
+    });
+    var m = L.marker([l.lat,l.lng], { icon:icon, title:l.n }).addTo(map);
+    m.bindPopup(
+      '<div style="min-width:190px">'+
+      '<div style="font-family:\'Spectral\',serif;font-weight:700;font-size:16px;color:#16331c">'+l.n+'</div>'+
+      '<div style="font-size:12px;color:#8a8b80;margin:2px 0 9px">'+l.b+' · '+l.r+'</div>'+
+      '<div style="display:flex;align-items:baseline;gap:6px"><b style="font-family:\'Spectral\',serif;font-size:20px;color:'+col+'">'+fmt(l.v)+'</b><span style="font-size:12px;color:#6b7669">eleitores</span></div>'+
+      '<div style="margin-top:8px">'+stars(l.v)+'</div>'+
+      '</div>'
+    );
+    m.on('click', function(){ showDetail(i); });
+    m._perf = l.p; circle._perf = l.p;
+    markers.push(m); circles.push(circle);
+  });
+
+  renderKpis(); renderMapList(); renderRede(); renderExpresso();
+}
+
+function applyPerf(p){
+  perfFilter = p;
+  var map = window.__map;
+  markers.forEach(function(m,i){
+    var show = (p==='todos' || m._perf===p);
+    if (show){ m.addTo(map); circles[i].addTo(map); }
+    else { map.removeLayer(m); map.removeLayer(circles[i]); }
+  });
+  renderMapList();
+}
+document.querySelectorAll('[data-perf]').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('[data-perf]').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    applyPerf(b.getAttribute('data-perf'));
+  });
+});
+
+function renderKpis(){
+  var tot = LEADERS.reduce(function(a,l){ return a+l.v; },0);
+  var regs = {}; LEADERS.forEach(function(l){ regs[l.r]=1; });
+  $('kLid').textContent = LEADERS.length;
+  $('kEle').textContent = fmt(tot);
+  $('kReg').textContent = Object.keys(regs).length;
+  $('kAlerta').textContent = LEADERS.filter(function(l){ return l.p==='alerta'; }).length;
+}
+
+function renderMapList(){
+  var list = LEADERS.map(function(l,i){ return {l:l,i:i}; })
+    .filter(function(o){ return perfFilter==='todos' || o.l.p===perfFilter; })
+    .sort(function(a,b){ return b.l.v-a.l.v; });
+  $('mapList').innerHTML = list.map(function(o){
+    var l=o.l, col=PCOLOR[l.p];
+    return '<button data-goto="'+o.i+'" style="display:flex;align-items:center;gap:11px;width:100%;padding:12px 20px;border:none;border-bottom:1px solid #f0efe9;background:#fff;cursor:pointer;text-align:left;font-family:\'Public Sans\',sans-serif">'+
+      '<span style="width:9px;height:9px;border-radius:50%;background:'+col+';flex-shrink:0"></span>'+
+      '<span style="flex:1;min-width:0"><span style="display:block;font-size:13.5px;font-weight:600;color:#243528">'+l.n+'</span>'+
+      '<span style="display:block;font-size:11.5px;color:#9aa397">'+l.b+'</span></span>'+
+      '<b style="font-size:13px;color:'+col+'">'+fmt(l.v)+'</b></button>';
+  }).join('') || '<div style="padding:22px;text-align:center;font-size:13px;color:#9aa397">Nenhum líder neste filtro.</div>';
+  $('mapList').querySelectorAll('[data-goto]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var i = +b.getAttribute('data-goto');
+      window.__map.setView([LEADERS[i].lat, LEADERS[i].lng], 14, { animate:true });
+      markers[i].openPopup(); showDetail(i);
+    });
+  });
+}
+
+function showDetail(i){
+  var l = LEADERS[i], col = PCOLOR[l.p];
+  $('detail').innerHTML =
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">'+
+      '<div class="av" style="background:'+col+'">'+l.n.charAt(0)+'</div>'+
+      '<div><div style="font-family:\'Spectral\',serif;font-weight:700;font-size:17px;color:#16331c;line-height:1.1">'+l.n+'</div>'+
+      '<div style="font-size:12px;color:#8a8b80;margin-top:2px">'+l.b+' · '+l.r+'</div></div>'+
+    '</div>'+
+    '<span class="chip" style="background:'+col+'1f;color:'+col+'">'+PLABEL[l.p]+'</span>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">'+
+      '<div style="background:#f7f7f3;border-radius:10px;padding:12px"><div style="font-family:\'Spectral\',serif;font-weight:700;font-size:20px;color:#16331c">'+fmt(l.v)+'</div><div style="font-size:11px;color:#9aa397;font-weight:600;margin-top:3px">ELEITORES</div></div>'+
+      '<div style="background:#f7f7f3;border-radius:10px;padding:12px"><div style="font-family:\'Spectral\',serif;font-weight:700;font-size:20px;color:#1f6b34">+'+l.w+'</div><div style="font-size:11px;color:#9aa397;font-weight:600;margin-top:3px">NA SEMANA</div></div>'+
+    '</div>'+
+    '<div style="margin-top:14px"><div style="font-size:11px;font-weight:700;letter-spacing:.7px;color:#9aa397;margin-bottom:6px">RATING DE INDICAÇÕES</div>'+stars(l.v)+'</div>'+
+    '<button style="width:100%;margin-top:16px;background:#1f6b34;color:#fff;border:none;border-radius:10px;padding:11px;font-family:\'Public Sans\',sans-serif;font-weight:700;font-size:13px;cursor:pointer">Abrir ficha do líder</button>';
+}
+
+// ================= REDE =================
+var sortMode = 'eleitores';
+function sorted(){
+  var arr = LEADERS.slice();
+  if (sortMode==='rating') arr.sort(function(a,b){ return rating(b.v)-rating(a.v) || b.v-a.v; });
+  else if (sortMode==='crescimento') arr.sort(function(a,b){ return b.w-a.w; });
+  else arr.sort(function(a,b){ return b.v-a.v; });
+  return arr;
+}
+function renderRede(){
+  var tot = LEADERS.reduce(function(a,l){ return a+l.v; },0);
+  var nov = LEADERS.reduce(function(a,l){ return a+l.w; },0);
+  var avg = LEADERS.reduce(function(a,l){ return a+rating(l.v); },0)/LEADERS.length;
+  $('rTot').textContent = fmt(tot);
+  $('rMed').textContent = fmt(Math.round(tot/LEADERS.length));
+  $('rStar').textContent = avg.toFixed(1);
+  $('rNovos').textContent = '+'+fmt(nov);
+
+  var top = sorted().slice(0,3);
+  var medals = ['#f3c41c','#c8cbd0','#cd9b62'], place = ['1º','2º','3º'];
+  $('podium').innerHTML = top.map(function(l,i){
+    return '<div class="card" style="padding:22px;position:relative;overflow:hidden;'+(i===0?'background:#143a1c;border-color:#143a1c;color:#fff':'')+'">'+
+      (i===0?'<div style="position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(243,196,28,.16),transparent 70%);top:-110px;right:-60px"></div>':'')+
+      '<div style="position:relative;display:flex;align-items:center;gap:12px;margin-bottom:14px">'+
+        '<div class="av" style="width:46px;height:46px;font-size:18px;background:'+medals[i]+';color:#143a1c">'+place[i]+'</div>'+
+        '<div><div style="font-family:\'Spectral\',serif;font-weight:700;font-size:17px;line-height:1.1;'+(i===0?'':'color:#16331c')+'">'+l.n+'</div>'+
+        '<div style="font-size:12px;'+(i===0?'color:rgba(255,255,255,.6)':'color:#8a8b80')+';margin-top:2px">'+l.b+'</div></div>'+
+      '</div>'+
+      '<div style="position:relative;display:flex;align-items:baseline;gap:7px">'+
+        '<b style="font-family:\'Spectral\',serif;font-size:32px;'+(i===0?'color:#f3c41c':'color:#1f6b34')+'">'+fmt(l.v)+'</b>'+
+        '<span style="font-size:12.5px;'+(i===0?'color:rgba(255,255,255,.7)':'color:#6b7669')+'">eleitores · +'+l.w+' na semana</span>'+
+      '</div>'+
+      '<div style="position:relative;margin-top:11px">'+stars(l.v)+'</div>'+
+    '</div>';
+  }).join('');
+
+  var max = Math.max.apply(null, LEADERS.map(function(l){ return l.v; }));
+  $('rankList').innerHTML = sorted().map(function(l,i){
+    var col = PCOLOR[l.p];
+    return '<div style="display:grid;grid-template-columns:52px 1fr 132px 108px 92px;gap:14px;align-items:center;padding:13px 20px;border-bottom:1px solid #f0efe9">'+
+      '<span style="font-family:\'Spectral\',serif;font-weight:700;font-size:16px;color:'+(i<3?'#b8860b':'#c2c8bf')+'">'+(i+1)+'</span>'+
+      '<div style="display:flex;align-items:center;gap:11px;min-width:0">'+
+        '<div class="av" style="width:36px;height:36px;font-size:14px;background:'+col+'">'+l.n.charAt(0)+'</div>'+
+        '<div style="min-width:0"><div style="font-size:14px;font-weight:600;color:#243528">'+l.n+'</div>'+
+        '<div style="font-size:11.5px;color:#9aa397">'+l.b+' · '+l.r+'</div></div>'+
+      '</div>'+
+      '<div>'+stars(l.v)+'</div>'+
+      '<div style="text-align:right"><b style="font-size:14px;color:#243528">'+fmt(l.v)+'</b>'+
+        '<div style="height:5px;background:#eef0ec;border-radius:999px;overflow:hidden;margin-top:5px"><div style="width:'+Math.round(l.v/max*100)+'%;height:100%;background:'+col+';border-radius:999px"></div></div></div>'+
+      '<span style="text-align:right;font-size:13px;font-weight:700;color:'+(l.w>=30?'#1f6b34':(l.w>=15?'#b8860b':'#c0392b'))+'">+'+l.w+'</span>'+
+    '</div>';
+  }).join('');
+}
+document.querySelectorAll('[data-sort]').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('[data-sort]').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    sortMode = b.getAttribute('data-sort');
+    renderRede();
+  });
+});
+
+// ================= RELATÓRIO EXPRESSO =================
+var freq = 'Diário (fim do dia)';
+function renderExpresso(){
+  $('eBlocks').innerHTML = BLOCKS.map(function(b,i){
+    return '<div style="display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid #f0efe9">'+
+      '<span style="flex:1;font-size:13.5px;color:'+(b.on?'#243528':'#9aa397')+'">'+b.k+'</span>'+
+      '<button class="sw'+(b.on?' on':'')+'" data-blk="'+i+'" style="background:'+(b.on?'#1f6b34':'#d5d8d1')+'"><i></i></button>'+
+    '</div>';
+  }).join('');
+  $('eBlocks').querySelectorAll('[data-blk]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var i = +b.getAttribute('data-blk');
+      BLOCKS[i].on = !BLOCKS[i].on;
+      renderExpresso();
+    });
+  });
+
+  $('eRecips').innerHTML = RECIPS.map(function(r){
+    return '<div style="display:flex;align-items:center;gap:12px;background:#f7f7f3;border-radius:11px;padding:12px 14px">'+
+      '<div class="av" style="width:36px;height:36px;font-size:14px;background:#25d366">'+r.n.charAt(0)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;color:#243528">'+r.n+'</div>'+
+      '<div style="font-size:11.5px;color:#9aa397">'+r.f+' · '+r.role+'</div></div>'+
+      '<span class="chip" style="background:#e3f1e8;color:#1f6b34">ativo</span>'+
+    '</div>';
+  }).join('');
+  $('eDest').textContent = RECIP_TOTAL;
+  renderPreview();
+}
+
+function renderPreview(){
+  var t = $('eTime').value || '21:00';
+  var tot = LEADERS.reduce(function(a,l){ return a+l.w; },0);
+  var top = LEADERS.slice().sort(function(a,b){ return b.w-a.w; });
+  var alert = LEADERS.filter(function(l){ return l.p==='alerta'; });
+  var msg = '*BEM PRO BRASIL — Relatório Expresso*\n';
+  msg += '_'+freq+' · '+t+' · Goiânia_\n';
+  msg += '────────────────\n';
+  BLOCKS.forEach(function(b){
+    if (!b.on) return;
+    if (b.k.indexOf('Resumo de eleitores')===0){
+      msg += '\n📈 *Eleitores indicados hoje:* '+fmt(tot)+'\nBase total: '+fmt(LEADERS.reduce(function(a,l){return a+l.v;},0))+' eleitores\n';
+    } else if (b.k.indexOf('Ranking')===0){
+      msg += '\n🏆 *Top líderes do dia*\n';
+      top.slice(0,5).forEach(function(l,i){ msg += (i+1)+'. '+l.n+' — +'+l.w+'\n'; });
+    } else if (b.k.indexOf('Bases em alerta')===0){
+      msg += '\n⚠️ *Bases em alerta:* '+alert.length+'\n';
+      alert.forEach(function(l){ msg += '• '+l.n+' ('+l.b+') — +'+l.w+'\n'; });
+    } else if (b.k.indexOf('Demandas')===0){
+      msg += '\n📋 *Demandas abertas hoje:* 12\nCríticas: 2 · Em andamento: 7\n';
+    } else if (b.k.indexOf('Sentimento')===0){
+      msg += '\n📡 *Rádio Peão IA:* 63% positivo (▲9 pts)\n';
+    } else if (b.k.indexOf('Presença')===0){
+      msg += '\n🤝 *Presença nos conselhos:* 82% dos líderes\n';
+    }
+  });
+  msg += '\n────────────────\nPainel completo: bempro.br/gestor';
+  $('pvMsg').textContent = msg;
+  $('pvTime').textContent = t+' ✓✓';
+  $('pvWhen').textContent = (freq==='Semanal'?'toda segunda ':'hoje ')+t;
+  $('eNext').textContent = t;
+}
+$('eTime').addEventListener('input', renderPreview);
+$('eScope').addEventListener('change', renderPreview);
+document.querySelectorAll('[data-freq]').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('[data-freq]').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    freq = b.getAttribute('data-freq');
+    renderPreview();
+  });
+});
+$('eTest').addEventListener('click', function(){
+  $('eTestL').textContent = 'Teste enviado aos '+RECIP_TOTAL+' destinatários ✓';
+  setTimeout(function(){ $('eTestL').textContent = 'Enviar teste agora'; }, 2400);
+});
+</script>
+</body>
+</html>
