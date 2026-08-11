@@ -180,6 +180,112 @@ describe("consulta de eleitores pelo painel", () => {
   });
 });
 
+// Cobertura do fluxo que o app do líder (Dev B) vai executar em campo:
+// cadastrar, editar e remover eleitores. O vínculo é sempre o leaderId.
+describe("cadastro de eleitores pelo líder (app mobile)", () => {
+  const novoEleitor = (leaderId) => ({
+    leaderId,
+    name: "Eleitor Novo",
+    normalizedName: "eleitor novo",
+    rg: "123456789",
+    titulo: "900000000001",
+    zona: "12",
+    secao: "345",
+    whatsapp: "(62) 9 1234-5678",
+    lat: -16.6799,
+    lng: -49.255,
+    locationMode: "gps",
+    validationStatus: "pendente",
+    syncStatus: "sincronizado",
+    createdAt: Timestamp.now(),
+  });
+
+  it("líder cadastra um eleitor vinculado a si mesmo", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      setDoc(doc(leaderA, "campaigns/campA/voters/novo-do-lider-a"), novoEleitor("leader-a-uid"))
+    );
+  });
+
+  it("líder NÃO cadastra eleitor em nome de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campA/voters/tentativa-alheia"), novoEleitor("other-leader-uid"))
+    );
+  });
+
+  it("líder NÃO cadastra eleitor em outra campanha", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(leaderA, "campaigns/campB/voters/tentativa-campanha-b"), novoEleitor("leader-a-uid"))
+    );
+  });
+
+  it("líder edita um eleitor próprio", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(
+      updateDoc(doc(leaderA, "campaigns/campA/voters/voter-a-1"), { whatsapp: "(62) 9 0000-1111" })
+    );
+  });
+
+  it("líder NÃO edita eleitor de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(
+      updateDoc(doc(leaderA, "campaigns/campA/voters/voter-other-1"), { name: "Alterado" })
+    );
+  });
+
+  it("líder remove um eleitor próprio", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "campaigns/campA/voters/descartavel-do-lider"), {
+        leaderId: "leader-a-uid",
+        name: "Para remover",
+        createdAt: Timestamp.now(),
+      });
+    });
+
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(deleteDoc(doc(leaderA, "campaigns/campA/voters/descartavel-do-lider")));
+  });
+
+  it("líder NÃO remove eleitor de outro líder", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(deleteDoc(doc(leaderA, "campaigns/campA/voters/voter-other-1")));
+  });
+
+  it("líder lê o próprio eleitor por get direto", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertSucceeds(getDoc(doc(leaderA, "campaigns/campA/voters/voter-a-1")));
+  });
+
+  it("líder NÃO lê eleitor de outro líder por get direto", async () => {
+    const leaderA = testEnv.authenticatedContext("leader-a-uid").firestore();
+    await assertFails(getDoc(doc(leaderA, "campaigns/campA/voters/voter-other-1")));
+  });
+
+  it("usuário não autenticado não cadastra eleitor", async () => {
+    const anon = testEnv.unauthenticatedContext().firestore();
+    await assertFails(
+      setDoc(doc(anon, "campaigns/campA/voters/anonimo"), novoEleitor("leader-a-uid"))
+    );
+  });
+
+  it("gestor cadastra e remove eleitores da própria campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertSucceeds(
+      setDoc(doc(managerA, "campaigns/campA/voters/do-gestor"), novoEleitor("leader-a-uid"))
+    );
+    await assertSucceeds(deleteDoc(doc(managerA, "campaigns/campA/voters/do-gestor")));
+  });
+
+  it("gestor NÃO cadastra eleitor em outra campanha", async () => {
+    const managerA = testEnv.authenticatedContext("manager-a-uid").firestore();
+    await assertFails(
+      setDoc(doc(managerA, "campaigns/campB/voters/invasao"), novoEleitor("leader-b-uid"))
+    );
+  });
+});
+
 describe("super_admin", () => {
   it("consegue listar membros de qualquer campanha", async () => {
     const admin = testEnv.authenticatedContext("admin-uid").firestore();

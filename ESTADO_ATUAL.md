@@ -108,6 +108,28 @@ campaigns/{campaignId}/voters/{voterId}
   marca — registros reais nunca são apagados por engano.
 - A **deduplicação por RG/título** (spec 2.3) ainda não está implementada em lugar nenhum.
 
+### O fluxo de escrita já está coberto por testes
+
+`tests/firestore.rules.test.js` cobre o ciclo completo que o app do líder vai executar —
+cadastrar, editar, remover e ler eleitores — **inclusive as tentativas que devem falhar**:
+
+| Cenário | Resultado esperado |
+|---|---|
+| Líder cadastra eleitor com o próprio `leaderId` | permitido |
+| Líder cadastra em nome de outro líder | **bloqueado** |
+| Líder cadastra em outra campanha | **bloqueado** |
+| Líder edita / remove eleitor próprio | permitido |
+| Líder edita / remove eleitor de outro líder | **bloqueado** |
+| Líder lê eleitor próprio (`get` direto) | permitido |
+| Líder lê eleitor de outro líder | **bloqueado** |
+| Usuário não autenticado cadastra | **bloqueado** |
+| Gestor cadastra/remove na própria campanha | permitido |
+| Gestor cadastra em outra campanha | **bloqueado** |
+
+Ou seja: o servidor já rejeita as escritas indevidas — o app do líder não precisa (e não deve)
+confiar em validação só no client. Se uma escrita falhar com `permission-denied`, o motivo mais
+provável é `leaderId` diferente do uid autenticado.
+
 ### Serviço de leitura já pronto
 
 `src/services/voters.js` já resolve paginação e contagens, e pode ser reusado:
@@ -180,7 +202,7 @@ Pela mesma razão, as faixas de cor de `weeklyColor` estão calibradas para a ba
 ## Testes
 
 `npm test` roda tudo: **63 testes de componente** (`tests/component/`, Vitest + Testing Library,
-mockam os `services/*.js`, ~6s) e **22 testes de Security Rules**
+mockam os `services/*.js`, ~6s) e **34 testes de Security Rules**
 (`tests/firestore.rules.test.js`, sobem e derrubam o Firestore Emulator sozinhos).
 
 Se `test:rules` falhar com "port taken", o `pretest:rules` já mata o emulador travado
