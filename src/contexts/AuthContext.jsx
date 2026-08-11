@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      const tokenResult = await firebaseUser.getIdTokenResult();
+      const tokenResult = await firebaseUser.getIdTokenResult(true);
       setUser(firebaseUser);
       setRole(tokenResult.claims.role ?? null);
       setCampaignId(tokenResult.claims.campaignId ?? null);

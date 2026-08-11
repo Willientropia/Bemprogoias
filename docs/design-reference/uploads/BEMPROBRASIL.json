@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "name": "Bem pro Brasil Master Design",
+    "version": "1.2.0",
+    "colors": {
+      "background": "#000000",
+      "primary": "#fff6df",
+      "secondary": "#00e3fd",
+      "tertiary": "#0055ff",
+      "accent-red": "#FF0000"
+    }
+  },
+  "content": "## Overview\\nDiretriz final do projeto Bem pro Brasil / Bem pro Brasil. Foco em estética \\"Universe Deep Space\\".\\n\\n## Branding\\n- **Nome do Blog**: Bem pro Brasil.\\n- **Logotipos**: 4 logotipos em sistema de rodízio.\\n- **Header Structure**:\\n  - Título Grande: \\"Bem pro Brasil\\" (Branco).\\n  - Texto Pequeno à Esquerda: \\"Todos os direitos reservados ®\\" (Branco).\\n  - Logotipo: Canto superior esquerdo.\\n\\n## Colors\\n- **Universe Background**: Fundo obrigatoriamente Preto Absoluto (#000000).\\n- **Mandatory Gradients**: Toda página deve possuir 2 gradientes radiais sobrepostos:\\n  1. Gradiente em tonalidades de **Azul Estelar**.\\n  2. Gradiente em tonalidades de **Turquesa/Ciano (Atmospheric)**.\\n  *As posições destes gradientes podem variar por página para dinamismo visual.*\\n- **Accents**: \\n  - **Shine Glow**: Títulos com animação Gold-Yellow-White e text-shadow pulsante.\\n  - **Celestial Indicator**: Traço Vermelho Vertical dinâmico no início de cada título.\\n  - **Interactions**: Cards com glow azul intenso e movimento translateY no hover.\\n\\n## Components\\n- **Text Cards**: Três quadrados sintonizados (Azul, Vermelho, Branco) no rodapé.\\n- **Motion Frames**: Molduras HUD com scanlines e labels de dados revezadas."
+}

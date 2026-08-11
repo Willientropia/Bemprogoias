@@ -19,39 +19,34 @@ Atualizar este arquivo à medida que cada item avançar.
 - [x] Rotas base (`/login`, `/super-admin`, `/manager`) com redirecionamento por papel
 - [x] Páginas placeholder: `LoginPage`, `SuperAdminDashboard`, `ManagerDashboard`
 - [x] Commit inicial + push para `main`
+- [x] `scripts/createSuperAdmin.js` — bootstrap do usuário super admin via Admin SDK
+- [x] Primeiro super admin criado (`willie.engenharia@gmail.com`) e validado no login
+- [x] **CRUD de Campanhas completo** (`src/services/campaigns.js`, `CampaignForm.jsx`, listagem no `SuperAdminDashboard`) — criar, editar, excluir testado no navegador
+- [x] `TopBar` compartilhado com botão de logout (usado em Super Admin e Gestor)
+- [x] `docs/design-reference/` — mockups visuais de referência (gerados via Claude) para a identidade "Universe Deep Space"
 
 ## Próximos passos (em ordem sugerida)
 
-### 1. Bootstrap do Super Admin
-- [ ] Criar usuário no Firebase Console (Authentication → Add user) **ou** via script
-- [ ] Script Node com `firebase-admin` (service account) para setar custom claim `role: "super_admin"` no seu uid
-- [ ] Validar login local com esse usuário e redirecionamento para `/super-admin`
-
-### 2. CRUD de Campanhas (Super Admin)
-- [ ] Modelo `campaigns/{campaignId}` (name, createdAt, minAppVersion)
-- [ ] Formulário de criação/edição de campanha
-- [ ] Listagem de campanhas (visão global do super admin)
-
-### 3. CRUD de Gestores (Super Admin cria, dentro de uma campanha)
+### 1. CRUD de Gestores (Super Admin cria, dentro de uma campanha)
 - [ ] Formulário de criação de gestor (email/senha inicial)
 - [ ] Cloud Function ou script para criar o usuário Auth + custom claim `role: "manager"` + `campaignId`
 - [ ] Listagem de gestores por campanha
 
-### 4. CRUD de Líderes (Gestor)
+### 2. CRUD de Líderes (Gestor)
 - [ ] Formulário: usuário/login, senha, WhatsApp, nome completo, região de atuação, raio de influência (km)
 - [ ] Criação do usuário Auth do líder + custom claim `role: "leader"` + `campaignId` (via Cloud Function, já que o gestor não deve ter permissão admin direta no client)
 - [ ] Listagem/edição/remoção de líderes da própria campanha
 
-### 5. Mapa do Gestor
+### 3. Mapa do Gestor
 - [ ] Escolher biblioteca de mapa (Leaflet é o candidato mais leve/gratuito para web+Electron+Capacitor)
 - [ ] Plotar cada líder como marcador + círculo de raio (km) centrado na região
 - [ ] Plotar eleitores como pontos (somente leitura, dado do Dev B)
 
-### 6. Empacotamento Electron (Windows)
+### 4. Empacotamento Electron (Windows)
 - [ ] Configurar Electron apontando para o build do Vite
 - [ ] Restringir o shell Electron a rotas de `super_admin`/`manager` (líder não usa desktop)
 
-### 7. Auto-update / OTA
+### 5. Auto-update / OTA
 - [ ] Integração com GitHub Releases API
 - [ ] Electron auto-update (ex: `electron-updater`)
 - [ ] Campo `minAppVersion` em `campaigns/{campaignId}` no Firebase para forçar atualização
@@ -60,7 +55,9 @@ Atualizar este arquivo à medida que cada item avançar.
 
 - **Índices de campo único não vão no `firestore.indexes.json`** — Firestore já cria automaticamente para `rg` e `titulo` isolados. Só índices compostos precisam ser declarados (ex: `leaderId` + `createdAt`). Erro visto: `this index is not necessary, configure using single field index controls`.
 - Custom claims (`role`, `campaignId`) só podem ser setadas via **Admin SDK** (backend/script), nunca do client — vai exigir Cloud Functions ou scripts administrativos para os fluxos de criação de gestor/líder.
-- CSS/identidade visual "Universe Deep Space" (seção 5 do spec) ainda não aplicado — páginas atuais são só estrutura funcional.
+- **`getIdTokenResult()` sem `forceRefresh` pode retornar claims desatualizadas** mesmo após logout/login — o SDK reaproveita o token em cache se ainda não expirou. `AuthContext.jsx` usa `getIdTokenResult(true)` para sempre forçar um token novo do servidor. Causou `permission-denied` nas primeiras tentativas de CRUD mesmo com a claim já setada no Firebase.
+- **Exclusão de campanha não faz cascade delete** — apagar uma campanha hoje não remove `managers`/`leaders`/`voters` associados (ficam órfãos). Resolver quando implementar Cloud Functions administrativas.
+- CSS/identidade visual "Universe Deep Space" (seção 5 do spec) ainda não aplicado ao código — há mockups de referência em `docs/design-reference/`, mas as páginas atuais são só estrutura funcional.
 
 ## Contrato com o Dev B
 

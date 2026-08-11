@@ -1,0 +1,353 @@
+/* BEMPROBRASIL Master Design - CSS Stylesheet */
+/* Generated from WIXFLUX_DESIGN.md - Adapted for Bem pro Brasil */
+
+:root {
+    /* Core Colors - Universe Black Palette */
+    --background: #000000;
+    --primary: #fff6df;
+    --secondary: #00e3fd;
+    --tertiary: #0055ff;
+    --accent-red: #FF0000;
+    
+    /* Universe Black Theme */
+    --universe-black: #000000;
+    --space-blue: #0055ff;
+    --atmospheric-turquoise: #00e3fd;
+    --gold: #fff6df;
+    --yellow: #FFFF00;
+    --white: #FFFFFF;
+}
+
+/* === UNIVERSE BLACK BASE STYLES === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--universe-black);
+    background-image: 
+        radial-gradient(circle at 10% 10%, rgba(0, 85, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 227, 253, 0.1) 0%, transparent 50%);
+    background-attachment: fixed;
+    color: #e3e1e9;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* === HEADER STYLES === */
+.header-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 160px;
+    background: linear-gradient(to bottom, var(--universe-black) 80%, transparent 100%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    gap: 20px;
+}
+
+.logo-area {
+    width: 400px;
+    height: 138px;
+    flex-shrink: 0;
+}
+
+.logo-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 1s ease-in-out;
+}
+
+.header-text {
+    flex-grow: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 30px;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    padding-left: 30px;
+}
+
+.blog-name {
+    font-family: 'Space Grotesk';
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.copyright {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* === NAVIGATION MENU === */
+.top-nav {
+    position: fixed;
+    top: 110px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 1001;
+}
+
+.top-nav a {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Space Grotesk';
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.top-nav a:hover, .top-nav a.active {
+    border-color: var(--space-blue);
+    box-shadow: 0 0 15px rgba(0, 85, 255, 0.5);
+    color: var(--secondary);
+}
+
+/* === SHINE GLOW ANIMATION === */
+@keyframes shine-glow {
+    0% { color: var(--gold); text-shadow: 0 0 15px rgba(255, 246, 223, 0.4); }
+    25% { color: var(--yellow); text-shadow: 0 0 25px rgba(255, 255, 0, 0.6); }
+    50% { color: var(--white); text-shadow: 0 0 45px rgba(255, 255, 255, 0.85); }
+    75% { color: var(--yellow); text-shadow: 0 0 25px rgba(255, 255, 0, 0.6); }
+    100% { color: var(--gold); text-shadow: 0 0 15px rgba(255, 246, 223, 0.4); }
+}
+
+/* === CELESTIAL INDICATOR === */
+.page-title {
+    animation: shine-glow 8s infinite ease-in-out; 
+    border-left: 8px solid var(--accent-red); 
+    padding-left: 0.5em; 
+    margin-bottom: 40px;
+    font-size: clamp(40px, 8vw, 60px); 
+    line-height: 1;
+    font-family: 'Space Grotesk';
+    text-transform: uppercase;
+}
+
+/* === CARDS & COMPONENTS === */
+.card {
+    background: rgba(255,255,255,0.02); 
+    backdrop-filter: blur(40px); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 16px; 
+    padding: 30px; 
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+    margin-bottom: 30px;
+}
+
+.card:hover {
+    transform: translateY(-14px); 
+    border-color: var(--space-blue); 
+    box-shadow: 0 40px 80px rgba(0, 85, 255, 0.5); 
+}
+
+/* === TEXT SQUARES (Footer) === */
+.squares {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.sq {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.sq-blue { background: var(--space-blue); }
+.sq-red { background: var(--accent-red); }
+.sq-white { background: var(--white); }
+
+/* === SCANLINES EFFECT === */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.03) 0px,
+        rgba(0,0,0,0.03) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* === BUTTONS === */
+.btn {
+    background: linear-gradient(90deg, var(--space-blue), var(--secondary));
+    color: #000;
+    font-family: 'Space Grotesk';
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    box-shadow: 0 0 20px rgba(0,227,253,0.6);
+    transform: scale(1.02);
+}
+
+/* === INTERACTIVE GLOW === */
+.interactive-glow:hover {
+    box-shadow: 0 0 15px rgba(0, 85, 255, 0.5);
+    color: var(--secondary);
+}
+
+/* === MOTION FRAMES (HUD Style) === */
+.motion-frame {
+    border: 2px solid var(--secondary);
+    box-shadow: 0 0 20px rgba(0, 227, 253, 0.3);
+    position: relative;
+}
+
+.motion-frame::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    border-left: 3px solid var(--secondary);
+    border-top: 3px solid var(--secondary);
+}
+
+.motion-frame::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    border-right: 3px solid var(--secondary);
+    border-bottom: 3px solid var(--secondary);
+}
+
+/* === LABELS DE DADOS TÉCNICOS === */
+.tech-label {
+    font-family: 'Space Grotesk';
+    font-size: 11px;
+    color: var(--secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+    .dashboard { grid-template-columns: repeat(2, 1fr); }
+    .card-full { grid-column: span 2; }
+}
+
+@media (max-width: 768px) {
+    .dashboard { grid-template-columns: 1fr; } 
+    .card-wide, .card-full { grid-column: span 1; }
+    .header-box { flex-direction: column; height: auto; padding: 20px; }
+    body { padding-top: 220px; }
+    .header-text { border-left: none; padding-left: 0; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+}
+
+/* === STATUS INDICATORS === */
+.status-live {
+    color: #0f0;
+    font-size: 0.85em;
+    font-family: 'Space Grotesk';
+    animation: pulse 2s infinite;
+    margin-left: auto;
+    font-weight: bold;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* === MODULE BADGES === */
+.module-badge {
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.75em;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.1);
+    text-transform: uppercase;
+    font-family: 'Space Grotesk';
+}
+
+.module-badge.online { background: rgba(0,200,100,0.1); border-color: #0c6; color: #0c6; }
+.module-badge.standby { background: rgba(255,200,0,0.1); border-color: #fa0; color: #fa0; }
+.module-badge.offline { background: rgba(255,50,50,0.1); border-color: #f33; color: #f33; }
+
+/* === TYPOGRAPHY === */
+h1, h2, h3 {
+    font-family: 'Space Grotesk';
+    text-transform: uppercase;
+}
+
+h3 {
+    font-size: 16px;
+    color: var(--white);
+    margin-bottom: 20px;
+    border-left: 4px solid var(--accent-red);
+    padding-left: 10px;
+    animation: shine-glow 8s infinite ease-in-out;
+}
+
+/* === FORM ELEMENTS === */
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--space-blue);
+    box-shadow: 0 0 10px rgba(0,85,255,0.4);
+}
+
+/* === TERMINAL STYLE === */
+.terminal {
+    background: #000;
+    border: 1px solid rgba(0, 227, 253, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: monospace;
+    color: #0f0;
+    height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.05);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

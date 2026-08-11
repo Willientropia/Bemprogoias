@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#e7e9e4;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;background-image:radial-gradient(circle at 30% 20%,rgba(31,107,52,.10),transparent 55%),radial-gradient(circle at 80% 90%,rgba(243,196,28,.12),transparent 55%)}
+  .mscroll{flex:1;overflow-y:auto;overflow-x:hidden}
+  .mscroll::-webkit-scrollbar{display:none}
+  @keyframes bg-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bg-shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+</style>
+</helmet>
+
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+<div style="height:100%;display:flex;flex-direction:column;font-family:'Public Sans',sans-serif">
+
+  <!-- ===== LOGIN ===== -->
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+  <div style="height:100%;background:#143a1c;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 30px;color:#fff">
+    <div style="position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(243,196,28,.16),transparent 70%);top:-120px;right:-120px"></div>
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(39,122,61,.5),transparent 70%);bottom:-110px;left:-90px"></div>
+    <div style="position:relative;animation:bg-fade .5s ease both">
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:30px">
+        <div style="background:#fff;border-radius:20px;padding:18px 22px;box-shadow:0 18px 44px rgba(0,0,0,.34)">
+          <img src="logo-brasil-full.png" alt="BEM pro Brasil — Mandato com participação pública" style="width:188px;height:auto;display:block" />
+        </div>
+      </div>
+
+      <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:25px;line-height:1.2;text-align:center;margin-bottom:8px">Sua voz constrói<br>o futuro do Brasil</h1>
+      <p style="font-size:13.5px;color:rgba(255,255,255,.7);text-align:center;line-height:1.5;margin-bottom:28px">Acesso exclusivo por convite</p>
+
+      <label style="display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:7px">Nome completo</label>
+      <input value="{{ nome }}" onChange="{{ onNome }}" placeholder="Como devemos te chamar?" style="width:100%;padding:14px 15px;border:1px solid rgba(255,255,255,.18);border-radius:13px;background:rgba(255,255,255,.07);font-size:14.5px;font-family:'Public Sans',sans-serif;color:#fff;margin-bottom:15px;outline:none" />
+
+      <label style="display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:7px">Código de convite</label>
+      <input value="{{ code }}" onChange="{{ onCode }}" placeholder="Ex: CAMPINAS2026" style="{{ codeInputStyle }}" />
+      <div style="{{ errStyle }}">{{ loginError }}</div>
+
+      <button onClick="{{ doLogin }}" style="width:100%;margin-top:18px;padding:16px;border:none;border-radius:13px;background:#f3c41c;color:#143a1c;font-family:'Public Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        Entrar na plataforma
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <div style="text-align:center;margin-top:18px;font-size:12.5px;color:rgba(255,255,255,.6)">Use <b style="color:#f3c41c">CAMPINAS2026</b> para testar</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== APP ===== -->
+  <sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+
+  <!-- green top header -->
+  <div style="flex-shrink:0;background:#143a1c;padding:54px 18px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:3px">
+        <img src="logo-brasil-mark.png" alt="Bem pro Brasil" style="width:100%;height:100%;object-fit:contain" />
+      </div>
+      <div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.1">Olá,</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;line-height:1.15">{{ userName }}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;position:relative">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span style="position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:#f3c41c;border:1.5px solid #143a1c"></span>
+      </div>
+      <button onClick="{{ doLogout }}" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg></button>
+    </div>
+  </div>
+
+  <div class="mscroll" style="background:#f4f4f2">
+    <div style="padding:18px 16px 28px">
+
+      <!-- INÍCIO -->
+      <sc-if value="{{ isInicio }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:bg-fade .35s ease both">
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:25px;color:#16331c;line-height:1.1">Painel Central</h1>
+        <p style="color:#6b7669;font-size:13px;margin-top:4px">Tudo o que acontece na sua região</p>
+
+        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e8e8e3;border-radius:12px;padding:4px 6px 4px 13px;margin-top:14px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f3c41c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+          <select value="{{ regiao }}" onChange="{{ onRegiao }}" style="flex:1;border:none;background:transparent;font-family:'Public Sans',sans-serif;font-size:13.5px;color:#1c2b1f;padding:9px 4px;outline:none">
+            <sc-for list="{{ regiaoOptions }}" as="r" hint-placeholder-count="4"><option value="{{ r }}">{{ r }}</option></sc-for>
+          </select>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.4px;color:#9aa397;margin:22px 0 11px">DESTAQUES</div>
+        <div style="display:flex;flex-direction:column;gap:13px">
+          <sc-for list="{{ destaques }}" as="d" hint-placeholder-count="2">
+            <div style="background:#fdf8e3;border:1px solid #efe3ab;border-radius:14px;padding:17px 18px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#a5852a;margin-bottom:10px">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.4 2.3 7.4L12 16.9 5.7 21.2 8 13.8 2 9.4h7.6Z"/></svg> Fixado
+              </div>
+              <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap">
+                <span style="{{ d.tagStyle }}">{{ d.tag }}</span>
+                <span style="{{ d.scopeStyle }}">{{ d.scope }}</span>
+              </div>
+              <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:16px;color:#16331c;line-height:1.25;margin-bottom:7px">{{ d.titulo }}</h3>
+              <p style="font-size:12.5px;color:#5c6657;line-height:1.5">{{ d.desc }}</p>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding-top:11px;border-top:1px solid rgba(165,133,42,.2);font-size:12px;color:#8a8378">
+                <span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>{{ d.comments }}</span>
+                <span>{{ d.data }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- tab chips (scroll x) -->
+        <div style="display:flex;gap:7px;margin:20px 0 13px;overflow-x:auto;padding-bottom:2px">
+          <button onClick="{{ tabMidia }}" style="{{ tabStyleMidia }}">Mídia</button>
+          <button onClick="{{ tabPlano }}" style="{{ tabStylePlano }}">Plano</button>
+          <button onClick="{{ tabAgenda }}" style="{{ tabStyleAgenda }}">Agenda</button>
+          <button onClick="{{ tabOpinioes }}" style="{{ tabStyleOpinioes }}">Opiniões</button>
+          <button onClick="{{ tabCanal }}" style="{{ tabStyleCanal }}">Canal</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ feed }}" as="f" hint-placeholder-count="2">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:14px;padding:16px 18px">
+              <div style="display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap">
+                <span style="{{ f.tagStyle }}">{{ f.tag }}</span>
+                <span style="{{ f.scopeStyle }}">{{ f.scope }}</span>
+              </div>
+              <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:15.5px;color:#16331c;line-height:1.25;margin-bottom:6px">{{ f.titulo }}</h3>
+              <p style="font-size:12.5px;color:#5c6657;line-height:1.5">{{ f.desc }}</p>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid #f0efe9;font-size:12px;color:#9aa397">
+                <span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>{{ f.comments }}</span>
+                <span>{{ f.data }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ feedEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px dashed #d9dcd4;border-radius:13px;padding:26px 18px;text-align:center;color:#8a8b80;font-size:13px">Nenhuma publicação desta categoria em <b style="color:#5c6657">{{ regionFilterLabel }}</b>.</div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ENQUETES -->
+      <sc-if value="{{ isEnquetes }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .35s ease both">
+        <h1 style="display:flex;align-items:center;gap:9px;font-family:'Spectral',serif;font-weight:700;font-size:25px;color:#16331c;line-height:1.1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f3c41c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Enquetes</h1>
+        <p style="color:#6b7669;font-size:13px;margin-top:4px">Defina as prioridades da sua região · {{ votedCount }}/{{ pollTotal }} respondidas</p>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:16px">
+          <sc-for list="{{ polls }}" as="p" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:14px;padding:18px">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap">
+                <span style="{{ p.tagStyle }}">{{ p.tag }}</span>
+                <span style="font-size:11px;color:#9aa397">{{ p.prazo }} · {{ p.totalLabel }} votos</span>
+              </div>
+              <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:17px;color:#16331c;line-height:1.25">{{ p.titulo }}</h3>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:13px">
+                <sc-for list="{{ p.options }}" as="o" hint-placeholder-count="3">
+                  <button onClick="{{ o.onClick }}" style="{{ o.rowStyle }}">
+                    <div style="{{ o.fillStyle }}"></div>
+                    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;z-index:1">
+                      <span style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#243528"><span style="{{ o.dotStyle }}"></span>{{ o.label }}</span>
+                      <span style="{{ o.pctStyle }}">{{ o.pctLabel }}</span>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- DEMANDAS -->
+      <sc-if value="{{ isRelatorios }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .35s ease both">
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:25px;color:#16331c;line-height:1.1">Demandas</h1>
+        <p style="color:#6b7669;font-size:13px;margin-top:4px">Acompanhe as demandas da sua região</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+              <span style="{{ s.iconWrap }}">{{ s.icon }}</span>
+              <div><div style="font-family:'Spectral',serif;font-weight:700;font-size:22px;color:#16331c;line-height:1">{{ s.value }}</div><div style="font-size:10px;font-weight:600;letter-spacing:.6px;color:#9aa397">{{ s.label }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin:16px 0 12px;overflow-x:auto;padding-bottom:2px">
+          <button onClick="{{ filtTodos }}" style="{{ filtStyleTodos }}">Todos</button>
+          <button onClick="{{ filtAberto }}" style="{{ filtStyleAberto }}">Aberto</button>
+          <button onClick="{{ filtAndamento }}" style="{{ filtStyleAndamento }}">Andamento</button>
+          <button onClick="{{ filtResolvido }}" style="{{ filtStyleResolvido }}">Resolvido</button>
+        </div>
+        <button onClick="{{ openDemand }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#1f6b34;color:#fff;border:none;border-radius:12px;padding:13px;font-family:'Public Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Nova Demanda
+        </button>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <sc-for list="{{ demands }}" as="d" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:15px 17px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:15.5px;color:#16331c;line-height:1.2">{{ d.titulo }}</h3>
+                <span style="{{ d.prioStyle }}">{{ d.prioridade }}</span>
+              </div>
+              <p style="font-size:12.5px;color:#5c6657;line-height:1.5;margin-top:7px">{{ d.desc }}</p>
+              <div style="display:flex;align-items:center;gap:7px;margin-top:11px;flex-wrap:wrap">
+                <span style="{{ d.statusStyle }}">{{ d.status }}</span>
+                <span style="font-size:11px;font-weight:600;color:#5c6657;background:#f0efe9;border-radius:6px;padding:3px 9px">{{ d.categoria }}</span>
+                <span style="font-size:11px;font-weight:700;color:#5a4708;background:#f3c41c;border-radius:6px;padding:3px 9px">{{ d.regiao }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- REGIÕES -->
+      <sc-if value="{{ isRegioes }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .35s ease both">
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:25px;color:#16331c;line-height:1.1">Regiões</h1>
+        <p style="color:#6b7669;font-size:13px;margin-top:4px">Regiões de Campinas, cidades e conselhos</p>
+        <div style="display:flex;gap:7px;margin:16px 0 14px;overflow-x:auto;padding-bottom:2px">
+          <button onClick="{{ regTabRegioes }}" style="{{ regStyleRegioes }}">Regiões</button>
+          <button onClick="{{ regTabSetores }}" style="{{ regStyleSetores }}">Cidades</button>
+          <button onClick="{{ regTabBairros }}" style="{{ regStyleBairros }}">Bairros</button>
+          <button onClick="{{ regTabConselhos }}" style="{{ regStyleConselhos }}">Conselhos</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <sc-for list="{{ regCards }}" as="c" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:15px 17px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <div>
+                <div style="font-family:'Spectral',serif;font-weight:700;font-size:15.5px;color:#16331c">{{ c.nome }}</div>
+                <div style="font-size:11.5px;color:#8a8b80;margin-top:3px">{{ c.sub }}</div>
+                <div style="font-size:12px;color:#5c6657;margin-top:7px;line-height:1.4">{{ c.desc }}</div>
+              </div>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#c2c8bf" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="m9 6 6 6-6 6"/></svg>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- PERFIL -->
+      <sc-if value="{{ isPerfil }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .35s ease both">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 0 20px">
+          <div style="width:74px;height:74px;border-radius:50%;background:#f3c41c;color:#143a1c;display:flex;align-items:center;justify-content:center;font-family:'Spectral',serif;font-weight:700;font-size:30px">{{ userInitial }}</div>
+          <div style="font-family:'Spectral',serif;font-weight:700;font-size:20px;color:#16331c;margin-top:12px">{{ userName }}</div>
+          <div style="font-size:13px;color:#6b7669;margin-top:3px">Apoiador · Campinas · {{ regiao }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ perfilItems }}" as="m" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:15px 17px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px"><span style="{{ m.iconWrap }}">{{ m.icon }}</span><span style="font-size:14px;font-weight:600;color:#243528">{{ m.label }}</span></div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2c8bf" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            </div>
+          </sc-for>
+          <button onClick="{{ doLogout }}" style="margin-top:6px;background:#fff;border:1px solid #f3d6d0;border-radius:13px;padding:15px;color:#c0392b;font-family:'Public Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer">Sair da conta</button>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- bottom tab bar -->
+  <div style="flex-shrink:0;background:#fff;border-top:1px solid #e6e6e0;padding:9px 8px 24px;display:flex;justify-content:space-around;align-items:flex-start">
+    <button onClick="{{ navInicio }}" style="{{ tabBtnInicio }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-6h5v6"/></svg>
+      <span>Início</span>
+    </button>
+    <button onClick="{{ navEnquetes }}" style="{{ tabBtnEnquetes }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      <span>Enquetes</span>
+    </button>
+    <button onClick="{{ navRelatorios }}" style="{{ tabBtnRelatorios }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+      <span>Demandas</span>
+    </button>
+    <button onClick="{{ navRegioes }}" style="{{ tabBtnRegioes }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      <span>Regiões</span>
+    </button>
+    <button onClick="{{ navPerfil }}" style="{{ tabBtnPerfil }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      <span>Perfil</span>
+    </button>
+  </div>
+
+  <!-- MODAL: NOVA DEMANDA -->
+  <sc-if value="{{ showDemand }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:60;display:flex;align-items:flex-end;background:rgba(16,28,18,.5);animation:bg-fade .2s ease both">
+    <div style="background:#f7f7f3;border-radius:22px 22px 0 0;width:100%;max-height:92%;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #e8e8e3;position:sticky;top:0;background:#f7f7f3">
+        <div>
+          <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:19px;color:#16331c;line-height:1">Nova Demanda</h2>
+          <p style="font-size:12px;color:#8a8b80;margin-top:2px">Registre uma demanda da sua região</p>
+        </div>
+        <button onClick="{{ closeDemand }}" style="background:#ecebe6;border:none;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5c6657"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:15px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#3a4a3d;margin-bottom:6px">Título</label>
+          <input value="{{ demForm.titulo }}" onChange="{{ onDemTitulo }}" placeholder="Ex: Buracos na Av. das Amoreiras" style="width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-family:'Public Sans',sans-serif;font-size:14px;color:#1c2b1f;outline:none" />
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#3a4a3d;margin-bottom:6px">Descrição</label>
+          <textarea value="{{ demForm.desc }}" onChange="{{ onDemDesc }}" placeholder="Descreva a situação…" rows="3" style="width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-family:'Public Sans',sans-serif;font-size:14px;color:#1c2b1f;outline:none;resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1">
+            <label style="display:block;font-size:12px;font-weight:600;color:#3a4a3d;margin-bottom:6px">Categoria</label>
+            <select value="{{ demForm.categoria }}" onChange="{{ onDemCategoria }}" style="width:100%;box-sizing:border-box;padding:12px 10px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-family:'Public Sans',sans-serif;font-size:13.5px;color:#1c2b1f;outline:none"><sc-for list="{{ demCategorias }}" as="c" hint-placeholder-count="4"><option value="{{ c }}">{{ c }}</option></sc-for></select>
+          </div>
+          <div style="flex:1">
+            <label style="display:block;font-size:12px;font-weight:600;color:#3a4a3d;margin-bottom:6px">Região</label>
+            <select value="{{ demForm.regiao }}" onChange="{{ onDemRegiao }}" style="width:100%;box-sizing:border-box;padding:12px 10px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-family:'Public Sans',sans-serif;font-size:13.5px;color:#1c2b1f;outline:none"><sc-for list="{{ demRegioes }}" as="r" hint-placeholder-count="4"><option value="{{ r }}">{{ r }}</option></sc-for></select>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#3a4a3d;margin-bottom:6px">Prioridade</label>
+          <select value="{{ demForm.prioridade }}" onChange="{{ onDemPrioridade }}" style="width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid #dcdcd4;border-radius:11px;background:#fff;font-family:'Public Sans',sans-serif;font-size:14px;color:#1c2b1f;outline:none"><sc-for list="{{ demPrioridades }}" as="p" hint-placeholder-count="3"><option value="{{ p }}">{{ p }}</option></sc-for></select>
+        </div>
+        <button onClick="{{ submitDemand }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#1f6b34;color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Public Sans',sans-serif;font-weight:700;font-size:14.5px;cursor:pointer;margin-top:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Registrar demanda</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  </sc-if>
+</div>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920}}">
+class Component extends DCLogic {
+  state = {
+    screen:'login', nome:'', code:'', loginError:'',
+    nav:'inicio', regiao:'Região Central', panelTab:'midia', regTab:'regioes', relFilter:'todos',
+    votes:{}, statusOverride:{}, showDemand:false, newDemands:[],
+    demForm:{ titulo:'', desc:'', categoria:'Infraestrutura', regiao:'R. Central', prioridade:'Média' },
+  };
+
+  demCategorias=['Infraestrutura','Saúde','Educação','Segurança','Meio Ambiente','Mobilidade','Coordenação'];
+  demRegioes=['R. Central','R. Norte','R. Sul','R. Leste','R. Sudoeste','R. Noroeste'];
+  demPrioridades=['Crítica','Alta','Média'];
+
+  regioes = ['Região Central','Região Norte','Região Sul','Região Leste','Região Sudoeste','Região Noroeste','Barão Geraldo','Sousas / Joaquim Egídio','Sumaré','Hortolândia','Valinhos'];
+
+  destaquesData = [
+    { tag:'Mídia Institucional', scope:'Campinas', titulo:'Programa de conselhos populares', desc:'Conselhos de participação chegam a todas as regiões de Campinas. Cada bairro poderá eleger seu presidente de conselho.', comments:'12', data:'24 jun' },
+    { tag:'Propostas', scope:'Campinas', titulo:'Prioridades da candidatura para 2026', desc:'Mobilidade urbana, saúde nos bairros, educação em tempo integral e geração de emprego na região metropolitana.', comments:'27', data:'22 jun' },
+  ];
+  feedByTab = {
+    midia:[ { tag:'Mídia', scope:'Campinas', titulo:'Vídeo institucional — Quem somos', desc:'Compartilhe com sua rede para ampliar o alcance da nossa mensagem em Campinas e região.', comments:'8', data:'23 jun' }, { tag:'Mídia', scope:'R. Sudoeste', titulo:'Mutirão de saúde no Ouro Verde', desc:'Mais de 400 famílias atendidas com consultas e exames gratuitos no fim de semana.', comments:'15', data:'21 jun' } ],
+    plano:[ { tag:'Proposta', scope:'Campinas', titulo:'Mais ônibus no transporte urbano', desc:'Modernização dos terminais e ampliação da frota no Corredor da Av. John Boyd Dunlop.', comments:'31', data:'20 jun' }, { tag:'Proposta', scope:'R. Noroeste', titulo:'Creches em tempo integral', desc:'10 novas unidades nas regiões Noroeste e Sudoeste de Campinas.', comments:'19', data:'18 jun' } ],
+    agenda:[ { tag:'Agenda', scope:'R. Central', titulo:'Audiência — Mercadão de Campinas', desc:'Encontro aberto para discutir a revitalização. Quinta, 19h, na Estação Cultura.', comments:'6', data:'27 jun' }, { tag:'Agenda', scope:'Barão Geraldo', titulo:'Visita ao Ribeirão das Pedras', desc:'Vistoria das obras de drenagem com o conselho local e moradores.', comments:'4', data:'29 jun' } ],
+    opinioes:[ { tag:'Opiniões', scope:'R. Sudoeste', titulo:'Moradores pedem mais iluminação', desc:'Falta de iluminação pública no Ouro Verde entrou na pauta de prioridades.', comments:'42', data:'19 jun' }, { tag:'Opiniões', scope:'Campinas', titulo:'Transporte é a maior preocupação', desc:'Mobilidade urbana é o tema mais citado pelos apoiadores neste mês.', comments:'58', data:'17 jun' } ],
+    canal:[ { tag:'Canal', scope:'Campinas', titulo:'Ao vivo — Encontro de conselhos', desc:'Acompanhe ao vivo o encontro trimestral dos presidentes de conselho.', comments:'73', data:'30 jun' }, { tag:'Canal', scope:'R. Sul', titulo:'Bastidores da semana', desc:'Conteúdo exclusivo dos encontros com lideranças da Região Sul.', comments:'11', data:'16 jun' } ],
+  };
+  regCardsByTab = {
+    regioes:[ {nome:'Região Central',sub:'Campinas · Ana Ribeiro',desc:'Cambuí, Centro, Botafogo e Guanabara'}, {nome:'Região Sul',sub:'Campinas · Carlos Mendes',desc:'Taquaral, Jd. Proença e Nova Campinas'}, {nome:'Região Sudoeste',sub:'Campinas · Júlia Faria',desc:'Ouro Verde, Campo Grande e DIC'}, {nome:'Região Norte',sub:'Campinas · Pedro Oliveira',desc:'Barão Geraldo e Jd. Chapadão'}, {nome:'Região Leste',sub:'Campinas · Sandra Lima',desc:'Sousas e Joaquim Egídio'} ],
+    setores:[ {nome:'Sumaré',sub:'Região Metropolitana',desc:'Coordenação municipal de Sumaré'}, {nome:'Hortolândia',sub:'Região Metropolitana',desc:'Articulação popular de Hortolândia'}, {nome:'Valinhos',sub:'Região Metropolitana',desc:'Coordenação de Valinhos'}, {nome:'Paulínia',sub:'Região Metropolitana',desc:'Base de apoiadores em Paulínia'} ],
+    bairros:[ {nome:'Cambuí',sub:'Região Central',desc:'Liderança comunitária do Cambuí'}, {nome:'Taquaral',sub:'Região Sul',desc:'Entorno da Lagoa do Taquaral'}, {nome:'Ouro Verde',sub:'Região Sudoeste',desc:'Articulação do Ouro Verde'} ],
+    conselhos:[ {nome:'Conselho do Centro',sub:'Presidente · Ana Ribeiro',desc:'Participação popular da região central'}, {nome:'Conselho do Ouro Verde',sub:'Presidente · Carlos Mendes',desc:'Ouro Verde e Campo Grande'}, {nome:'Conselho de Barão Geraldo',sub:'Presidente · Júlia Faria',desc:'Distrito de Barão Geraldo'}, {nome:'Conselho de Sumaré',sub:'Presidente · Sandra Lima',desc:'Participação municipal de Sumaré'} ],
+  };
+  pollsData = [
+    { id:'p1', tag:'Mobilidade', prazo:'Encerra em 5 dias', titulo:'Prioridade no transporte de Campinas?', options:[ {label:'Ampliar a frota',base:1240}, {label:'Corredor Av. J. B. Dunlop',base:860}, {label:'Linhas metropolitanas',base:1530}, {label:'Segurança nos terminais',base:640} ] },
+    { id:'p2', tag:'Prioridades', prazo:'Encerra em 12 dias', titulo:'Onde Campinas deve investir primeiro?', options:[ {label:'Saúde nos bairros',base:2110}, {label:'Educação integral',base:1740}, {label:'Segurança pública',base:1980}, {label:'Mobilidade urbana',base:1520} ] },
+    { id:'p3', tag:'R. Central', prazo:'Encerra em 3 dias', titulo:'Revitalização do Mercadão de Campinas', options:[ {label:'Reforma da estrutura',base:920}, {label:'Apoio aos comerciantes',base:1180}, {label:'Acessibilidade',base:540} ] },
+  ];
+  demandsData = [
+    { id:'d1', titulo:'Falta de material na escola municipal', desc:'Escola do Ouro Verde sem materiais didáticos há 3 meses.', categoria:'Educação', regiao:'R. Sudoeste', status:'Aberto', prioridade:'Alta' },
+    { id:'d2', titulo:'Buracos na Av. John Boyd Dunlop', desc:'Trecho do Ouro Verde com vários buracos causando acidentes. Recapeamento urgente.', categoria:'Infraestrutura', regiao:'R. Sudoeste', status:'Em Andamento', prioridade:'Crítica' },
+    { id:'d3', titulo:'Iluminação precária no Campo Grande', desc:'Ruas sem iluminação pública aumentam a sensação de insegurança à noite.', categoria:'Segurança', regiao:'R. Sudoeste', status:'Em Andamento', prioridade:'Média' },
+    { id:'d4', titulo:'Limpeza do Ribeirão das Pedras', desc:'Acúmulo de lixo às margens em Barão Geraldo. Risco de enchente no período de chuvas.', categoria:'Meio Ambiente', regiao:'R. Norte', status:'Aberto', prioridade:'Alta' },
+    { id:'d5', titulo:'Relatório mensal — Região Sul', desc:'Atividades do mês na Região Sul: reuniões, eventos e ações comunitárias.', categoria:'Coordenação', regiao:'R. Sul', status:'Resolvido', prioridade:'Média' },
+  ];
+
+  onNome=e=>this.setState({nome:e.target.value});
+  onCode=e=>this.setState({code:e.target.value,loginError:''});
+  doLogin=()=>{ const c=this.state.code.trim(); if(c.length<4){this.setState({loginError:'Informe um código válido.'});return;} this.setState({screen:'app',loginError:''}); };
+  doLogout=()=>this.setState({screen:'login',code:'',nav:'inicio'});
+  setNav=k=>{this.setState({nav:k}); const sc=document.querySelector('.mscroll'); if(sc)sc.scrollTop=0;};
+  navInicio=()=>this.setNav('inicio'); navEnquetes=()=>this.setNav('enquetes'); navRelatorios=()=>this.setNav('relatorios'); navRegioes=()=>this.setNav('regioes'); navPerfil=()=>this.setNav('perfil');
+  onRegiao=e=>this.setState({regiao:e.target.value});
+  openDemand=()=>this.setState({showDemand:true});
+  closeDemand=()=>this.setState({showDemand:false});
+  onDemField=k=>e=>this.setState(s=>({demForm:{...s.demForm,[k]:e.target.value}}));
+  submitDemand=()=>{
+    const f=this.state.demForm; if(!(f.titulo||'').trim())return;
+    const n=new Date(), dd=String(n.getDate()).padStart(2,'0'), mm=String(n.getMonth()+1).padStart(2,'0');
+    const nd={id:'u'+Date.now(),titulo:f.titulo.trim(),desc:(f.desc||'').trim()||'Demanda registrada pelo apoiador.',categoria:f.categoria,regiao:f.regiao,data:dd+'/'+mm+'/'+n.getFullYear(),status:'Aberto',prioridade:f.prioridade};
+    this.setState(s=>({newDemands:[nd,...s.newDemands],showDemand:false,relFilter:'todos',demForm:{titulo:'',desc:'',categoria:'Infraestrutura',regiao:'R. Central',prioridade:'Média'}}));
+  };
+  setTab=t=>this.setState({panelTab:t}); tabMidia=()=>this.setTab('midia');tabPlano=()=>this.setTab('plano');tabAgenda=()=>this.setTab('agenda');tabOpinioes=()=>this.setTab('opinioes');tabCanal=()=>this.setTab('canal');
+  setRegTab=t=>this.setState({regTab:t}); regTabRegioes=()=>this.setRegTab('regioes');regTabSetores=()=>this.setRegTab('setores');regTabBairros=()=>this.setRegTab('bairros');regTabConselhos=()=>this.setRegTab('conselhos');
+  setFilt=f=>this.setState({relFilter:f}); filtTodos=()=>this.setFilt('todos');filtAberto=()=>this.setFilt('Aberto');filtAndamento=()=>this.setFilt('Em Andamento');filtResolvido=()=>this.setFilt('Resolvido');
+  vote=(pid,idx)=>this.setState(s=>({votes:{...s.votes,[pid]:idx}}));
+
+  chip(bg,c){return {fontSize:'11px',fontWeight:600,padding:'3px 10px',borderRadius:'999px',background:bg,color:c,whiteSpace:'nowrap'};}
+  scopeChip(sc){ if(sc==='Campinas'||sc==='Nacional')return this.chip('#1f6b34','#fff'); return this.chip('#f3c41c','#5a4708'); }
+  statusChip(st){const m={'Aberto':['#fbf3d6','#b8860b'],'Em Andamento':['#e3f1e8','#1f6b34'],'Resolvido':['#e6eef8','#2563a8'],'Arquivado':['#eef0ee','#6b7280']};const[bg,c]=m[st]||m['Aberto'];return this.chip(bg,c);}
+  prioChip(p){const m={'Crítica':['#fbe9e6','#c0392b'],'Alta':['#fbeede','#d9701f'],'Média':['#fbf3d6','#b8860b']};const[bg,c]=m[p]||m['Média'];return this.chip(bg,c);}
+  chipBtn(active){return {border:'none',cursor:'pointer',padding:'8px 15px',borderRadius:'999px',fontFamily:"'Public Sans',sans-serif",fontSize:'12.5px',fontWeight:600,whiteSpace:'nowrap',flexShrink:0,transition:'all .18s',background:active?'#1f6b34':'#ecebe6',color:active?'#fff':'#6b7669'};}
+  tabBtn(active){return {display:'flex',flexDirection:'column',alignItems:'center',gap:'4px',background:'none',border:'none',cursor:'pointer',padding:'4px 6px',fontFamily:"'Public Sans',sans-serif",fontSize:'10.5px',fontWeight:active?700:500,color:active?'#1f6b34':'#9aa397',flex:1,transition:'color .15s'};}
+  ico(p){return React.createElement('svg',{width:15,height:15,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round',dangerouslySetInnerHTML:{__html:p}});}
+
+  renderVals(){
+    const s=this.state, nav=s.nav, isApp=s.screen==='app';
+    const nrm=x=>(x||'').replace(/^região\s+/i,'').replace(/^r\.\s*/i,'').trim().toLowerCase();
+    const matchReg=sc=> sc==='Campinas'||sc==='Nacional'||nrm(sc)===nrm(s.regiao);
+    const destaques=this.destaquesData.filter(d=>matchReg(d.scope)).map(d=>({...d,tagStyle:this.chip('#f0efe9','#5c6657'),scopeStyle:this.scopeChip(d.scope)}));
+    const feed=(this.feedByTab[s.panelTab]||[]).filter(f=>matchReg(f.scope)).map(f=>({...f,tagStyle:this.chip('#f0efe9','#5c6657'),scopeStyle:this.scopeChip(f.scope)}));
+    const feedEmpty=feed.length===0;
+    const regCards=this.regCardsByTab[s.regTab]||[];
+    let votedCount=0;
+    const polls=this.pollsData.map(p=>{
+      const voted=s.votes[p.id]!=null; if(voted)votedCount++;
+      const counts=p.options.map((o,i)=>o.base+(s.votes[p.id]===i?1:0));
+      const total=counts.reduce((a,b)=>a+b,0); const sel=s.votes[p.id];
+      const options=p.options.map((o,i)=>{const pct=Math.round(counts[i]/total*100);const isSel=sel===i;return {
+        label:o.label,pctLabel:pct+'%',onClick:()=>this.vote(p.id,i),
+        rowStyle:{position:'relative',overflow:'hidden',display:'flex',alignItems:'center',width:'100%',textAlign:'left',padding:'12px 14px',borderRadius:'11px',cursor:'pointer',border:isSel?'1.5px solid #1f6b34':'1px solid #e8e8e3',background:'#fafaf7',fontFamily:"'Public Sans',sans-serif",transition:'all .2s'},
+        fillStyle:{position:'absolute',left:0,top:0,height:'100%',width:pct+'%',background:isSel?'rgba(31,107,52,.16)':'rgba(31,107,52,.07)',transition:'width .5s cubic-bezier(.2,.8,.2,1)',zIndex:0},
+        dotStyle:{width:'12px',height:'12px',borderRadius:'50%',flexShrink:0,border:isSel?'4px solid #1f6b34':'2px solid #c2c8bf',background:'#fff',boxSizing:'border-box'},
+        pctStyle:{fontSize:'12.5px',fontWeight:700,color:isSel?'#1f6b34':'#8a8b80',fontFamily:"'Public Sans',sans-serif"},
+      };});
+      return {id:p.id,tag:p.tag,tagStyle:this.chip('#e3f1e8','#1f6b34'),prazo:p.prazo,titulo:p.titulo,totalLabel:total.toLocaleString('pt-BR'),options};
+    });
+    const withStatus=[...this.state.newDemands,...this.demandsData].map(d=>({...d,status:s.statusOverride[d.id]||d.status}));
+    const demands=withStatus.filter(d=>s.relFilter==='todos'||d.status===s.relFilter).map(d=>({...d,statusStyle:this.statusChip(d.status),prioStyle:this.prioChip(d.prioridade)}));
+    const cnt={Aberto:0,'Em Andamento':0,Resolvido:0,Arquivado:0}; withStatus.forEach(d=>cnt[d.status]=(cnt[d.status]||0)+1);
+    const sw=(bg,c)=>({display:'inline-flex',width:'34px',height:'34px',borderRadius:'9px',alignItems:'center',justifyContent:'center',background:bg,color:c,flexShrink:0});
+    const stats=[
+      {label:'ABERTO',value:cnt['Aberto'],icon:this.ico('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),iconWrap:sw('#fbf3d6','#b8860b')},
+      {label:'ANDAMENTO',value:cnt['Em Andamento'],icon:this.ico('<path d="M21 12a9 9 0 1 1-6.2-8.5"/><path d="M21 4v5h-5"/>'),iconWrap:sw('#e3f1e8','#1f6b34')},
+      {label:'RESOLVIDO',value:cnt['Resolvido'],icon:this.ico('<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>'),iconWrap:sw('#e6eef8','#2563a8')},
+      {label:'ARQUIVADO',value:cnt['Arquivado'],icon:this.ico('<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/>'),iconWrap:sw('#eef0ee','#6b7280')},
+    ];
+    const perfilItems=[
+      {label:'Minha rede de indicação',icon:this.ico('<circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9 15.8 7.1M8.2 13.1 15.8 16.9"/>'),iconWrap:sw('#e3f1e8','#1f6b34')},
+      {label:'Minhas demandas',icon:this.ico('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>'),iconWrap:sw('#fbf3d6','#b8860b')},
+      {label:'Notificações',icon:this.ico('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>'),iconWrap:sw('#e6eef8','#2563a8')},
+      {label:'Configurações',icon:this.ico('<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1l-.4-2.5h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6a7 7 0 0 0 .1-1Z"/>'),iconWrap:sw('#eef0ee','#6b7280')},
+    ];
+    const nome=(s.nome||'').trim();
+    return {
+      isLogin:!isApp, isApp,
+      nome:s.nome, code:s.code, loginError:s.loginError, onNome:this.onNome, onCode:this.onCode, doLogin:this.doLogin, doLogout:this.doLogout,
+      codeInputStyle:{width:'100%',padding:'14px 15px',borderRadius:'13px',background:'rgba(255,255,255,.07)',fontSize:'14.5px',fontFamily:"'Public Sans',sans-serif",color:'#fff',letterSpacing:'1px',textTransform:'uppercase',outline:'none',border:s.loginError?'1.5px solid #ff8a7a':'1px solid rgba(255,255,255,.18)',animation:s.loginError?'bg-shake .4s':'none'},
+      errStyle:{color:'#ff8a7a',fontSize:'12px',marginTop:'6px',minHeight:'15px',fontWeight:500},
+      userName:nome||'Apoiador', userInitial:(nome?nome[0]:'A').toUpperCase(),
+      navInicio:this.navInicio,navEnquetes:this.navEnquetes,navRelatorios:this.navRelatorios,navRegioes:this.navRegioes,navPerfil:this.navPerfil,
+      tabBtnInicio:this.tabBtn(nav==='inicio'),tabBtnEnquetes:this.tabBtn(nav==='enquetes'),tabBtnRelatorios:this.tabBtn(nav==='relatorios'),tabBtnRegioes:this.tabBtn(nav==='regioes'),tabBtnPerfil:this.tabBtn(nav==='perfil'),
+      isInicio:nav==='inicio',isEnquetes:nav==='enquetes',isRelatorios:nav==='relatorios',isRegioes:nav==='regioes',isPerfil:nav==='perfil',
+      regiao:s.regiao,onRegiao:this.onRegiao,regiaoOptions:this.regioes,
+      destaques,feed,feedEmpty,regionFilterLabel:s.regiao,
+      openDemand:this.openDemand,closeDemand:this.closeDemand,submitDemand:this.submitDemand,showDemand:s.showDemand,
+      demForm:s.demForm,onDemTitulo:this.onDemField('titulo'),onDemDesc:this.onDemField('desc'),onDemCategoria:this.onDemField('categoria'),onDemRegiao:this.onDemField('regiao'),onDemPrioridade:this.onDemField('prioridade'),
+      demCategorias:this.demCategorias,demRegioes:this.demRegioes,demPrioridades:this.demPrioridades,
+      tabMidia:this.tabMidia,tabPlano:this.tabPlano,tabAgenda:this.tabAgenda,tabOpinioes:this.tabOpinioes,tabCanal:this.tabCanal,
+      tabStyleMidia:this.chipBtn(s.panelTab==='midia'),tabStylePlano:this.chipBtn(s.panelTab==='plano'),tabStyleAgenda:this.chipBtn(s.panelTab==='agenda'),tabStyleOpinioes:this.chipBtn(s.panelTab==='opinioes'),tabStyleCanal:this.chipBtn(s.panelTab==='canal'),
+      regTabRegioes:this.regTabRegioes,regTabSetores:this.regTabSetores,regTabBairros:this.regTabBairros,regTabConselhos:this.regTabConselhos,
+      regStyleRegioes:this.chipBtn(s.regTab==='regioes'),regStyleSetores:this.chipBtn(s.regTab==='setores'),regStyleBairros:this.chipBtn(s.regTab==='bairros'),regStyleConselhos:this.chipBtn(s.regTab==='conselhos'),
+      regCards,
+      polls,votedCount,pollTotal:this.pollsData.length,
+      filtTodos:this.filtTodos,filtAberto:this.filtAberto,filtAndamento:this.filtAndamento,filtResolvido:this.filtResolvido,
+      filtStyleTodos:this.chipBtn(s.relFilter==='todos'),filtStyleAberto:this.chipBtn(s.relFilter==='Aberto'),filtStyleAndamento:this.chipBtn(s.relFilter==='Em Andamento'),filtStyleResolvido:this.chipBtn(s.relFilter==='Resolvido'),
+      stats,demands,perfilItems,
+    };
+  }
+}
+</script>
+</body>
+</html>

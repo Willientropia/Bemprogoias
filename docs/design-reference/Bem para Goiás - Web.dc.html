@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#f4f4f2;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#cfcfc8;border-radius:8px;border:2px solid #f4f4f2}
+  ::-webkit-scrollbar-track{background:transparent}
+  @keyframes bg-shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+  @keyframes bg-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bg-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</helmet>
+
+<div style="height:100vh;width:100%;overflow:hidden;color:#1c2b1f">
+
+<!-- ===================== LOGIN ===================== -->
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;height:100vh;width:100%">
+  <!-- left brand panel -->
+  <div style="width:44%;background:#143a1c;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:54px 56px;color:#fff">
+    <div style="position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(243,196,28,.16),transparent 70%);top:-160px;right:-160px"></div>
+    <div style="position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(39,122,61,.55),transparent 70%);bottom:-150px;left:-120px"></div>
+    <div style="position:relative;display:flex;align-items:center;gap:13px">
+      <div style="width:52px;height:52px;background:#fff;border-radius:13px;display:flex;align-items:center;justify-content:center;padding:5px;flex-shrink:0">
+        <img src="logo-mark.png" alt="Bem para Goiás" style="width:100%;height:100%;object-fit:contain" />
+      </div>
+      <div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:17px;letter-spacing:.5px;line-height:1">BEM PARA GOIÁS</div>
+        <div style="font-size:8.5px;letter-spacing:1.6px;color:rgba(255,255,255,.6);margin-top:3px">MANDATO COM PARTICIPAÇÃO PÚBLICA</div>
+      </div>
+    </div>
+    <div style="position:relative">
+      <div style="font-size:11px;letter-spacing:2.5px;color:#f3c41c;font-weight:600;margin-bottom:18px">PLATAFORMA DE PARTICIPAÇÃO</div>
+      <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:46px;line-height:1.08;margin-bottom:20px">Sua voz constrói<br>o futuro de Goiás.</h1>
+      <p style="font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.78);max-width:420px">Participe de enquetes, acompanhe demandas da sua região e ajude a definir as prioridades do mandato — direto do seu bairro.</p>
+      <div style="display:flex;gap:30px;margin-top:36px">
+        <div><div style="font-family:'Spectral',serif;font-size:28px;font-weight:700;color:#f3c41c">12</div><div style="font-size:12px;color:rgba(255,255,255,.6);letter-spacing:.5px">regiões de Goiânia</div></div>
+        <div><div style="font-family:'Spectral',serif;font-size:28px;font-weight:700;color:#f3c41c">48k</div><div style="font-size:12px;color:rgba(255,255,255,.6);letter-spacing:.5px">apoiadores ativos</div></div>
+        <div><div style="font-family:'Spectral',serif;font-size:28px;font-weight:700;color:#f3c41c">320</div><div style="font-size:12px;color:rgba(255,255,255,.6);letter-spacing:.5px">demandas atendidas</div></div>
+      </div>
+    </div>
+    <div style="position:relative;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.5px">Todos os direitos reservados ® · Acesso exclusivo por convite</div>
+  </div>
+
+  <!-- right form -->
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#f4f4f2;padding:40px">
+    <div style="width:100%;max-width:392px;animation:bg-fade .5s ease both">
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:30px;color:#16331c;margin-bottom:6px">Entrar na plataforma</h2>
+      <p style="font-size:14.5px;color:#6b7669;margin-bottom:30px">Acesso por convite. Informe seus dados e o código que você recebeu.</p>
+
+      <label style="display:block;font-size:12.5px;font-weight:600;color:#3a4a3d;letter-spacing:.3px;margin-bottom:7px">Nome completo</label>
+      <input value="{{ nome }}" onChange="{{ onNome }}" placeholder="Como devemos te chamar?" style="width:100%;padding:13px 15px;border:1px solid #dcdcd5;border-radius:11px;background:#fff;font-size:14.5px;font-family:'Public Sans',sans-serif;color:#1c2b1f;margin-bottom:18px" />
+
+      <label style="display:block;font-size:12.5px;font-weight:600;color:#3a4a3d;letter-spacing:.3px;margin-bottom:7px">Telefone / WhatsApp</label>
+      <input value="{{ fone }}" onChange="{{ onFone }}" placeholder="(62) 9 0000-0000" style="width:100%;padding:13px 15px;border:1px solid #dcdcd5;border-radius:11px;background:#fff;font-size:14.5px;font-family:'Public Sans',sans-serif;color:#1c2b1f;margin-bottom:18px" />
+
+      <label style="display:block;font-size:12.5px;font-weight:600;color:#3a4a3d;letter-spacing:.3px;margin-bottom:7px">Código de convite</label>
+      <input value="{{ code }}" onChange="{{ onCode }}" placeholder="Ex: GOIAS2026" style="{{ codeInputStyle }}" />
+      <div style="{{ errStyle }}">{{ loginError }}</div>
+
+      <button onClick="{{ doLogin }}" style="width:100%;margin-top:22px;padding:15px;border:none;border-radius:11px;background:#1f6b34;color:#fff;font-family:'Public Sans',sans-serif;font-weight:700;font-size:15px;letter-spacing:.4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px" style-hover="background:#1a5c2c">
+        Entrar na plataforma
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+
+      <div style="margin-top:18px;padding:13px 15px;background:#fdf8e3;border:1px solid #efe3ab;border-radius:11px;display:flex;align-items:center;gap:10px">
+        <div style="width:26px;height:26px;flex-shrink:0;border-radius:7px;background:#f3c41c;display:flex;align-items:center;justify-content:center;color:#5a4708;font-size:14px">★</div>
+        <div style="font-size:12.5px;color:#7a6210;line-height:1.4">Para testar, use o código <b style="font-family:'Public Sans'">GOIAS2026</b></div>
+      </div>
+
+      <div style="text-align:center;margin-top:24px;font-size:13px;color:#6b7669">Não tem convite? <span style="color:#1f6b34;font-weight:600;cursor:pointer">Solicitar acesso</span></div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ===================== APP SHELL ===================== -->
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;height:100vh;width:100%">
+
+  <!-- SIDEBAR -->
+  <aside style="width:248px;flex-shrink:0;background:#143a1c;display:flex;flex-direction:column;padding:22px 16px;color:#fff">
+    <div style="display:flex;align-items:center;gap:11px;padding:6px 8px 22px 8px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:16px">
+      <div style="width:44px;height:44px;background:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:4px">
+        <img src="logo-mark.png" alt="Bem para Goiás" style="width:100%;height:100%;object-fit:contain" />
+      </div>
+      <div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:14.5px;letter-spacing:.4px;line-height:1.05">BEM PARA GOIÁS</div>
+        <div style="font-size:7.5px;letter-spacing:1.3px;color:rgba(255,255,255,.55);margin-top:3px">MANDATO COM PARTICIPAÇÃO PÚBLICA</div>
+      </div>
+    </div>
+
+    <nav style="display:flex;flex-direction:column;gap:3px">
+      <button onClick="{{ navInicio }}" style="{{ navStyleInicio }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-6h5v6"/></svg>
+        <span>Início</span>
+      </button>
+      <button onClick="{{ navRegioes }}" style="{{ navStyleRegioes }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        <span>Regiões</span>
+      </button>
+      <button onClick="{{ navRede }}" style="{{ navStyleRede }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9 15.8 7.1M8.2 13.1 15.8 16.9"/></svg>
+        <span>Rede de Indicação</span>
+      </button>
+      <button onClick="{{ navEnquetes }}" style="{{ navStyleEnquetes }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        <span>Enquetes</span>
+      </button>
+      <button onClick="{{ navTopicos }}" style="{{ navStyleTopicos }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10h8M8 14h5"/><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+        <span>Tópicos</span>
+      </button>
+      <button onClick="{{ navRelatorios }}" style="{{ navStyleRelatorios }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+        <span>Relatórios</span>
+      </button>
+      <button onClick="{{ navRadio }}" style="{{ navStyleRadio }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 16.2a6 6 0 0 0 0-8.4M5 5a9.5 9.5 0 0 0 0 14M19 19a9.5 9.5 0 0 0 0-14"/></svg>
+        <span>Rádio Peão IA</span>
+      </button>
+      <button onClick="{{ navReunioes }}" style="{{ navStyleReunioes }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="m15.5 10 6-3.2v10.4l-6-3.2"/></svg>
+        <span>Reuniões</span>
+      </button>
+    </nav>
+
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px">
+        <button onClick="{{ navProfile }}" title="Meu perfil" style="display:flex;align-items:center;gap:10px;background:none;border:none;cursor:pointer;padding:0;flex:1;min-width:0;text-align:left;color:inherit;font-family:'Public Sans',sans-serif">
+          <div style="width:34px;height:34px;border-radius:50%;background:#f3c41c;color:#143a1c;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">{{ userInitial }}</div>
+          <div style="overflow:hidden">
+            <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff">{{ userName }}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5)">Apoiador · Goiânia</div>
+          </div>
+        </button>
+        <button onClick="{{ doLogout }}" title="Sair" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;padding:4px;display:flex" style-hover="color:#f3c41c">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main style="flex:1;overflow-y:auto;background:#f4f4f2">
+    <div style="max-width:1180px;margin:0 auto;padding:42px 48px 80px">
+
+      <!-- ===== INÍCIO / PAINEL CENTRAL ===== -->
+      <sc-if value="{{ isInicio }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:bg-fade .4s ease both">
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:38px;color:#16331c;line-height:1">Painel Central</h1>
+        <p style="color:#6b7669;font-size:15px;margin-top:8px">Acompanhe tudo o que está acontecendo na sua região</p>
+
+        <div style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e8e8e3;border-radius:11px;padding:4px 6px 4px 14px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c41c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+            <select value="{{ regiao }}" onChange="{{ onRegiao }}" style="border:none;background:transparent;font-family:'Public Sans',sans-serif;font-size:14px;color:#1c2b1f;padding:9px 8px;cursor:pointer;outline:none">
+              <sc-for list="{{ regiaoOptions }}" as="r" hint-placeholder-count="4"><option value="{{ r }}">{{ r }}</option></sc-for>
+            </select>
+          </div>
+          <button onClick="{{ detectarLocal }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e8e8e3;border-radius:11px;padding:12px 16px;font-family:'Public Sans',sans-serif;font-size:14px;color:#3a4a3d;font-weight:500;cursor:pointer" style-hover="border-color:#1f6b34;color:#1f6b34">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            Detectar localização
+          </button>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#9aa397;margin:30px 0 14px">DESTAQUES</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <sc-for list="{{ destaques }}" as="d" hint-placeholder-count="2">
+            <div style="background:#fdf8e3;border:1px solid #efe3ab;border-radius:14px;padding:22px 24px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:#a5852a;margin-bottom:14px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.4 2.3 7.4L12 16.9 5.7 21.2 8 13.8 2 9.4h7.6Z"/></svg> Fixado
+              </div>
+              <div style="display:flex;gap:8px;margin-bottom:12px">
+                <span style="{{ d.tagStyle }}">{{ d.tag }}</span>
+                <span style="{{ d.scopeStyle }}">{{ d.scope }}</span>
+              </div>
+              <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:19px;color:#16331c;line-height:1.25;margin-bottom:9px">{{ d.titulo }}</h3>
+              <p style="font-size:13.5px;color:#5c6657;line-height:1.55">{{ d.desc }}</p>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid rgba(165,133,42,.2)">
+                <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#8a8378"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>{{ d.comments }}</span>
+                <span style="font-size:12.5px;color:#8a8378">{{ d.data }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- feed tabs -->
+        <div style="display:flex;gap:6px;margin:26px 0 18px;background:#ecebe6;padding:5px;border-radius:13px;width:fit-content">
+          <button onClick="{{ tabMidia }}" style="{{ tabStyleMidia }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg> Mídia</button>
+          <button onClick="{{ tabPlano }}" style="{{ tabStylePlano }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/></svg> Plano</button>
+          <button onClick="{{ tabAgenda }}" style="{{ tabStyleAgenda }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg> Agenda</button>
+          <button onClick="{{ tabOpinioes }}" style="{{ tabStyleOpinioes }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg> Opiniões</button>
+          <button onClick="{{ tabCanal }}" style="{{ tabStyleCanal }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 7 16-3v16L4 17z"/><path d="M9 6v12"/></svg> Canal</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <sc-for list="{{ feed }}" as="f" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:14px;padding:22px 24px;transition:all .25s" style-hover="border-color:#cdd6cd;box-shadow:0 6px 20px rgba(20,58,28,.07);transform:translateY(-2px)">
+              <div style="display:flex;gap:8px;margin-bottom:12px">
+                <span style="{{ f.tagStyle }}">{{ f.tag }}</span>
+                <span style="{{ f.scopeStyle }}">{{ f.scope }}</span>
+              </div>
+              <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:18px;color:#16331c;line-height:1.25;margin-bottom:9px">{{ f.titulo }}</h3>
+              <p style="font-size:13.5px;color:#5c6657;line-height:1.55">{{ f.desc }}</p>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:13px;border-top:1px solid #f0efe9">
+                <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#9aa397"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>{{ f.comments }}</span>
+                <span style="font-size:12.5px;color:#9aa397">{{ f.data }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== REGIÕES ===== -->
+      <sc-if value="{{ isRegioes }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:bg-fade .4s ease both">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+          <div>
+            <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:38px;color:#16331c;line-height:1">Regiões</h1>
+            <p style="color:#6b7669;font-size:15px;margin-top:8px">Regiões de Goiânia, setores, bairros e conselhos</p>
+          </div>
+          <button style="display:flex;align-items:center;gap:8px;background:#1f6b34;color:#fff;border:none;border-radius:11px;padding:13px 20px;font-family:'Public Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer" style-hover="background:#1a5c2c">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Nova Região
+          </button>
+        </div>
+
+        <div style="display:flex;gap:6px;margin:24px 0 22px;background:#ecebe6;padding:5px;border-radius:13px;width:fit-content">
+          <button onClick="{{ regTabRegioes }}" style="{{ regStyleRegioes }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg> Regiões</button>
+          <button onClick="{{ regTabSetores }}" style="{{ regStyleSetores }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg> Setores</button>
+          <button onClick="{{ regTabBairros }}" style="{{ regStyleBairros }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l5-3 5 3v13M9 21v-4h2v4"/></svg> Bairros</button>
+          <button onClick="{{ regTabConselhos }}" style="{{ regStyleConselhos }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M17 5.5a3 3 0 0 1 0 5.5M21 20a5.5 5.5 0 0 0-4-5.3"/></svg> Conselhos</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <sc-for list="{{ regCards }}" as="c" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:20px;cursor:pointer;transition:all .25s;display:flex;align-items:flex-start;justify-content:space-between;gap:10px" style-hover="border-color:#1f6b34;box-shadow:0 6px 20px rgba(20,58,28,.08);transform:translateY(-2px)">
+              <div>
+                <div style="font-family:'Spectral',serif;font-weight:700;font-size:16.5px;color:#16331c">{{ c.nome }}</div>
+                <div style="font-size:12.5px;color:#8a8b80;margin-top:4px">{{ c.sub }}</div>
+                <div style="font-size:13px;color:#5c6657;margin-top:12px;line-height:1.45">{{ c.desc }}</div>
+              </div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c2c8bf" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><path d="m9 6 6 6-6 6"/></svg>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fdf8e3;border:1px solid #efe3ab;border-radius:14px;padding:22px 24px;margin-top:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:9px;font-family:'Spectral',serif;font-weight:700;font-size:17px;color:#16331c">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f3c41c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+              Enquetes — {{ regContextLabel }}
+            </div>
+            <button style="display:flex;align-items:center;gap:8px;background:#1f6b34;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'Public Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer" style-hover="background:#1a5c2c"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Nova Enquete</button>
+          </div>
+          <div style="text-align:center;color:#a5852a;font-size:13.5px;padding:26px 0 8px">Nenhuma enquete criada para esta região ainda.</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== ENQUETES ===== -->
+      <sc-if value="{{ isEnquetes }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:bg-fade .4s ease both">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+          <div>
+            <h1 style="display:flex;align-items:center;gap:11px;font-family:'Spectral',serif;font-weight:700;font-size:38px;color:#16331c;line-height:1">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f3c41c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+              Enquetes
+            </h1>
+            <p style="color:#6b7669;font-size:15px;margin-top:8px">Participe e ajude a definir as prioridades da sua região</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e8e8e3;border-radius:11px;padding:11px 16px;font-size:13.5px;color:#5c6657"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f6b34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> {{ votedCount }} de {{ pollTotal }} respondidas</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:18px;margin-top:24px">
+          <sc-for list="{{ polls }}" as="p" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:14px;padding:24px 26px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px">
+                <div>
+                  <div style="display:flex;gap:8px;margin-bottom:11px">
+                    <span style="{{ p.tagStyle }}">{{ p.tag }}</span>
+                    <span style="font-size:11.5px;color:#9aa397;display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{{ p.prazo }}</span>
+                  </div>
+                  <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:20px;color:#16331c;line-height:1.25">{{ p.titulo }}</h3>
+                  <p style="font-size:13.5px;color:#5c6657;line-height:1.5;margin-top:7px;max-width:640px">{{ p.desc }}</p>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                  <div style="font-family:'Spectral',serif;font-weight:700;font-size:24px;color:#1f6b34;line-height:1">{{ p.totalLabel }}</div>
+                  <div style="font-size:11px;color:#9aa397;letter-spacing:.5px">VOTOS</div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:9px;margin-top:18px">
+                <sc-for list="{{ p.options }}" as="o" hint-placeholder-count="3">
+                  <button onClick="{{ o.onClick }}" style="{{ o.rowStyle }}">
+                    <div style="{{ o.fillStyle }}"></div>
+                    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;z-index:1">
+                      <span style="display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:#243528"><span style="{{ o.dotStyle }}"></span>{{ o.label }}</span>
+                      <span style="{{ o.pctStyle }}">{{ o.pctLabel }}</span>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="font-size:12px;color:#9aa397;margin-top:14px">Fonte: {{ p.fonte }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== RELATÓRIOS ===== -->
+      <sc-if value="{{ isRelatorios }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:bg-fade .4s ease both">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+          <div>
+            <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:38px;color:#16331c;line-height:1">Relatórios e Demandas</h1>
+            <p style="color:#6b7669;font-size:15px;margin-top:8px">Organize e acompanhe demandas da sua região</p>
+          </div>
+          <button style="display:flex;align-items:center;gap:8px;background:#1f6b34;color:#fff;border:none;border-radius:11px;padding:13px 20px;font-family:'Public Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer" style-hover="background:#1a5c2c">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Nova Demanda
+          </button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:20px">
+              <div style="display:flex;align-items:center;gap:9px;color:#9aa397;margin-bottom:12px"><span style="{{ s.iconWrap }}">{{ s.icon }}</span></div>
+              <div style="font-family:'Spectral',serif;font-weight:700;font-size:32px;color:#16331c;line-height:1">{{ s.value }}</div>
+              <div style="font-size:11.5px;font-weight:600;letter-spacing:1px;color:#9aa397;margin-top:6px">{{ s.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;gap:10px;margin:24px 0 18px;flex-wrap:wrap">
+          <button onClick="{{ filtTodos }}" style="{{ filtStyleTodos }}">Todos status</button>
+          <button onClick="{{ filtAberto }}" style="{{ filtStyleAberto }}">Aberto</button>
+          <button onClick="{{ filtAndamento }}" style="{{ filtStyleAndamento }}">Em Andamento</button>
+          <button onClick="{{ filtResolvido }}" style="{{ filtStyleResolvido }}">Resolvido</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ demands }}" as="d" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:18px">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+                  <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:17.5px;color:#16331c">{{ d.titulo }}</h3>
+                  <span style="{{ d.statusStyle }}">{{ d.status }}</span>
+                  <span style="{{ d.prioStyle }}">{{ d.prioridade }}</span>
+                </div>
+                <p style="font-size:13.5px;color:#5c6657;line-height:1.5;max-width:720px">{{ d.desc }}</p>
+                <div style="display:flex;align-items:center;gap:9px;margin-top:12px">
+                  <span style="font-size:11.5px;font-weight:600;color:#5c6657;background:#f0efe9;border-radius:7px;padding:4px 10px">{{ d.categoria }}</span>
+                  <span style="font-size:11.5px;font-weight:700;color:#5a4708;background:#f3c41c;border-radius:7px;padding:4px 10px">{{ d.regiao }}</span>
+                  <span style="font-size:12px;color:#9aa397">{{ d.data }}</span>
+                </div>
+              </div>
+              <select value="{{ d.status }}" onChange="{{ d.onStatus }}" style="border:1px solid #e0e0d9;border-radius:9px;padding:9px 12px;font-family:'Public Sans',sans-serif;font-size:13px;color:#3a4a3d;background:#fafaf7;cursor:pointer;outline:none;flex-shrink:0">
+                <option value="Aberto">Aberto</option>
+                <option value="Em Andamento">Em Andamento</option>
+                <option value="Resolvido">Resolvido</option>
+                <option value="Arquivado">Arquivado</option>
+              </select>
+            </div>
+          </sc-for>
+          <sc-if value="{{ demandsEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;color:#9aa397;font-size:14px;padding:40px;background:#fff;border:1px solid #e8e8e3;border-radius:13px">Nenhuma demanda neste filtro.</div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== REDE DE INDICAÇÃO / CONVITES ===== -->
+      <sc-if value="{{ isRede }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .4s ease both">
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:38px;color:#16331c;line-height:1">Rede de Indicação</h1>
+        <p style="color:#6b7669;font-size:15px;margin-top:8px">Convide apoiadores e acompanhe o alcance das suas indicações em Goiânia</p>
+
+        <div style="background:#143a1c;border-radius:18px;padding:30px 32px;margin-top:22px;position:relative;overflow:hidden;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+          <div style="position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(243,196,28,.14),transparent 70%);top:-130px;right:-60px;pointer-events:none"></div>
+          <div style="position:relative">
+            <div style="font-size:11.5px;letter-spacing:1.8px;color:#f3c41c;font-weight:600;margin-bottom:11px">SEU CÓDIGO DE CONVITE</div>
+            <div style="font-family:'Spectral',serif;font-weight:700;font-size:34px;letter-spacing:3px">{{ inviteCode }}</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);margin-top:9px;max-width:340px">Cada pessoa que entrar com o seu código fortalece a rede do seu bairro.</div>
+          </div>
+          <div style="position:relative;display:flex;gap:10px;flex-wrap:wrap">
+            <button onClick="{{ copyInvite }}" style="display:flex;align-items:center;gap:8px;background:#f3c41c;color:#143a1c;border:none;border-radius:11px;padding:13px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Public Sans',sans-serif" style-hover="background:#f7d046">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              {{ copyLabel }}
+            </button>
+            <button style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:11px;padding:13px 20px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Public Sans',sans-serif" style-hover="background:rgba(255,255,255,.2)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4M12 2v13"/></svg>
+              Compartilhar
+            </button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px">
+          <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:20px"><div style="font-family:'Spectral',serif;font-weight:700;font-size:32px;color:#1f6b34;line-height:1">{{ invAceitos }}</div><div style="font-size:12px;font-weight:600;letter-spacing:.6px;color:#9aa397;margin-top:6px">INDICAÇÕES ACEITAS</div></div>
+          <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:20px"><div style="font-family:'Spectral',serif;font-weight:700;font-size:32px;color:#b8860b;line-height:1">{{ invPendentes }}</div><div style="font-size:12px;font-weight:600;letter-spacing:.6px;color:#9aa397;margin-top:6px">PENDENTES</div></div>
+          <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:20px"><div style="font-family:'Spectral',serif;font-weight:700;font-size:32px;color:#16331c;line-height:1">{{ invTotal }}</div><div style="font-size:12px;font-weight:600;letter-spacing:.6px;color:#9aa397;margin-top:6px">TOTAL ENVIADAS</div></div>
+        </div>
+
+        <div style="background:#fdf8e3;border:1px solid #efe3ab;border-radius:14px;padding:22px 24px;margin-top:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+            <div style="display:flex;align-items:center;gap:9px;font-family:'Spectral',serif;font-weight:700;font-size:16px;color:#16331c"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f3c41c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 2.4 7.4H22l-6 4.4 2.3 7.4L12 16.9 5.7 21.2 8 13.8 2 9.4h7.6Z"/></svg> Meta: Líder de Bairro</div>
+            <div style="font-weight:700;font-size:14px;color:#a5852a">{{ invAceitos }} / {{ inviteGoal }}</div>
+          </div>
+          <div style="height:9px;background:#efe3ab;border-radius:999px;overflow:hidden"><div style="{{ inviteProgressStyle }}"></div></div>
+          <p style="font-size:13px;color:#8a6d12;margin-top:12px">Faltam poucas indicações para você se tornar Líder de Bairro e coordenar ações locais na sua região.</p>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#9aa397;margin:28px 0 14px">PESSOAS QUE VOCÊ INDICOU</div>
+        <div style="background:#fff;border:1px solid #e8e8e3;border-radius:14px;overflow:hidden">
+          <sc-for list="{{ invites }}" as="p" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 20px;border-bottom:1px solid #f0efe9">
+              <div style="width:40px;height:40px;border-radius:50%;background:#143a1c;color:#f3c41c;display:flex;align-items:center;justify-content:center;font-family:'Spectral',serif;font-weight:700;font-size:16px;flex-shrink:0">{{ p.initial }}</div>
+              <div style="flex:1"><div style="font-weight:600;font-size:14.5px;color:#243528">{{ p.nome }}</div><div style="font-size:12.5px;color:#8a8b80;margin-top:2px">{{ p.regiao }}</div></div>
+              <span style="{{ p.statusStyle }}">{{ p.status }}</span>
+              <span style="font-size:12px;color:#9aa397;width:54px;text-align:right">{{ p.data }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== TÓPICOS (LISTA) ===== -->
+      <sc-if value="{{ isTopicosList }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .4s ease both">
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:38px;color:#16331c;line-height:1">Tópicos de Discussão</h1>
+        <p style="color:#6b7669;font-size:15px;margin-top:8px">Conversas abertas por tema — cada uma com um período definido para participação</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px">
+          <sc-for list="{{ topics }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.onOpen }}" style="text-align:left;background:#fff;border:1px solid #e8e8e3;border-radius:16px;padding:22px 24px;cursor:pointer;font-family:'Public Sans',sans-serif;transition:all .25s;display:flex;flex-direction:column" style-hover="border-color:#1f6b34;box-shadow:0 8px 24px rgba(20,58,28,.08);transform:translateY(-3px)">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+                <span style="{{ t.catStyle }}">{{ t.cat }}</span>
+                <span style="font-size:12px;color:#9aa397">{{ t.regiao }}</span>
+              </div>
+              <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:19px;color:#16331c;line-height:1.25;margin-bottom:8px">{{ t.titulo }}</h3>
+              <p style="font-size:13px;color:#5c6657;line-height:1.5;margin-bottom:18px">{{ t.resumo }}</p>
+
+              <div style="background:#f7f7f3;border-radius:11px;padding:14px 16px;margin-top:auto">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <span style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#9aa397">PERÍODO DE DISCUSSÃO</span>
+                  <span style="{{ t.statusStyle }}">{{ t.statusLabel }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#5c6657;margin-bottom:9px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa397" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>{{ t.periodLabel }}</div>
+                <div style="height:6px;background:#e6e6e0;border-radius:999px;overflow:hidden"><div style="{{ t.progressFill }}"></div></div>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:15px">
+                <div style="display:flex;gap:16px;font-size:12.5px;color:#9aa397">
+                  <span style="display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M17 5.5a3 3 0 0 1 0 5.5"/></svg>{{ t.participantes }}</span>
+                  <span style="display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>{{ t.mensagens }}</span>
+                </div>
+                <span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;color:{{ t.ctaColor }}">{{ t.ctaLabel }} <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== TÓPICO (CONVERSA) ===== -->
+      <sc-if value="{{ isTopicThread }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .4s ease both;max-width:820px">
+        <button onClick="{{ backTopics }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;font-family:'Public Sans',sans-serif;font-size:13.5px;font-weight:600;color:#6b7669;padding:0;margin-bottom:18px" style-hover="color:#1f6b34">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg> Voltar aos tópicos
+        </button>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="{{ thread.catStyle }}">{{ thread.cat }}</span>
+          <span style="font-size:12.5px;color:#9aa397">{{ thread.regiao }}</span>
+        </div>
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:30px;color:#16331c;line-height:1.15">{{ thread.titulo }}</h1>
+
+        <!-- PERÍODO DE DISCUSSÃO -->
+        <div style="background:#fdf8e3;border:1px solid #efe3ab;border-radius:14px;padding:18px 22px;margin-top:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:11px">
+              <div style="width:38px;height:38px;border-radius:10px;background:#f3c41c;color:#143a1c;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+              <div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#a5852a">PERÍODO DE DISCUSSÃO</div>
+                <div style="font-family:'Spectral',serif;font-weight:700;font-size:17px;color:#16331c;margin-top:2px">{{ thread.periodLabel }}</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:700;font-size:14px;color:#8a6d12">{{ thread.countdown }}</div>
+              <div style="font-size:12px;color:#a5852a;margin-top:2px">{{ thread.participantes }} participantes · {{ thread.mensagens }} mensagens</div>
+            </div>
+          </div>
+          <div style="height:7px;background:#efe3ab;border-radius:999px;overflow:hidden;margin-top:14px"><div style="{{ thread.progressFill }}"></div></div>
+        </div>
+
+        <!-- MENSAGENS -->
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:24px">
+          <sc-for list="{{ thread.messages }}" as="m" hint-placeholder-count="4">
+            <div style="display:flex;gap:13px;align-items:flex-start">
+              <div style="{{ m.avatarStyle }}">{{ m.initial }}</div>
+              <div style="{{ m.bubbleStyle }}">
+                <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;flex-wrap:wrap">
+                  <span style="font-weight:700;font-size:14px;color:#16331c">{{ m.nome }}</span>
+                  <span style="font-size:11px;color:#9aa397">{{ m.role }}</span>
+                  <span style="font-size:11px;color:#bcc2b8;margin-left:auto">{{ m.time }}</span>
+                </div>
+                <p style="font-size:14px;color:#3a4a3d;line-height:1.55">{{ m.text }}</p>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- COMPOSER -->
+        <sc-if value="{{ threadOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="position:sticky;bottom:0;background:#f4f4f2;padding:18px 0 4px;margin-top:22px">
+          <div style="display:flex;gap:10px;align-items:flex-end;background:#fff;border:1px solid #e0e0d9;border-radius:14px;padding:10px 10px 10px 16px">
+            <input value="{{ message }}" onChange="{{ onMessage }}" placeholder="Escreva sua contribuição para a discussão…" style="flex:1;border:none;outline:none;background:transparent;font-family:'Public Sans',sans-serif;font-size:14px;color:#1c2b1f;padding:8px 0" />
+            <button onClick="{{ thread.onSend }}" style="display:flex;align-items:center;gap:7px;background:#1f6b34;color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:'Public Sans',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;flex-shrink:0" style-hover="background:#1a5c2c">Enviar <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ threadClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:11px;background:#eef0ee;border:1px solid #e0e2dd;border-radius:14px;padding:16px 20px;margin-top:22px;color:#6b7280">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          <span style="font-size:14px;font-weight:500">Esta discussão está encerrada. {{ thread.countdown }}. Obrigado por participar!</span>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===== PERFIL DO USUÁRIO ===== -->
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .4s ease both">
+        <div style="background:#143a1c;border-radius:18px;padding:30px 32px;position:relative;overflow:hidden;color:#fff;display:flex;align-items:center;gap:22px">
+          <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(243,196,28,.13),transparent 70%);top:-130px;right:-40px;pointer-events:none"></div>
+          <div style="width:84px;height:84px;border-radius:50%;background:#f3c41c;color:#143a1c;display:flex;align-items:center;justify-content:center;font-family:'Spectral',serif;font-weight:700;font-size:38px;flex-shrink:0;position:relative">{{ userInitial }}</div>
+          <div style="position:relative;flex:1">
+            <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:28px;line-height:1.1">{{ userName }}</h1>
+            <div style="font-size:14px;color:rgba(255,255,255,.72);margin-top:5px">Apoiador · Goiânia · {{ regLabel }}</div>
+          </div>
+          <button style="position:relative;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:11px;padding:11px 18px;font-family:'Public Sans',sans-serif;font-weight:600;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg> Editar perfil</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px">
+          <sc-for list="{{ profileStats }}" as="st" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e8e8e3;border-radius:13px;padding:20px;text-align:center"><div style="font-family:'Spectral',serif;font-weight:700;font-size:30px;color:#1f6b34;line-height:1">{{ st.value }}</div><div style="font-size:12px;font-weight:600;letter-spacing:.5px;color:#9aa397;margin-top:6px">{{ st.label }}</div></div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
+          <div style="background:#fff;border:1px solid #e8e8e3;border-radius:14px;padding:24px 26px">
+            <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:17px;color:#16331c;margin-bottom:16px">Informações</h3>
+            <sc-for list="{{ profileFields }}" as="f" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0efe9">
+                <span style="font-size:13px;color:#9aa397">{{ f.label }}</span>
+                <span style="font-size:14px;font-weight:600;color:#243528;text-align:right">{{ f.value }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#fff;border:1px solid #e8e8e3;border-radius:14px;padding:24px 26px">
+            <h3 style="font-family:'Spectral',serif;font-weight:700;font-size:17px;color:#16331c;margin-bottom:16px">Atividade recente</h3>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:13px;padding:9px 0">
+                  <span style="{{ a.iconWrap }}">{{ a.icon }}</span>
+                  <div style="flex:1"><div style="font-size:13.5px;color:#243528"><span style="color:#6b7669">{{ a.acao }}</span> · <b>{{ a.alvo }}</b></div></div>
+                  <span style="font-size:12px;color:#bcc2b8;flex-shrink:0">{{ a.time }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <button onClick="{{ doLogout }}" style="margin-top:18px;background:#fff;border:1px solid #f3d6d0;border-radius:13px;padding:13px 22px;color:#c0392b;font-family:'Public Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:9px" style-hover="background:#fdf2f0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg> Sair da conta</button>
+      </div>
+      </sc-if>
+
+      <!-- ===== PLACEHOLDER (Rádio, Reuniões) ===== -->
+      <sc-if value="{{ isPlaceholder }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:bg-fade .4s ease both;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:60vh">
+        <div style="width:74px;height:74px;border-radius:20px;background:#fdf8e3;border:1px solid #efe3ab;display:flex;align-items:center;justify-content:center;color:#f3c41c;margin-bottom:22px">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+        </div>
+        <h1 style="font-family:'Spectral',serif;font-weight:700;font-size:30px;color:#16331c">{{ phTitle }}</h1>
+        <p style="color:#6b7669;font-size:15px;margin-top:10px;max-width:380px;line-height:1.55">{{ phDesc }}</p>
+        <div style="margin-top:18px;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#a5852a;background:#fdf8e3;border:1px solid #efe3ab;border-radius:999px;padding:8px 18px">EM BREVE</div>
+      </div>
+      </sc-if>
+
+    </div>
+  </main>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'login',
+    nome: '', fone: '', code: '', loginError: '',
+    nav: 'inicio',
+    regiao: 'Selecione sua região',
+    panelTab: 'midia',
+    regTab: 'regioes',
+    relFilter: 'todos',
+    votes: {},
+    statusOverride: {},
+    topicView: null,
+    message: '',
+    localMessages: {},
+    copied: false,
+  };
+
+  regioes = ['Selecione sua região','Região Centro','Região Sul','Região Sudoeste','Região Oeste','Região Norte','Região Leste','Região Campinas','Região Mendanha','Região Macambira','Aparecida de Goiânia','Senador Canedo','Trindade'];
+
+  destaquesData = [
+    { tag:'Mídia Institucional', scope:'Goiás', titulo:'Lançamento do programa de participação popular', desc:'Foi lançado hoje o programa que leva consultas públicas para todas as regiões de Goiânia. Cada bairro será convocado a opinar sobre as obras prioritárias.', comments:'12', data:'24 jun 2026' },
+    { tag:'Plano de Governo', scope:'Goiás', titulo:'Diretrizes do Plano de Goiânia 2026', desc:'As principais diretrizes incluem mobilidade urbana no Eixo Anhanguera, saúde nos bairros, educação em tempo integral e geração de emprego no interior.', comments:'27', data:'22 jun 2026' },
+  ];
+
+  feedByTab = {
+    midia: [
+      { tag:'Mídia Institucional', scope:'Goiás', titulo:'Vídeo institucional — Quem somos', desc:'Novo vídeo publicado nas redes sociais. Compartilhe com sua rede de contatos para ampliar o alcance da nossa mensagem em Goiânia.', comments:'8', data:'23 jun 2026' },
+      { tag:'Mídia Institucional', scope:'Região Sul', titulo:'Mutirão de saúde no Setor Pedro Ludovico', desc:'Cobertura do mutirão que atendeu mais de 400 famílias com consultas e exames gratuitos no fim de semana.', comments:'15', data:'21 jun 2026' },
+    ],
+    plano: [
+      { tag:'Plano de Governo', scope:'Goiás', titulo:'Eixo Anhanguera: requalificação do BRT', desc:'Proposta de modernização das estações e ampliação da frota para reduzir o tempo de deslocamento na capital.', comments:'31', data:'20 jun 2026' },
+      { tag:'Plano de Governo', scope:'Região Norte', titulo:'Creches em tempo integral', desc:'Meta de 10 novas unidades nas regiões Norte e Noroeste de Goiânia até o fim do mandato.', comments:'19', data:'18 jun 2026' },
+    ],
+    agenda: [
+      { tag:'Agenda', scope:'Região Centro', titulo:'Audiência pública — Mercado Central', desc:'Encontro aberto à população para discutir a revitalização do Mercado Central. Quinta, 19h, no auditório municipal.', comments:'6', data:'27 jun 2026' },
+      { tag:'Agenda', scope:'Aparecida de Goiânia', titulo:'Visita técnica ao Jardim Olímpico', desc:'Vistoria das obras de drenagem com lideranças locais e moradores da região.', comments:'4', data:'29 jun 2026' },
+    ],
+    opinioes: [
+      { tag:'Opiniões', scope:'Região Oeste', titulo:'Moradores pedem mais iluminação', desc:'Relatos crescentes sobre falta de iluminação pública em vias do Setor Oeste. Tema entrou na pauta de prioridades.', comments:'42', data:'19 jun 2026' },
+      { tag:'Opiniões', scope:'Goiás', titulo:'Transporte é a maior preocupação', desc:'Levantamento aponta mobilidade urbana como tema mais citado pelos apoiadores neste mês.', comments:'58', data:'17 jun 2026' },
+    ],
+    canal: [
+      { tag:'Canal Oficial', scope:'Goiás', titulo:'Transmissão ao vivo — Prestação de contas', desc:'Acompanhe a prestação de contas trimestral do mandato direto pelo canal oficial. Participe pelo chat.', comments:'73', data:'30 jun 2026' },
+      { tag:'Canal Oficial', scope:'Região Sul', titulo:'Bastidores da agenda da semana', desc:'Conteúdo exclusivo mostrando os encontros com lideranças comunitárias da Região Sul.', comments:'11', data:'16 jun 2026' },
+    ],
+  };
+
+  regCardsByTab = {
+    regioes: [
+      { nome:'Região Centro', sub:'Goiânia · Ana Ribeiro', desc:'Coordenação da região central de Goiânia' },
+      { nome:'Região Sul', sub:'Goiânia · Carlos Mendes', desc:'Setores Bueno, Marista e Pedro Ludovico' },
+      { nome:'Região Sudoeste', sub:'Goiânia · Júlia Faria', desc:'Vila Pedroso, Jardim Curitiba e adjacências' },
+      { nome:'Região Norte', sub:'Goiânia · Pedro Oliveira', desc:'Setor Norte Ferroviário e Goiânia 2' },
+      { nome:'Região Oeste', sub:'Goiânia · Sandra Lima', desc:'Setor Oeste, Campinas e Cidade Jardim' },
+      { nome:'Região Leste', sub:'Goiânia · Rafael Souza', desc:'Jardim Goiás, Vila Nova e Aldeia do Vale' },
+    ],
+    setores: [
+      { nome:'Setor Bueno', sub:'Região Sul', desc:'Coordenação do Setor Bueno e entorno' },
+      { nome:'Setor Marista', sub:'Região Sul', desc:'Articulação local do Setor Marista' },
+      { nome:'Setor Oeste', sub:'Região Oeste', desc:'Coordenação do Setor Oeste' },
+      { nome:'Setor Campinas', sub:'Região Oeste', desc:'Polo histórico e comercial' },
+      { nome:'Jardim América', sub:'Região Sudoeste', desc:'Coordenação do Jardim América' },
+      { nome:'Setor Pedro Ludovico', sub:'Região Sul', desc:'Articulação do Setor Pedro Ludovico' },
+    ],
+    bairros: [
+      { nome:'Jardim Goiás', sub:'Região Leste', desc:'Liderança comunitária do Jardim Goiás' },
+      { nome:'Vila Nova', sub:'Região Leste', desc:'Coordenação de bairro da Vila Nova' },
+      { nome:'Jardim Curitiba', sub:'Região Sudoeste', desc:'Articulação do Jardim Curitiba' },
+      { nome:'Vila Pedroso', sub:'Região Sudoeste', desc:'Coordenação da Vila Pedroso' },
+      { nome:'Cidade Jardim', sub:'Região Oeste', desc:'Liderança da Cidade Jardim' },
+      { nome:'Goiânia 2', sub:'Região Norte', desc:'Coordenação do bairro Goiânia 2' },
+    ],
+    conselhos: [
+      { nome:'Conselho de Saúde — Goiânia', sub:'Goiás', desc:'Conselho municipal de saúde de Goiânia' },
+      { nome:'Conselho de Educação — GO', sub:'Goiás', desc:'Conselho regional para assuntos educacionais' },
+      { nome:'Conselho de Mobilidade', sub:'Goiânia', desc:'Pauta de transporte e Eixo Anhanguera' },
+    ],
+  };
+
+  regContextByTab = {
+    regioes:'Região Centro', setores:'Setor Bueno', bairros:'Jardim Goiás', conselhos:'Conselho de Saúde — Goiânia',
+  };
+
+  pollsData = [
+    { id:'p1', tag:'Mobilidade', prazo:'Encerra em 5 dias', titulo:'Qual deve ser a prioridade no Eixo Anhanguera?', desc:'O BRT da capital precisa de melhorias. Onde devemos concentrar o investimento primeiro?', fonte:'Consulta pública · Região Centro',
+      options:[ {label:'Ampliar a frota de ônibus', base:1240}, {label:'Modernizar as estações', base:860}, {label:'Criar novas linhas para o interior', base:1530}, {label:'Mais segurança nas paradas', base:640} ] },
+    { id:'p2', tag:'Prioridades', prazo:'Encerra em 12 dias', titulo:'Onde Goiânia deve investir primeiro em 2026?', desc:'Ajude a definir a principal área de investimento do mandato para o próximo ano.', fonte:'Pesquisa interna · Toda Goiânia',
+      options:[ {label:'Saúde nos bairros', base:2110}, {label:'Educação em tempo integral', base:1740}, {label:'Segurança pública', base:1980}, {label:'Mobilidade urbana', base:1520} ] },
+    { id:'p3', tag:'Região Centro', prazo:'Encerra em 3 dias', titulo:'Revitalização do Mercado Central: por onde começar?', desc:'A revitalização do Mercado Central é uma demanda antiga. Qual frente é mais urgente?', fonte:'Audiência pública · Região Centro',
+      options:[ {label:'Reforma da estrutura física', base:920}, {label:'Apoio aos pequenos comerciantes', base:1180}, {label:'Acessibilidade e banheiros', base:540} ] },
+  ];
+
+  demandsData = [
+    { id:'d1', titulo:'Falta de material na escola municipal', desc:'A Escola Municipal do Setor Norte Ferroviário está sem materiais didáticos básicos há 3 meses. Alunos e professores pedem providências urgentes.', categoria:'Educação', regiao:'R. Norte', data:'19/06/2026', status:'Aberto', prioridade:'Alta' },
+    { id:'d2', titulo:'Buracos na Avenida T-9', desc:'Trecho do Setor Bueno com vários buracos causando acidentes e danos a veículos. Precisa de recapeamento urgente.', categoria:'Infraestrutura', regiao:'R. Sul', data:'18/06/2026', status:'Em Andamento', prioridade:'Crítica' },
+    { id:'d3', titulo:'Iluminação precária no Jardim Curitiba', desc:'Diversas ruas do Jardim Curitiba estão sem iluminação pública, aumentando a sensação de insegurança à noite.', categoria:'Segurança', regiao:'R. Sudoeste', data:'17/06/2026', status:'Em Andamento', prioridade:'Média' },
+    { id:'d4', titulo:'Limpeza do Córrego Botafogo', desc:'Acúmulo de lixo e entulho às margens do Córrego Botafogo. Risco de enchente no período de chuvas em Goiânia.', categoria:'Meio Ambiente', regiao:'R. Centro', data:'15/06/2026', status:'Aberto', prioridade:'Alta' },
+    { id:'d5', titulo:'Relatório mensal de atividades — Região Sul', desc:'Relatório com todas as atividades realizadas no mês na Região Sul, incluindo reuniões, eventos e ações comunitárias.', categoria:'Coordenação Geral', regiao:'R. Sul', data:'14/06/2026', status:'Resolvido', prioridade:'Média' },
+  ];
+
+  inviteCode = 'GOIAS-7K4P-2026';
+  invitesData = [
+    { nome:'Marcos Antunes', regiao:'Setor Bueno', status:'Aceito', data:'21 jun' },
+    { nome:'Luana Ferreira', regiao:'Jardim Goiás', status:'Aceito', data:'20 jun' },
+    { nome:'Roberto Dias', regiao:'Setor Oeste', status:'Pendente', data:'19 jun' },
+    { nome:'Patrícia Gomes', regiao:'Aparecida de Goiânia', status:'Aceito', data:'18 jun' },
+    { nome:'Eduardo Lima', regiao:'Setor Norte Ferroviário', status:'Pendente', data:'17 jun' },
+    { nome:'Carla Mendonça', regiao:'Setor Marista', status:'Aceito', data:'15 jun' },
+  ];
+
+  topicsData = [
+    { id:'t1', cat:'Mobilidade', regiao:'Região Centro', titulo:'BRT do Eixo Anhanguera: o que priorizar?', resumo:'Discussão aberta sobre as melhorias mais urgentes no corredor. As contribuições vão direto para a equipe técnica do mandato.', inicio:'20 jun', fim:'30 jun', status:'aberta', dias:4, progresso:60, participantes:34, mensagens:128 },
+    { id:'t2', cat:'Saúde', regiao:'Região Sul', titulo:'Postos de saúde nos bairros: cobertura e horários', resumo:'Como ampliar o atendimento nos postos do Setor Pedro Ludovico e região. Período final de coleta de sugestões.', inicio:'18 jun', fim:'28 jun', status:'aberta', dias:2, progresso:80, participantes:51, mensagens:203 },
+    { id:'t3', cat:'Educação', regiao:'Goiás', titulo:'Educação em tempo integral: prós e contras', resumo:'Debate encerrado sobre a expansão do tempo integral na rede municipal. Veja o resumo das contribuições.', inicio:'01 jun', fim:'15 jun', status:'encerrada', dias:0, progresso:100, participantes:88, mensagens:341 },
+    { id:'t4', cat:'Segurança', regiao:'Região Oeste', titulo:'Iluminação e segurança no Setor Oeste', resumo:'Levantamento dos pontos críticos com a participação direta dos moradores da região.', inicio:'22 jun', fim:'02 jul', status:'aberta', dias:6, progresso:40, participantes:27, mensagens:74 },
+  ];
+  messagesByTopic = {
+    t1: [
+      { nome:'Ana Ribeiro', role:'Coordenadora Regional', time:'há 3 dias', text:'Abrimos a discussão sobre o Eixo Anhanguera. Queremos ouvir vocês: onde o investimento faz mais diferença no dia a dia?', color:'#1f6b34' },
+      { nome:'João Pereira', role:'Apoiador · Setor Central', time:'há 2 dias', text:'A frota nos horários de pico é o maior problema. Espero 25 minutos todo dia para ir trabalhar.', color:'#2563a8' },
+      { nome:'Equipe Técnica', role:'Mandato', time:'há 1 dia', text:'Obrigado pelos relatos. Já mapeamos 6 estações com maior lotação. Continuem enviando os horários críticos.', color:'#b8860b' },
+      { nome:'Mariana Costa', role:'Líder de Bairro', time:'há 5h', text:'No fim de linha falta segurança à noite. Iluminação e câmeras ajudariam muito quem chega tarde.', color:'#c0392b' },
+    ],
+    t2: [
+      { nome:'Carlos Mendes', role:'Coordenador · R. Sul', time:'há 4 dias', text:'Vamos discutir os horários dos postos. Muitos trabalhadores não conseguem ir durante o expediente.', color:'#1f6b34' },
+      { nome:'Patrícia Gomes', role:'Apoiadora', time:'há 2 dias', text:'Atendimento aos sábados seria ótimo. Hoje preciso faltar ao trabalho para levar meu filho.', color:'#2563a8' },
+      { nome:'Equipe Técnica', role:'Mandato', time:'há 20h', text:'Estamos estudando um turno estendido até 21h em 3 postos-piloto. Qual região priorizar?', color:'#b8860b' },
+    ],
+    t3: [
+      { nome:'Sandra Lima', role:'Coordenadora', time:'12 jun', text:'Encerramos com 341 mensagens. A maioria apoia o tempo integral, com ressalvas sobre transporte e merenda.', color:'#1f6b34' },
+      { nome:'Roberto Dias', role:'Apoiador', time:'10 jun', text:'Sou a favor, mas precisa garantir o transporte das crianças que moram longe.', color:'#2563a8' },
+    ],
+    t4: [
+      { nome:'Sandra Lima', role:'Coordenadora · R. Oeste', time:'há 3 dias', text:'Mapa colaborativo aberto: marquem as ruas com iluminação precária no Setor Oeste.', color:'#1f6b34' },
+      { nome:'Eduardo Lima', role:'Apoiador', time:'há 1 dia', text:'A Rua C-204 está totalmente escura. Já houve assaltos perto da praça.', color:'#2563a8' },
+    ],
+  };
+  activityData = [
+    { acao:'Votou na enquete', alvo:'Prioridade no Eixo Anhanguera', time:'há 2 horas', color:'#1f6b34', ic:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>' },
+    { acao:'Abriu uma demanda', alvo:'Buracos na Avenida T-9', time:'ontem', color:'#b8860b', ic:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>' },
+    { acao:'Participou do tópico', alvo:'Postos de saúde nos bairros', time:'há 3 dias', color:'#2563a8', ic:'<path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/>' },
+    { acao:'Indicou um apoiador', alvo:'Marcos Antunes', time:'há 5 dias', color:'#c0392b', ic:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M17 11l2 2 4-4"/>' },
+  ];
+
+  // ---- handlers
+  onNome = e => this.setState({ nome: e.target.value });
+  onFone = e => this.setState({ fone: e.target.value });
+  onCode = e => this.setState({ code: e.target.value, loginError:'' });
+  doLogin = () => {
+    const c = this.state.code.trim();
+    if (c.length < 4) { this.setState({ loginError:'Informe um código de convite válido.' }); return; }
+    this.setState({ screen:'app', loginError:'' });
+  };
+  doLogout = () => this.setState({ screen:'login', code:'' });
+
+  setNav = k => { const m=document.querySelector('main'); if(m)m.scrollTop=0; this.setState({ nav:k, topicView:null }); };
+  navInicio=()=>this.setNav('inicio'); navRegioes=()=>this.setNav('regioes'); navRede=()=>this.setNav('rede');
+  navEnquetes=()=>this.setNav('enquetes'); navRelatorios=()=>this.setNav('relatorios'); navRadio=()=>this.setNav('radio'); navReunioes=()=>this.setNav('reunioes');
+  navTopicos=()=>this.setNav('topicos'); navProfile=()=>this.setNav('profile');
+
+  openTopic = id => { const m=document.querySelector('main'); if(m)m.scrollTop=0; this.setState({ topicView:id }); };
+  backTopics = () => this.setState({ topicView:null });
+  onMessage = e => this.setState({ message:e.target.value });
+  sendMessage = (id) => {
+    const t=(this.state.message||'').trim(); if(!t) return;
+    this.setState(s=>({ localMessages:{ ...s.localMessages, [id]:[ ...(s.localMessages[id]||[]), { nome:(s.nome||'').trim()||'Você', role:'Você · Apoiador', time:'agora', text:t, color:'#143a1c', you:true } ] }, message:'' }));
+  };
+  copyInvite = () => { try{ navigator.clipboard && navigator.clipboard.writeText(this.inviteCode); }catch(e){} this.setState({ copied:true }); setTimeout(()=>this.setState({ copied:false }), 1800); };
+
+  onRegiao = e => this.setState({ regiao:e.target.value });
+  detectarLocal = () => this.setState({ regiao:'Região Centro' });
+
+  setTab = t => this.setState({ panelTab:t });
+  tabMidia=()=>this.setTab('midia'); tabPlano=()=>this.setTab('plano'); tabAgenda=()=>this.setTab('agenda'); tabOpinioes=()=>this.setTab('opinioes'); tabCanal=()=>this.setTab('canal');
+
+  setRegTab = t => this.setState({ regTab:t });
+  regTabRegioes=()=>this.setRegTab('regioes'); regTabSetores=()=>this.setRegTab('setores'); regTabBairros=()=>this.setRegTab('bairros'); regTabConselhos=()=>this.setRegTab('conselhos');
+
+  setFilt = f => this.setState({ relFilter:f });
+  filtTodos=()=>this.setFilt('todos'); filtAberto=()=>this.setFilt('Aberto'); filtAndamento=()=>this.setFilt('Em Andamento'); filtResolvido=()=>this.setFilt('Resolvido');
+
+  vote = (pid, idx) => this.setState(s => ({ votes: { ...s.votes, [pid]: idx } }));
+  setStatus = (id, val) => this.setState(s => ({ statusOverride: { ...s.statusOverride, [id]: val } }));
+
+  // ---- style helpers
+  navStyle(active){
+    return { display:'flex', alignItems:'center', gap:'12px', width:'100%', textAlign:'left', padding:'11px 14px', borderRadius:'11px', border:'none', cursor:'pointer',
+      fontFamily:"'Public Sans',sans-serif", fontSize:'14px', fontWeight: active?700:500,
+      background: active?'#f3c41c':'transparent', color: active?'#143a1c':'rgba(255,255,255,.78)', transition:'all .18s' };
+  }
+  pill(active){
+    return { display:'flex', alignItems:'center', gap:'7px', border:'none', cursor:'pointer', padding:'9px 16px', borderRadius:'9px',
+      fontFamily:"'Public Sans',sans-serif", fontSize:'13.5px', fontWeight:600, transition:'all .18s',
+      background: active?'#1f6b34':'transparent', color: active?'#fff':'#6b7669' };
+  }
+  chip(bg,color){ return { fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'999px', background:bg, color:color, whiteSpace:'nowrap' }; }
+  scopeChip(scope){
+    if(scope==='Goiás'||scope==='Nacional') return this.chip('#1f6b34','#fff');
+    return this.chip('#f3c41c','#5a4708');
+  }
+  statusChip(st){
+    const m={ 'Aberto':['#fbf3d6','#b8860b'], 'Em Andamento':['#e3f1e8','#1f6b34'], 'Resolvido':['#e6eef8','#2563a8'], 'Arquivado':['#eef0ee','#6b7280'] };
+    const [bg,c]=m[st]||m['Aberto']; return this.chip(bg,c);
+  }
+  prioChip(p){
+    const m={ 'Crítica':['#fbe9e6','#c0392b'], 'Alta':['#fbeede','#d9701f'], 'Média':['#fbf3d6','#b8860b'], 'Baixa':['#eef0ee','#6b7280'] };
+    const [bg,c]=m[p]||m['Média']; return this.chip(bg,c);
+  }
+
+  renderVals(){
+    const s = this.state;
+    const isApp = s.screen==='app';
+    const nav = s.nav;
+
+    // destaques
+    const destaques = this.destaquesData.map(d=>({ ...d, tagStyle:this.chip('#f0efe9','#5c6657'), scopeStyle:this.scopeChip(d.scope) }));
+    const feed = (this.feedByTab[s.panelTab]||[]).map(f=>({ ...f, tagStyle:this.chip('#f0efe9','#5c6657'), scopeStyle:this.scopeChip(f.scope) }));
+
+    // regioes
+    const regCards = (this.regCardsByTab[s.regTab]||[]);
+    const regContextLabel = this.regContextByTab[s.regTab];
+
+    // polls
+    let votedCount=0;
+    const polls = this.pollsData.map(p=>{
+      const voted = s.votes[p.id]!=null;
+      if(voted) votedCount++;
+      const counts = p.options.map((o,i)=> o.base + (s.votes[p.id]===i?1:0));
+      const total = counts.reduce((a,b)=>a+b,0);
+      const sel = s.votes[p.id];
+      const options = p.options.map((o,i)=>{
+        const pct = Math.round(counts[i]/total*100);
+        const isSel = sel===i;
+        return {
+          label:o.label, pctLabel: pct+'%',
+          onClick:()=>this.vote(p.id,i),
+          rowStyle:{ position:'relative', overflow:'hidden', display:'flex', alignItems:'center', width:'100%', textAlign:'left', padding:'13px 16px', borderRadius:'11px', cursor:'pointer',
+            border: isSel?'1.5px solid #1f6b34':'1px solid #e8e8e3', background:'#fafaf7', fontFamily:"'Public Sans',sans-serif", transition:'all .2s' },
+          fillStyle:{ position:'absolute', left:0, top:0, height:'100%', width:pct+'%', background: isSel?'rgba(31,107,52,.16)':'rgba(31,107,52,.07)', transition:'width .5s cubic-bezier(.2,.8,.2,1)', zIndex:0 },
+          dotStyle:{ width:'13px', height:'13px', borderRadius:'50%', flexShrink:0, border: isSel?'4px solid #1f6b34':'2px solid #c2c8bf', background:'#fff', boxSizing:'border-box' },
+          pctStyle:{ fontSize:'13.5px', fontWeight:700, color: isSel?'#1f6b34':'#8a8b80', fontFamily:"'Public Sans',sans-serif" },
+        };
+      });
+      return { id:p.id, tag:p.tag, tagStyle:this.chip('#e3f1e8','#1f6b34'), prazo:p.prazo, titulo:p.titulo, desc:p.desc, fonte:p.fonte,
+        totalLabel: total.toLocaleString('pt-BR'), options };
+    });
+
+    // demands + filter
+    const withStatus = this.demandsData.map(d=>({ ...d, status: s.statusOverride[d.id]||d.status }));
+    const demands = withStatus.filter(d=> s.relFilter==='todos'||d.status===s.relFilter).map(d=>({
+      ...d, statusStyle:this.statusChip(d.status), prioStyle:this.prioChip(d.prioridade), onStatus:(e)=>this.setStatus(d.id,e.target.value)
+    }));
+    const counts = { Aberto:0,'Em Andamento':0,Resolvido:0,Arquivado:0 };
+    withStatus.forEach(d=>{ counts[d.status] = (counts[d.status]||0)+1; });
+    const ico = (path)=> React.createElement('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round',dangerouslySetInnerHTML:{__html:path}});
+    const statIcon = (path,color)=>({ display:'inline-flex',width:'30px',height:'30px',borderRadius:'9px',alignItems:'center',justifyContent:'center' });
+    const stats = [
+      { label:'ABERTO', value:counts['Aberto'], icon:ico('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), iconWrap:{display:'inline-flex',width:'30px',height:'30px',borderRadius:'9px',alignItems:'center',justifyContent:'center',background:'#fbf3d6',color:'#b8860b'} },
+      { label:'EM ANDAMENTO', value:counts['Em Andamento'], icon:ico('<path d="M21 12a9 9 0 1 1-6.2-8.5"/><path d="M21 4v5h-5"/>'), iconWrap:{display:'inline-flex',width:'30px',height:'30px',borderRadius:'9px',alignItems:'center',justifyContent:'center',background:'#e3f1e8',color:'#1f6b34'} },
+      { label:'RESOLVIDO', value:counts['Resolvido'], icon:ico('<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>'), iconWrap:{display:'inline-flex',width:'30px',height:'30px',borderRadius:'9px',alignItems:'center',justifyContent:'center',background:'#e6eef8',color:'#2563a8'} },
+      { label:'ARQUIVADO', value:counts['Arquivado'], icon:ico('<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/>'), iconWrap:{display:'inline-flex',width:'30px',height:'30px',borderRadius:'9px',alignItems:'center',justifyContent:'center',background:'#eef0ee',color:'#6b7280'} },
+    ];
+
+    // placeholder
+    const phMap = {
+      rede:{ t:'Rede de Indicação', d:'Convide apoiadores, acompanhe sua rede e veja o alcance das suas indicações em cada região de Goiânia.' },
+      radio:{ t:'Rádio Peão IA', d:'Monitoramento inteligente alimentado por IA: acompanhe o sentimento da população sobre os principais temas de Goiânia.' },
+      reunioes:{ t:'Reuniões', d:'Agende e acompanhe reuniões com lideranças comunitárias, conselhos e coordenações regionais.' },
+    };
+    const ph = phMap[nav]||{t:'',d:''};
+
+    // ---- convites
+    let aceitos=0, pendentes=0;
+    this.invitesData.forEach(i=>{ if(i.status==='Aceito')aceitos++; else pendentes++; });
+    const invites = this.invitesData.map(i=>({ ...i, statusStyle: i.status==='Aceito'?this.chip('#e3f1e8','#1f6b34'):this.chip('#fbf3d6','#b8860b'), initial:(i.nome[0]||'?').toUpperCase() }));
+    const inviteGoal = 10;
+    const inviteProgress = Math.min(100, Math.round(aceitos/inviteGoal*100));
+
+    // ---- topicos
+    const topics = this.topicsData.map(t=>{
+      const aberta = t.status==='aberta';
+      return { id:t.id, cat:t.cat, regiao:t.regiao, titulo:t.titulo, resumo:t.resumo, participantes:t.participantes, mensagens:t.mensagens,
+        catStyle:this.chip('#e3f1e8','#1f6b34'),
+        periodLabel: t.inicio+' – '+t.fim,
+        statusLabel: aberta ? ('Discussão aberta · faltam '+t.dias+(t.dias===1?' dia':' dias')) : 'Discussão encerrada',
+        statusStyle: aberta ? this.chip('#e3f1e8','#1f6b34') : this.chip('#eef0ee','#6b7280'),
+        progressFill:{ width:t.progresso+'%', height:'100%', borderRadius:'999px', background: aberta?'#1f6b34':'#c2c8bf', transition:'width .5s' },
+        ctaColor: aberta ? '#1f6b34' : '#8a8b80',
+        ctaLabel: aberta ? 'Entrar na conversa' : 'Ver resumo',
+        onOpen:()=>this.openTopic(t.id),
+      };
+    });
+    const ot = this.topicsData.find(t=>t.id===s.topicView);
+    let thread=null;
+    if(ot){
+      const aberta = ot.status==='aberta';
+      const base = this.messagesByTopic[ot.id]||[];
+      const local = s.localMessages[ot.id]||[];
+      const messages = [...base, ...local].map(m=>({ nome:m.nome, role:m.role, time:m.time, text:m.text, you:!!m.you,
+        initial:(m.nome&&m.nome[0]||'?').toUpperCase(),
+        avatarStyle:{ width:'40px',height:'40px',borderRadius:'50%',flexShrink:0,background:m.color||'#1f6b34',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'15px',fontFamily:"'Spectral',serif" },
+        bubbleStyle:{ background:m.you?'#e9f3ec':'#fff', border:m.you?'1px solid #cfe6d6':'1px solid #e8e8e3', borderRadius:'14px', padding:'12px 16px', flex:1 },
+      }));
+      thread = { id:ot.id, cat:ot.cat, regiao:ot.regiao, titulo:ot.titulo, aberta, messages,
+        participantes:ot.participantes, mensagens:ot.mensagens,
+        catStyle:this.chip('#e3f1e8','#1f6b34'),
+        periodLabel: ot.inicio+' a '+ot.fim+' de 2026',
+        countdown: aberta ? ('Faltam '+ot.dias+(ot.dias===1?' dia':' dias')+' para encerrar') : ('Encerrado em '+ot.fim),
+        progressFill:{ width:ot.progresso+'%', height:'100%', borderRadius:'999px', background:aberta?'#f3c41c':'#c2c8bf', transition:'width .5s' },
+        onSend:()=>this.sendMessage(ot.id),
+      };
+    }
+
+    // ---- profile
+    const activity = this.activityData.map(a=>({ acao:a.acao, alvo:a.alvo, time:a.time,
+      iconWrap:{ display:'inline-flex',width:'36px',height:'36px',borderRadius:'10px',alignItems:'center',justifyContent:'center',flexShrink:0,background:'#f4f4f2',color:a.color },
+      icon: ico(a.ic) }));
+    const nmp = (s.nome||'').trim()||'Apoiador Goiano';
+    const regLabel = (s.regiao && s.regiao!=='Selecione sua região') ? s.regiao : 'Região Centro';
+    const profileFields = [
+      { label:'Nome completo', value:nmp },
+      { label:'Telefone / WhatsApp', value:(s.fone||'').trim()||'(62) 9 9123-4567' },
+      { label:'Região', value:regLabel },
+      { label:'Função', value:'Apoiador' },
+    ];
+    const profileStats = [
+      { label:'Enquetes', value:votedCount+'/'+this.pollsData.length },
+      { label:'Demandas', value:'2' },
+      { label:'Tópicos', value:'3' },
+      { label:'Indicações', value:String(aceitos) },
+    ];
+
+    const nome = (s.nome||'').trim();
+    return {
+      isLogin: !isApp, isApp,
+      nome:s.nome, fone:s.fone, code:s.code, loginError:s.loginError,
+      onNome:this.onNome, onFone:this.onFone, onCode:this.onCode, doLogin:this.doLogin, doLogout:this.doLogout,
+      codeInputStyle:{ width:'100%', padding:'13px 15px', borderRadius:'11px', background:'#fff', fontSize:'14.5px', fontFamily:"'Public Sans',sans-serif", color:'#1c2b1f', letterSpacing:'1px', textTransform:'uppercase', border: s.loginError?'1.5px solid #c0392b':'1px solid #dcdcd5', animation: s.loginError?'bg-shake .4s':'none' },
+      errStyle:{ color:'#c0392b', fontSize:'12.5px', marginTop:'7px', minHeight:'16px', fontWeight:500 },
+
+      userName: nome||'Apoiador Goiano', userInitial:(nome? nome[0]: 'A').toUpperCase(),
+
+      navInicio:this.navInicio, navRegioes:this.navRegioes, navRede:this.navRede, navEnquetes:this.navEnquetes, navRelatorios:this.navRelatorios, navRadio:this.navRadio, navReunioes:this.navReunioes, navTopicos:this.navTopicos, navProfile:this.navProfile,
+      navStyleInicio:this.navStyle(nav==='inicio'), navStyleRegioes:this.navStyle(nav==='regioes'), navStyleRede:this.navStyle(nav==='rede'),
+      navStyleEnquetes:this.navStyle(nav==='enquetes'), navStyleRelatorios:this.navStyle(nav==='relatorios'), navStyleRadio:this.navStyle(nav==='radio'), navStyleReunioes:this.navStyle(nav==='reunioes'), navStyleTopicos:this.navStyle(nav==='topicos'),
+
+      isInicio:nav==='inicio', isRegioes:nav==='regioes', isEnquetes:nav==='enquetes', isRelatorios:nav==='relatorios',
+      isRede:nav==='rede', isTopicosList: nav==='topicos'&&!s.topicView, isTopicThread: nav==='topicos'&&!!s.topicView, isProfile:nav==='profile',
+      isPlaceholder: nav==='radio'||nav==='reunioes',
+      phTitle:ph.t, phDesc:ph.d,
+
+      inviteCode:this.inviteCode, copyInvite:this.copyInvite, copied:s.copied, copyLabel: s.copied?'Copiado!':'Copiar código',
+      invites, invAceitos:aceitos, invPendentes:pendentes, invTotal:this.invitesData.length, inviteGoal, inviteProgress,
+      inviteProgressStyle:{ width:inviteProgress+'%', height:'100%', borderRadius:'999px', background:'#f3c41c', transition:'width .5s' },
+
+      topics, thread, threadOpen: thread?thread.aberta:false, threadClosed: thread?!thread.aberta:false, backTopics:this.backTopics, message:s.message, onMessage:this.onMessage,
+
+      activity, profileFields, profileStats, navProfileChip:this.navProfile, regLabel,
+
+      regiao:s.regiao, onRegiao:this.onRegiao, regiaoOptions:this.regioes, detectarLocal:this.detectarLocal,
+      destaques, feed,
+      tabMidia:this.tabMidia, tabPlano:this.tabPlano, tabAgenda:this.tabAgenda, tabOpinioes:this.tabOpinioes, tabCanal:this.tabCanal,
+      tabStyleMidia:this.pill(s.panelTab==='midia'), tabStylePlano:this.pill(s.panelTab==='plano'), tabStyleAgenda:this.pill(s.panelTab==='agenda'), tabStyleOpinioes:this.pill(s.panelTab==='opinioes'), tabStyleCanal:this.pill(s.panelTab==='canal'),
+
+      regTabRegioes:this.regTabRegioes, regTabSetores:this.regTabSetores, regTabBairros:this.regTabBairros, regTabConselhos:this.regTabConselhos,
+      regStyleRegioes:this.pill(s.regTab==='regioes'), regStyleSetores:this.pill(s.regTab==='setores'), regStyleBairros:this.pill(s.regTab==='bairros'), regStyleConselhos:this.pill(s.regTab==='conselhos'),
+      regCards, regContextLabel,
+
+      polls, votedCount, pollTotal:this.pollsData.length,
+
+      filtTodos:this.filtTodos, filtAberto:this.filtAberto, filtAndamento:this.filtAndamento, filtResolvido:this.filtResolvido,
+      filtStyleTodos:this.pillOutline(s.relFilter==='todos'), filtStyleAberto:this.pillOutline(s.relFilter==='Aberto'), filtStyleAndamento:this.pillOutline(s.relFilter==='Em Andamento'), filtStyleResolvido:this.pillOutline(s.relFilter==='Resolvido'),
+      stats, demands, demandsEmpty: demands.length===0,
+    };
+  }
+
+  pillOutline(active){
+    return { border: active?'1.5px solid #1f6b34':'1px solid #e0e0d9', background: active?'#e3f1e8':'#fff', color: active?'#1f6b34':'#5c6657',
+      cursor:'pointer', padding:'9px 16px', borderRadius:'10px', fontFamily:"'Public Sans',sans-serif", fontSize:'13.5px', fontWeight:600, transition:'all .18s' };
+  }
+}
+</script>
+</body>
+</html>
