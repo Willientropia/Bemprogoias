@@ -9,11 +9,18 @@ import { VitePWA } from 'vite-plugin-pwa';
 // que o checkForAppUpdate compara com a tag da release.
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
+// O build do Electron carrega a interface de file://, onde caminho absoluto
+// (/assets/…) aponta para a raiz do disco e não acha nada — daí o base './'.
+// O service worker também sai fora: ele existe para dar offline ao PWA, e o
+// app empacotado já tem os arquivos em disco.
+const isElectronBuild = process.env.BUILD_TARGET === 'electron';
+
 export default defineConfig(() => {
   return {
+    base: isElectronBuild ? './' : '/',
     plugins: [
       react(),
-      VitePWA({
+      !isElectronBuild && VitePWA({
         registerType: 'prompt',
         injectRegister: false,
         includeAssets: ['icons/app-icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
@@ -49,7 +56,12 @@ export default defineConfig(() => {
         },
         devOptions: { enabled: true }
       })
-    ],
+    ].filter(Boolean),
+    resolve: {
+      alias: isElectronBuild
+        ? { 'virtual:pwa-register': new URL('./src/services/pwaRegisterStub.js', import.meta.url).pathname }
+        : {}
+    },
     define: { __APP_VERSION__: JSON.stringify(version) }
   };
 });

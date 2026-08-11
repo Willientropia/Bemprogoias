@@ -17,7 +17,10 @@
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.js\"",
     "check:versions": "node scripts/checkVersions.js",
     "cap:sync": "npm run check:versions && npm run build && cap sync android",
-    "android:debug": "npm run cap:sync && powershell.exe -ExecutionPolicy Bypass -File scripts/android-debug.ps1"
+    "android:debug": "npm run cap:sync && powershell.exe -ExecutionPolicy Bypass -File scripts/android-debug.ps1",
+    "build:electron": "node scripts/buildElectronRenderer.js",
+    "electron:dev": "electron .",
+    "electron:build": "npm run build:electron && electron-builder --win --publish never"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
@@ -41,6 +44,8 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
     "firebase-admin": "^14.2.0",
     "firebase-tools": "^15.26.0",
     "jsdom": "^29.1.1",
@@ -48,6 +53,41 @@
     "vite": "^8.2.0",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.10"
-  }
+  },
+  "main": "electron/main.cjs",
+  "description": "Painel de campanha Bem pro Goias",
+  "build": {
+    "appId": "br.com.bemprogoias.painel",
+    "productName": "Bem pro Goias",
+    "copyright": "Bem pro Goias",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "BemProGoias-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Bem pro Goias"
+    }
+  },
+  "author": "Bem pro Goias"
 }
-

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ROLES } from "./config/roles";
@@ -21,9 +21,15 @@ function RoleHome() {
   return <Navigate to="/login" replace />;
 }
 
+// No Electron a interface é carregada de um arquivo local (file://), e o
+// BrowserRouter dependeria do servidor responder qualquer rota com o index.
+// O HashRouter guarda a rota depois do "#", que funciona sem servidor —
+// mas só é usado no desktop, para as URLs do site continuarem limpas.
+const Router = window.electronAPI?.isElectron ? HashRouter : BrowserRouter;
+
 export default function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -64,6 +70,6 @@ export default function App() {
           <Route path="/" element={<RoleHome />} />
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </Router>
   );
 }
