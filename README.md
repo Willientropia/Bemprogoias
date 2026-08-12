@@ -34,6 +34,27 @@ npm run test:rules         # só Security Rules (roda no Firestore Emulator loca
 
 `test:rules` sobe o Firestore Emulator automaticamente e o derruba ao final — não precisa de projeto Firebase real nem de rede.
 
+## Aplicativo Windows (Electron)
+
+```bash
+npm run electron:dev     # abre o app apontando para o build local
+npm run electron:build   # gera o instalador em release/
+```
+
+O `electron:build` roda um build separado da interface (`BUILD_TARGET=electron`):
+caminhos relativos, porque o app carrega de `file://`, e sem service worker, já
+que os arquivos ficam no disco. Por isso o app desktop usa `HashRouter` — sem
+servidor, o `BrowserRouter` não conseguiria resolver as rotas.
+
+> **Se o build falhar com `EPERM: operation not permitted, rename ... win-unpacked.tmp`:**
+> é o antivírus segurando a pasta enquanto o electron-builder a renomeia. Ou se
+> adiciona a pasta do projeto às exclusões do Windows Defender, ou se gera fora
+> da árvore do projeto:
+>
+> ```bash
+> npx electron-builder --win --publish never -c.directories.output=C:/tmp/bpg-release
+> ```
+
 ## Campanha de demonstração
 
 Os 15 líderes fictícios do Painel do Gestor são persistidos no Firestore, no
