@@ -127,3 +127,47 @@ de `leaderId`, `validationStatus` e `createdAt`.
 - O handoff é do "Bem pro Brasil"; adaptei os textos para "Bem para Goiás" (título da
   mensagem do relatório e URL do rodapé). Os assets `logo-brasil-*.png` do handoff
   **não** foram usados — o painel segue usando a `logo-mark.png` já no projeto.
+
+---
+
+## Aplicativo Windows (Electron) — status
+
+**Feito e commitado:**
+- `electron/main.cjs` e `electron/preload.cjs` com `contextIsolation` e `sandbox`
+  ligados; links externos abrem no navegador do sistema e uma segunda execução
+  foca a janela existente em vez de abrir outro painel no mesmo Firestore.
+- Build separado da interface (`npm run build:electron`): base relativa, porque
+  `/assets` aponta para a raiz do disco em `file://`, e sem service worker.
+- `HashRouter` no desktop, escolhido em tempo de execução — o `BrowserRouter`
+  precisa de um servidor respondendo qualquer rota com o index.
+- `electron-builder` configurado para NSIS x64. **O instalador é gerado**
+  (`BemProGoias-Setup-1.0.7.exe`, ~101 MB) e contém `dist/` e `electron/`.
+
+**Impedimento — o app empacotado não abre:**
+
+O executável inicia e encerra em silêncio (exit 0). A causa é que o binário do
+Electron carrega o entry point no **Node embutido** em vez do processo
+principal: `require('electron')` devolve a string com o caminho do executável
+em vez do objeto da API, então `app` fica `undefined`.
+
+Isso **não é do código deste projeto** — reproduz com um app Electron mínimo
+(três linhas, `package.json` próprio, fora da árvore do repositório) usando o
+mesmo binário. Tentativas já feitas sem sucesso: reinstalar o pacote, rodar o
+`install.js` manualmente para reextrair o binário (225 MB, tamanho correto do
+Electron 43) e isolar o entry num sub-package CommonJS.
+
+Próximos caminhos, em ordem de custo:
+1. Rodar `npx electron .` num terminal normal (fora do agente) — o ambiente do
+   shell pode ser o fator.
+2. Limpar o cache de download (`%LOCALAPPDATA%\electron\Cache`) e reinstalar.
+3. Testar outra versão maior (`electron@37`, por exemplo).
+4. Verificar bloqueio do antivírus, que já causou o `EPERM` no empacotamento.
+
+**Armadilha do empacotamento (resolvida, mas vale saber):** o electron-builder
+respeita o `.gitignore`, onde `dist` está listado. O primeiro pacote saiu sem a
+interface e sem o processo principal. Por isso `build.files` começa com
+`"!**/*"` e inclui explicitamente o que entra.
+
+**EPERM ao gerar o instalador:** o Windows Defender segura a pasta durante o
+rename de `win-unpacked.tmp`. Gerar fora da árvore do projeto contorna:
+`npx electron-builder --win --publish never -c.directories.output=C:/tmp/bpg-release`
