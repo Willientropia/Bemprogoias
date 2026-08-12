@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require("electron");
+const { app, BrowserWindow, screen, shell } = require("electron");
 const path = require("node:path");
 
 // Em desenvolvimento a janela aponta para o dev server do Vite (com HMR);
@@ -6,11 +6,32 @@ const path = require("node:path");
 const DEV_SERVER_URL = process.env.ELECTRON_DEV_SERVER_URL;
 const isDev = Boolean(DEV_SERVER_URL);
 
+// O painel troca para o layout empilhado (mobile) abaixo de 1100px de LARGURA
+// CSS — que não é a largura em pixels da tela. Num monitor 1536x960 a 125% de
+// escala, sobram ~1229px de CSS; uma janela pedindo 1440 não cabe, o Windows
+// encolhe, e o painel cai no breakpoint achando que está num celular.
+const PAINEL_LARGURA_IDEAL = 1440;
+const PAINEL_ALTURA_IDEAL = 900;
+
+function tamanhoInicial() {
+  // workAreaSize já vem em pixels independentes de dispositivo (o mesmo
+  // sistema de medida do CSS), então dá para comparar direto com o breakpoint.
+  const { workAreaSize } = screen.getPrimaryDisplay();
+  return {
+    width: Math.min(PAINEL_LARGURA_IDEAL, workAreaSize.width),
+    height: Math.min(PAINEL_ALTURA_IDEAL, workAreaSize.height),
+  };
+}
+
 function createWindow() {
+  const { width, height } = tamanhoInicial();
+
   const window = new BrowserWindow({
-    width: 1440,
-    height: 900,
-    minWidth: 1024,
+    width,
+    height,
+    // Sem minWidth acima do breakpoint o gestor consegue arrastar a janela até
+    // um tamanho onde o painel vira layout de celular no desktop.
+    minWidth: 1120,
     minHeight: 680,
     backgroundColor: "#f4f4f2",
     show: false,

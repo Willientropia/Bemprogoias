@@ -143,25 +143,27 @@ de `leaderId`, `validationStatus` e `createdAt`.
 - `electron-builder` configurado para NSIS x64. **O instalador é gerado**
   (`BemProGoias-Setup-1.0.7.exe`, ~101 MB) e contém `dist/` e `electron/`.
 
-**Impedimento — o app empacotado não abre:**
+**`ELECTRON_RUN_AS_NODE` (resolvido — mas leia se o app não abrir):**
 
-O executável inicia e encerra em silêncio (exit 0). A causa é que o binário do
-Electron carrega o entry point no **Node embutido** em vez do processo
-principal: `require('electron')` devolve a string com o caminho do executável
-em vez do objeto da API, então `app` fica `undefined`.
+Durante o desenvolvimento o app abria e fechava em silêncio (exit 0), com
+`require('electron')` devolvendo a string do caminho do executável em vez da
+API, e `app` chegando `undefined`.
 
-Isso **não é do código deste projeto** — reproduz com um app Electron mínimo
-(três linhas, `package.json` próprio, fora da árvore do repositório) usando o
-mesmo binário. Tentativas já feitas sem sucesso: reinstalar o pacote, rodar o
-`install.js` manualmente para reextrair o binário (225 MB, tamanho correto do
-Electron 43) e isolar o entry num sub-package CommonJS.
+A causa era a variável de ambiente **`ELECTRON_RUN_AS_NODE=1`**, que instrui o
+binário do Electron a se comportar como Node puro: sem processo principal, sem
+janela, sem API. Ela vinha do terminal em que os comandos rodavam (o próprio
+Claude Code roda sobre Electron e a define para seus subprocessos), não do
+projeto.
 
-Próximos caminhos, em ordem de custo:
-1. Rodar `npx electron .` num terminal normal (fora do agente) — o ambiente do
-   shell pode ser o fator.
-2. Limpar o cache de download (`%LOCALAPPDATA%\electron\Cache`) e reinstalar.
-3. Testar outra versão maior (`electron@37`, por exemplo).
-4. Verificar bloqueio do antivírus, que já causou o `EPERM` no empacotamento.
+Como reconhecer: `electron --version` imprime a versão do **Node** (v24…) em
+vez da do Electron (v43…). Como contornar num terminal afetado:
+
+```bash
+env -u ELECTRON_RUN_AS_NODE npx electron .
+```
+
+Num terminal comum (PowerShell, cmd, Git Bash fora do agente) a variável não
+existe e nada disso é necessário.
 
 **Armadilha do empacotamento (resolvida, mas vale saber):** o electron-builder
 respeita o `.gitignore`, onde `dist` está listado. O primeiro pacote saiu sem a
