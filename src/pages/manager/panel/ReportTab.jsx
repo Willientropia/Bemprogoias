@@ -4,6 +4,8 @@ import { updateReportSettings } from "../../../services/campaigns";
 import { whatsappNumber, whatsappUrl } from "../../../utils/whatsapp";
 import { buildReportMessage } from "./buildReportMessage";
 import { Chip, KpiCard, SectionLabel } from "./PanelBits";
+// Ver comentário em Sidebar.jsx: caminho absoluto quebra no Electron (file://).
+import logoMark from "../../../assets/logo-mark.png";
 
 export default function ReportTab({ leaders, campaignId, campaign }) {
   const [horario, setHorario] = useState(campaign?.reportDeliveryTime ?? "21:00");
@@ -160,7 +162,7 @@ export default function ReportTab({ leaders, campaignId, campaign }) {
             <div style={{ background: "#e6ddd4", padding: "18px 16px 22px", minHeight: 430 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
                 <div style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--brand-900)", display: "flex", alignItems: "center", justifyContent: "center", padding: 3, flexShrink: 0 }}>
-                  <img src="/logo-mark.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  <img src={logoMark} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                 </div>
                 <div style={{ lineHeight: 1.2 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-strong)" }}>Relatório Expresso</div>

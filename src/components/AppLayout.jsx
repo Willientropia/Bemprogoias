@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "./Sidebar";
+// Ver comentário em Sidebar.jsx: caminho absoluto quebra no Electron (file://).
+import logoMark from "../assets/logo-mark.png";
 
 const SIDEBAR_STORAGE_KEY = "bemparagoias.sidebarCollapsed";
 
@@ -64,7 +66,7 @@ export function AppLayout({
               <path d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
-          <img src="/logo-mark.png" alt="" />
+          <img src={logoMark} alt="" />
           <span>Bem para Goiás</span>
         </div>
 

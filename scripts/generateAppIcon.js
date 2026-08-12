@@ -13,7 +13,7 @@ import sharp from "sharp";
 import pngToIco from "png-to-ico";
 
 const raiz = fileURLToPath(new URL("../", import.meta.url));
-const origem = path.join(raiz, "public", "logo-mark.png");
+const origem = path.join(raiz, "src", "assets", "logo-mark.png");
 const destinoDir = path.join(raiz, "build");
 const destinoIco = path.join(destinoDir, "icon.ico");
 

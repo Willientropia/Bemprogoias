@@ -1,6 +1,11 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ROLES } from "../config/roles";
+// Importadas como módulo, não por caminho absoluto: no Electron a página vem
+// de file://, onde "/logo.png" aponta para a raiz do disco e a imagem quebra.
+// Assim o Vite gera o caminho correto para cada alvo (web e desktop).
+import logoFull from "../assets/logo-full.png";
+import logoMark from "../assets/logo-mark.png";
 
 const ROLE_LABELS = {
   [ROLES.SUPER_ADMIN]: "Super Admin",
@@ -88,10 +93,10 @@ export function Sidebar({
         {/* Recolhido só cabe o emblema; expandido entra a logo completa, que
             já traz o nome e a assinatura desenhados na própria arte. */}
         <div className="sidebar-logo">
-          <img src="/logo-mark.png" alt="" />
+          <img src={logoMark} alt="" />
         </div>
         <div className="sidebar-brand-text">
-          <img className="sidebar-brand-logo" src="/logo-full.png" alt="Bem pro Goiás" />
+          <img className="sidebar-brand-logo" src={logoFull} alt="Bem pro Goiás" />
           <div className="sidebar-context-label">{contextLabel ?? "MANDATO COM PARTICIPAÇÃO PÚBLICA"}</div>
         </div>
         <button type="button" className="sidebar-mobile-close" aria-label="Fechar menu" onClick={onCloseMobile}>

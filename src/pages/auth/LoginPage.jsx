@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+// Ver comentário em Sidebar.jsx: caminho absoluto quebra no Electron (file://).
+import logoFull from "../../assets/logo-full.png";
 
 // O Firebase, com proteção de enumeração de e-mail ativa (padrão em projetos
 // novos), responde `auth/invalid-credential` tanto para senha errada quanto
@@ -78,7 +80,7 @@ export default function LoginPage() {
           }}
         >
           <img
-            src="/logo-full.png"
+            src={logoFull}
             alt="Bem pro Goiás — Mandato com participação pública"
             style={{ width: "100%", maxWidth: 248, height: "auto", display: "block" }}
           />
@@ -104,7 +106,7 @@ export default function LoginPage() {
       {/* Formulário */}
       <div className="login-form-panel" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--page-bg)" }}>
         <div style={{ width: "100%", maxWidth: 392 }}>
-          <img className="login-mobile-logo" src="/logo-full.png"
+          <img className="login-mobile-logo" src={logoFull}
             alt="Bem pro Goiás — Mandato com participação pública" />
           <h2 style={{ fontSize: 30, marginBottom: 6 }}>Entrar na plataforma</h2>
           <p style={{ fontSize: 14.5, marginBottom: 30 }}>Entre com a conta cadastrada no Firebase para acessar sua área da campanha.</p>
