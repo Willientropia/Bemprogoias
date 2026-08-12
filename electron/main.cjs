@@ -36,6 +36,9 @@ function createWindow() {
     backgroundColor: "#f4f4f2",
     show: false,
     title: "Bem pro Goiás — Painel",
+    // No app empacotado o ícone vem do executável; em desenvolvimento é
+    // preciso apontar o arquivo, senão a janela usa o ícone padrão do Electron.
+    icon: path.join(__dirname, "..", "build", "icon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
       // O painel só renderiza a própria interface; nada aqui precisa de acesso

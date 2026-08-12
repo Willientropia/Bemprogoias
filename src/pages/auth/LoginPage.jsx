@@ -63,18 +63,25 @@ export default function LoginPage() {
         <div style={{ position: "absolute", width: 520, height: 520, borderRadius: "50%", background: "radial-gradient(circle,rgba(243,196,28,.16),transparent 70%)", top: -160, right: -160 }} />
         <div style={{ position: "absolute", width: 420, height: 420, borderRadius: "50%", background: "radial-gradient(circle,rgba(39,122,61,.55),transparent 70%)", bottom: -150, left: -120 }} />
 
-        <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 13 }}>
-          <div style={{ width: 52, height: 52, background: "#fff", borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", padding: 5, flexShrink: 0 }}>
-            <img src="/logo-mark.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-          </div>
-          <div>
-            <div style={{ fontFamily: "var(--heading)", fontWeight: 700, fontSize: 17, letterSpacing: 0.5, lineHeight: 1 }}>
-              BEM PRO GOIÁS
-            </div>
-            <div style={{ fontSize: 8.5, letterSpacing: 1.6, color: "rgba(255,255,255,.6)", marginTop: 3 }}>
-              MANDATO COM PARTICIPAÇÃO PÚBLICA
-            </div>
-          </div>
+        {/* Cartão branco atrás da logo, como no design de referência: o texto
+            da arte tem contorno escuro e sumiria contra o verde do painel. */}
+        <div
+          style={{
+            position: "relative",
+            background: "#fff",
+            borderRadius: 22,
+            padding: "20px 26px",
+            boxShadow: "0 22px 60px rgba(0,0,0,.32)",
+            alignSelf: "flex-start",
+            maxWidth: 300,
+            flexShrink: 0,
+          }}
+        >
+          <img
+            src="/logo-full.png"
+            alt="Bem pro Goiás — Mandato com participação pública"
+            style={{ width: "100%", maxWidth: 248, height: "auto", display: "block" }}
+          />
         </div>
 
         <div style={{ position: "relative" }}>
@@ -97,8 +104,8 @@ export default function LoginPage() {
       {/* Formulário */}
       <div className="login-form-panel" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--page-bg)" }}>
         <div style={{ width: "100%", maxWidth: 392 }}>
-          <img className="login-mobile-logo" src="/logo-bem-pro-brasil.png"
-            alt="BEM pro Brasil — Mandato com participação pública" />
+          <img className="login-mobile-logo" src="/logo-full.png"
+            alt="Bem pro Goiás — Mandato com participação pública" />
           <h2 style={{ fontSize: 30, marginBottom: 6 }}>Entrar na plataforma</h2>
           <p style={{ fontSize: 14.5, marginBottom: 30 }}>Entre com a conta cadastrada no Firebase para acessar sua área da campanha.</p>
 

@@ -85,11 +85,13 @@ export function Sidebar({
   return (
     <aside className={`app-sidebar${mobileOpen ? " mobile-open" : ""}`} aria-label="Navegação principal">
       <div className="sidebar-brand">
+        {/* Recolhido só cabe o emblema; expandido entra a logo completa, que
+            já traz o nome e a assinatura desenhados na própria arte. */}
         <div className="sidebar-logo">
           <img src="/logo-mark.png" alt="" />
         </div>
         <div className="sidebar-brand-text">
-          <div className="sidebar-brand-name">BEM PRO GOIÁS</div>
+          <img className="sidebar-brand-logo" src="/logo-full.png" alt="Bem pro Goiás" />
           <div className="sidebar-context-label">{contextLabel ?? "MANDATO COM PARTICIPAÇÃO PÚBLICA"}</div>
         </div>
         <button type="button" className="sidebar-mobile-close" aria-label="Fechar menu" onClick={onCloseMobile}>

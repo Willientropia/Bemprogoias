@@ -441,6 +441,25 @@ button.modal-close svg {
   letter-spacing: 0.4px;
 }
 
+/* A logo completa já contém o nome e a assinatura da marca, então quando ela
+   aparece o emblema redondo ao lado sairia repetido.
+   O fundo branco é necessário: o texto da arte tem contorno escuro e fica
+   ilegível direto sobre o verde da barra — mesmo tratamento do design de
+   referência, que também apoia a logo num cartão claro. */
+.sidebar-brand-logo {
+  display: block;
+  width: 100%;
+  max-width: 168px;
+  height: auto;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.sidebar-brand:has(.sidebar-brand-logo) .sidebar-logo {
+  display: none;
+}
+
 .sidebar-context-label {
   margin-top: 4px;
   overflow: hidden;
@@ -591,6 +610,11 @@ button.sidebar-logout:hover {
 .sidebar-is-collapsed .sidebar-brand {
   justify-content: center;
   padding-inline: 0;
+}
+
+/* Recolhido, a logo completa fica ilegível: volta o emblema quadrado. */
+.sidebar-is-collapsed .sidebar-brand:has(.sidebar-brand-logo) .sidebar-logo {
+  display: flex;
 }
 
 .sidebar-is-collapsed .sidebar-brand-text,
