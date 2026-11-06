@@ -55,6 +55,27 @@ servidor, o `BrowserRouter` não conseguiria resolver as rotas.
 > npx electron-builder --win --publish never -c.directories.output=C:/tmp/bpg-release
 > ```
 
+## Publicar uma versão
+
+Uma tag `v*.*.*` dispara o [`release.yml`](.github/workflows/release.yml), que gera o instalador do Windows e o APK assinado e publica os dois na mesma release, com os commits desde a versão anterior como notas. O app Android avisa da atualização, e o Williehub atualiza o app de Windows.
+
+1. Suba a versão no `package.json` e o `versionName`/`versionCode` em `android/app/build.gradle`. O `npm run check:versions` confere se batem.
+2. Commite e publique a tag:
+
+   ```bash
+   git tag v1.0.8
+   git push origin main v1.0.8
+   ```
+
+**Configuração única**, em Settings → Secrets and variables → Actions:
+
+| Secret | Valor |
+|---|---|
+| `VITE_FIREBASE_*` (6) | os valores do `.env` |
+| `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_PASSWORD` | gerados por `scripts/chave-android.ps1` |
+
+O Android só atualiza um app por cima se o APK novo tiver **a mesma chave** do instalado. Os APKs v1.0.6 e v1.0.7 foram assinados com uma chave de debug (SHA-256 começando em `B0:8A:DB:7A`) que não está neste PC. Achando essa chave, use `-Existente`; com uma chave nova, quem já tem o app desinstala e instala de novo uma vez.
+
 ## Campanha de demonstração
 
 Os 15 líderes fictícios do Painel do Gestor são persistidos no Firestore, no
